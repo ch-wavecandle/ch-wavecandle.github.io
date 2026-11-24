@@ -8260,7 +8260,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
 
     // Si 15h00 est depasse : arreter de lire DonneesSource.txt et lire Historique/Synthese_cloture/synthese_cloture_reel_<DateDuJour>.csv
     if(tunisNow.heureStr >= "15:00:00"){
-      if(heureMarcheVerrouillee === "15:00:00" && lh.textContent === "15:00:00") return;
+      if(heureMarcheVerrouillee && lh.innerText === heureMarcheVerrouillee) return;
       const cheminsSynth = [
         "Historique/Synthese_cloture/synthese_cloture_reel_" + tunisNow.dateStr + ".csv",
         "Synthese_cloture/synthese_cloture_reel_" + tunisNow.dateStr + ".csv"
@@ -8271,7 +8271,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
           if(resSyn && resSyn.status === 200 && resSyn.text){
             const hSyn = extraireHeureConfigSystem(resSyn.text);
             if(hSyn && hSyn !== "--:--:--"){
-              heureMarcheVerrouillee = hSyn;
+              heureMarcheVerrouillee = hSyn; if(typeof heureMarcheDs !== "undefined") heureMarcheDs = hSyn; lh.innerText = hSyn;
               if(lh.textContent !== hSyn) lh.textContent = hSyn;
               return;
             }
@@ -8287,7 +8287,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       if(res && res.status === 200 && res.text){
         const hDs = extraireHeureConfigSystem(res.text);
         if(hDs && hDs !== "--:--:--"){
-          heureMarcheVerrouillee = hDs;
+          heureMarcheVerrouillee = hDs; if(typeof heureMarcheDs !== "undefined") heureMarcheDs = hDs; lh.innerText = hDs;
           if(lh.textContent !== hDs) lh.textContent = hDs;
         }
       }
