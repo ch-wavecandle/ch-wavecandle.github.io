@@ -8203,9 +8203,9 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     st.id = "ch-final-touch-css";
     st.textContent = `
       #chChartTickerBanner { background:transparent!important; border:none!important; box-shadow:none!important; color:#000000!important; font-weight:900!important; font-size:16px!important; letter-spacing:0.05em!important; top:6px!important; }
-      #boxHorlogeMarche { display:inline-flex!important; align-items:center!important; gap:4px!important; background:#0F172A!important; color:#E2E8F0!important; padding:0 6px!important; border-radius:3px!important; font-weight:700!important; }
+      #boxHorlogeMarche { display:inline-flex!important; align-items:center!important; gap:4px!important; background:#0F172A!important; color:#E2E8F0!important; padding:1px 7px!important; border-radius:4px!important; border:1px solid #334155!important; font-weight:700!important; height:20px!important; }
       #lblHorlogeMarche { color:#4ADE80!important; font-weight:800!important; }
-      #btnSimulerLive, #btnTouteSeance { display:none!important; }
+      #btnSimulerLive, #btnTouteSeance { display:none!important; visibility:hidden!important; }
     `;
     document.head.appendChild(st);
   }
@@ -8219,8 +8219,9 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       if(!res || res.status !== 200 || !res.text) return;
       const lines = res.text.split(/\r?\n/).filter(l => l.trim().length > 0);
       if(lines.length < 2) return;
-      const sep = lines.includes(";") ? ";" : "\t";
-      const hdr = lines.split(sep).map(c => c.trim().toLowerCase());
+      const firstLine = lines.at(0) || "";
+      const sep = firstLine.includes(";") ? ";" : "\t";
+      const hdr = firstLine.split(sep).map(c => c.trim().toLowerCase());
       const idxH = hdr.findIndex(c => c === "heure");
       const cfgLine = lines.slice().reverse().find(l => l.toUpperCase().startsWith("CONFIG_SYSTEM")) || lines[lines.length - 1];
       const cols = cfgLine.split(sep);
@@ -8242,7 +8243,13 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       b.style.setProperty("color", lum < 128 ? "#FFFFFF" : "#000000", "important");
     }
     const bh = document.getElementById("boxHorlogeMarche");
-    if(bh) bh.style.setProperty("display", "inline-flex", "important");
+    if(bh){
+      bh.style.setProperty("display", "inline-flex", "important");
+      bh.style.setProperty("background", "#0F172A", "important");
+      bh.style.setProperty("color", "#E2E8F0", "important");
+    }
+    const br = document.getElementById("btnSimulerLive");
+    if(br) br.style.setProperty("display", "none", "important");
     lireHeureConfigSystem();
   }
 
