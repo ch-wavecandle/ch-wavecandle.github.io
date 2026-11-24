@@ -8202,7 +8202,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       #chChartTickerBanner { background:transparent!important; border:none!important; box-shadow:none!important; color:#000000!important; font-weight:900!important; font-size:16px!important; letter-spacing:0.05em!important; top:6px!important; }
       #ch-statusbar-telemetry { background:#0F172A!important; color:#E2E8F0!important; border:1px solid #334155!important; }
       #boxHorlogeMarche { display:inline-flex!important; align-items:center!important; gap:4px!important; background:transparent!important; color:#E2E8F0!important; border:none!important; padding:0!important; font-weight:700!important; }
-      #lblHorlogeMarche { color:#4ADE80!important; font-weight:800!important; }
+      #lblHorlogeMarche { color:#15803D!important; font-weight:900!important; } body.dark-theme #lblHorlogeMarche { color:#4ADE80!important; }
       #btnSimulerLive, #btnTouteSeance, #selActionSeance { display:none!important; visibility:hidden!important; position:absolute!important; left:-9999px!important; }
     `;
     document.head.appendChild(st);
@@ -8229,7 +8229,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     const lh = document.getElementById("lblHorlogeMarche");
     if(!lh) return;
     const tk = (typeof sessionStorage !== "undefined" && typeof CLE_TK !== "undefined") ? (sessionStorage.getItem(CLE_TK) || "") : "";
-    const dInp = document.getElementById("txtDateSeance")?.value || new Date().toLocaleDateString("fr-FR");
+    const rawD = (document.getElementById("selDateReplay")?.value || document.getElementById("txtDateSeance")?.value || document.getElementById("txtBadgeLive")?.textContent || "").trim(); const mIso = rawD.match(/^(\d{4})-(\d{2})-(\d{2})$/); const mFr = rawD.match(/(\d{2})\/(\d{2})\/(\d{4})/); const dInp = mIso ? (mIso[3]+"/"+mIso[2]+"/"+mIso[1]) : (mFr ? mFr[0] : new Date().toLocaleDateString("fr-FR"));
     const dStr = dInp.replace(/\//g, "");
     const candidates = [];
 
