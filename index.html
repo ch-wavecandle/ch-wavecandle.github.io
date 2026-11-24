@@ -8268,8 +8268,8 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     const lh = document.getElementById("lblHorlogeMarche");
     if(!lh){ logDiagHorloge("Element #lblHorlogeMarche introuvable"); return; }
     if(typeof appelerGradioApi !== "function"){ logDiagHorloge("appelerGradioApi indisponible"); return; }
-    const tk = (typeof CLE_TK !== "undefined" ? sessionStorage.getItem(CLE_TK) : "") || "";
-    if(!tk) return;
+    let tk = (typeof CLE_TK !== "undefined" ? sessionStorage.getItem(CLE_TK) : "") || ""; if(!tk){ for(let i=0;i<sessionStorage.length;i++){ const v=sessionStorage.getItem(sessionStorage.key(i))||""; if(v.length>=16 && /^[a-f0-9_-]+$/i.test(v)){ tk=v; break; } } }
+    if(!tk){ logDiagHorloge("Token session introuvable"); return; }
 
     const tunisNow = getDateEtHeureTunis();
     const marcheFerme = (tunisNow.heureStr >= "15:00:00");
@@ -8355,7 +8355,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       new MutationObserver(() => { if(heureMarcheVerrouillee && lh.innerText !== heureMarcheVerrouillee) lh.innerText = heureMarcheVerrouillee; }).observe(lh, { childList: true, characterData: true, subtree: true });
     }
     const bh = document.getElementById("boxHorlogeMarche");
-    if(bh) bh.style.setProperty("display", "inline-flex", "important");
+    if(bh){ bh.removeAttribute("style"); bh.style.setProperty("display", "inline-flex", "important"); }
     const b = document.getElementById("chChartTickerBanner");
     if(b){
       const bg = getComputedStyle(document.body).backgroundColor || "";
