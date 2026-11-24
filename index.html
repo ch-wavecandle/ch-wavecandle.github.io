@@ -7853,5 +7853,45 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
   });
 })();
 </script>
+<script id="ch-header-save-one-line">
+(function(){
+  if(!document.getElementById("ch-save-line-css")){
+    const st = document.createElement("style");
+    st.id = "ch-save-line-css";
+    st.textContent = `
+      header select, .toolbar select, #controlsBar select {
+        min-width: 0 !important;
+        max-width: 175px !important;
+        padding-left: 5px !important;
+        padding-right: 18px !important;
+      }
+      header button, .toolbar button, #controlsBar button {
+        padding: 2px 6px !important;
+      }
+    `;
+    document.head.appendChild(st);
+  }
+
+  function mergeOrphanButtons(){
+    const btnAnalyses = document.getElementById("btnMesAnalyses");
+    const btnChat = Array.from(document.querySelectorAll("button")).find(b => /chat/i.test(b.textContent || ""));
+    if(btnAnalyses && btnChat && btnAnalyses.parentElement !== btnChat.parentElement){
+      const oldBar = btnAnalyses.parentElement;
+      const btnAide = Array.from(oldBar.querySelectorAll("button")).find(b => b !== btnAnalyses);
+      btnChat.parentElement.appendChild(btnAnalyses);
+      if(btnAide) btnChat.parentElement.appendChild(btnAide);
+      if(oldBar.children.length === 0) oldBar.style.display = "none";
+    }
+    if(typeof chart !== "undefined" && chart && typeof chart.resize === "function"){
+      try { chart.resize(); } catch(e){}
+    }
+  }
+
+  window.addEventListener("load", () => {
+    setTimeout(mergeOrphanButtons, 250);
+    setTimeout(mergeOrphanButtons, 800);
+  });
+})();
+</script>
 </body>
 </html>
