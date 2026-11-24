@@ -8264,12 +8264,17 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     }
   }
 
-  async function lireHeureConfigSystem(){
+    async function lireHeureConfigSystem(){
     const lh = document.getElementById("lblHorlogeMarche");
-    if(!lh){ logDiagHorloge("Element #lblHorlogeMarche introuvable dans le DOM"); return; }
+    if(!lh){ logDiagHorloge("Element #lblHorlogeMarche introuvable"); return; }
+    if(typeof appelerGradioApi !== "function"){ logDiagHorloge("appelerGradioApi indisponible"); return; }
+    const tk = (typeof CLE_TK !== "undefined" ? sessionStorage.getItem(CLE_TK) : "") || "";
+    if(!tk) return;
+
     const tunisNow = getDateEtHeureTunis();
     const marcheFerme = (tunisNow.heureStr >= "15:00:00");
 
+    // 1. Si le marche est ferme (>= 15h00) : lire exclusivement Synthese_cloture/synthese_cloture_reel_<Date>.csv via Gradio RPC
     if(marcheFerme){
       const dInp = (document.getElementById("selDateReplay")?.value || document.getElementById("txtDateSeance")?.value || "").trim();
       const mIso = dInp.match(/^(\d{4})-(\d{2})-(\d{2})$/);
@@ -8279,55 +8284,48 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       const rapports = [];
 
       for(const dt of datesEssai){
-        const urlSyn = "/bvmt_api/Synthese_cloture/synthese_cloture_reel_" + dt + ".csv?t=" + Date.now();
+        const pathSyn = "Synthese_cloture/synthese_cloture_reel_" + dt + ".csv";
         try {
-          const rSyn = await fetch(urlSyn);
-          if(!rSyn.ok){
-            rapports.push("Synthese(" + dt + "): HTTP " + rSyn.status);
+          const resSyn = await appelerGradioApi("bvmt_data", { token: tk, path: pathSyn });
+          if(!resSyn || resSyn.status !== 200 || !resSyn.text){
+            rapports.push(pathSyn + " -> status=" + (resSyn ? resSyn.status : "null") + " err=" + (resSyn && resSyn.err ? resSyn.err : ""));
             continue;
           }
-          const txtSyn = await rSyn.text();
-          if(!txtSyn || txtSyn.trim().length < 10){
-            rapports.push("Synthese(" + dt + "): fichier vide (" + (txtSyn ? txtSyn.length : 0) + " octets)");
-            continue;
-          }
-          const hSyn = extraireHeureConfigSystem(txtSyn);
+          const hSyn = extraireHeureConfigSystem(resSyn.text);
           if(hSyn && hSyn !== "--:--:--"){
             heureMarcheVerrouillee = hSyn;
+            if(typeof heureMarcheDs !== "undefined") heureMarcheDs = hSyn;
             lh.innerText = hSyn;
             return;
           } else {
-            const lastLn = txtSyn.split(/\r?\n/).filter(l => l.trim().length > 0).at(-1) || "";
-            rapports.push("Synthese(" + dt + "): colonne Heure introuvable | derniere ligne = " + lastLn.slice(0, 90));
+            const lastLn = resSyn.text.split(/\r?\n/).filter(l => l.trim().length > 0).at(-1) || "";
+            rapports.push(pathSyn + " -> colonne Heure introuvable | derniere ligne = " + lastLn.slice(0, 90));
           }
         } catch(e){
-          rapports.push("Synthese(" + dt + "): exception " + (e && e.message ? e.message : String(e)));
+          rapports.push(pathSyn + " -> exception " + (e && e.message ? e.message : String(e)));
         }
       }
       logDiagHorloge("Marche ferme (" + tunisNow.heureStr + " >= 15:00:00) -> " + rapports.join(" ; "));
       return;
     }
 
-    if(typeof appelerGradioApi === "function"){
-      try {
-        const tk = sessionStorage.getItem("ch_bvmt_token") || sessionStorage.getItem("CH_TOKEN") || "";
-        const res = await appelerGradioApi("bvmt_data", { token: tk, path: "DonneesSource.txt" });
-        if(!res || res.status !== 200 || !res.text){
-          logDiagHorloge("DonneesSource.txt RPC status=" + (res ? res.status : "null"));
-          return;
-        }
-        const hDs = extraireHeureConfigSystem(res.text);
-        if(hDs && hDs !== "--:--:--"){
-          heureMarcheVerrouillee = hDs;
-          lh.innerText = hDs;
-        } else {
-          logDiagHorloge("DonneesSource.txt: colonne Heure introuvable");
-        }
-      } catch(e){
-        logDiagHorloge("DonneesSource.txt exception: " + (e && e.message ? e.message : String(e)));
+    // 2. Si le marche est en cours (< 15h00) : lire DonneesSource.txt via Gradio RPC
+    try {
+      const res = await appelerGradioApi("bvmt_data", { token: tk, path: "DonneesSource.txt" });
+      if(!res || res.status !== 200 || !res.text){
+        logDiagHorloge("DonneesSource.txt -> status=" + (res ? res.status : "null"));
+        return;
       }
-    } else {
-      logDiagHorloge("appelerGradioApi indisponible");
+      const hDs = extraireHeureConfigSystem(res.text);
+      if(hDs && hDs !== "--:--:--"){
+        heureMarcheVerrouillee = hDs;
+        if(typeof heureMarcheDs !== "undefined") heureMarcheDs = hDs;
+        lh.innerText = hDs;
+      } else {
+        logDiagHorloge("DonneesSource.txt -> colonne Heure introuvable");
+      }
+    } catch(e){
+      logDiagHorloge("DonneesSource.txt exception: " + (e && e.message ? e.message : String(e)));
     }
   }
 
