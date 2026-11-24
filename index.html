@@ -3148,7 +3148,7 @@ document.getElementById('btnClearDessin').onclick = () => {
 
 let timerSimulLive = null, opsSimul = [], idxSimul = 0, tickersSimul = [], dateSimul = { date_iso: '', date_fr: '' };
 
-function arreterSimulationLive() {
+window.arreterSimulationLive = function arreterSimulationLive() {
   if (timerSimulLive) { clearInterval(timerSimulLive); timerSimulLive = null; }
   const btnS = document.getElementById('btnSimulerLive');
   if (btnS) btnS.innerHTML = '🎬 Replay Séance';
@@ -8490,8 +8490,12 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       bPlay.onclick  = () => { window.chReplayEnPause = false; setPlayState("PLAY"); if((typeof timerSimulLive === "undefined" || !timerSimulLive) && (btnReplay.innerText || "").includes("Replay")) btnReplay.click(); };
       bStop.onclick  = () => {
         window.chReplayEnPause = false;
-        if(typeof arreterSimulationLive === "function") arreterSimulationLive();
-        else if((btnReplay.innerText || "").includes("Stop")) btnReplay.click();
+        if(typeof window.arreterSimulationLive === "function"){
+          window.arreterSimulationLive();
+        } else {
+          if(typeof timerSimulLive !== "undefined" && timerSimulLive){ clearTimeout(timerSimulLive); clearInterval(timerSimulLive); timerSimulLive = null; }
+          if(btnReplay && /stop/i.test(btnReplay.textContent || "")) btnReplay.click();
+        }
         ctrlBox.style.display = "none";
         btnMain.dataset.directToute = "1";
         btnMain.textContent = "📊 Toute la séance";
