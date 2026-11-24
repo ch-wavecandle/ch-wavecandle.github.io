@@ -7853,34 +7853,31 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
   });
 })();
 </script>
+
 <script id="ch-header-save-one-line">
 (function(){
-  if(!document.getElementById("ch-save-line-css")){
-    const st = document.createElement("style");
-    st.id = "ch-save-line-css";
-    st.textContent = `
-      header select, .toolbar select, #controlsBar select {
-        min-width: 0 !important;
-        max-width: 175px !important;
-        padding-left: 5px !important;
-        padding-right: 18px !important;
+  function forceThreeHeaderLines(){
+    const btnAnalyses = document.getElementById("btnMesAnalyses") || Array.from(document.querySelectorAll("button")).find(b => /mes analyses/i.test(b.textContent || ""));
+    const btnAide = Array.from(document.querySelectorAll("button")).find(b => /aide\s*&\s*lexique/i.test(b.textContent || ""));
+    const btnChat = Array.from(document.querySelectorAll("button")).find(b => /\bchat\b/i.test(b.textContent || ""));
+    if(btnAnalyses && btnChat){
+      const oldRow = btnAnalyses.parentElement;
+      const targetRow = btnChat.parentElement;
+      if(oldRow && targetRow && oldRow !== targetRow){
+        targetRow.style.flexWrap = "nowrap";
+        targetRow.style.gap = "5px";
+        Array.from(targetRow.children).forEach(el => { if(el.style) el.style.marginLeft = "0"; });
+        targetRow.appendChild(btnAnalyses);
+        if(btnAide) targetRow.appendChild(btnAide);
+        if(oldRow.children.length === 0) oldRow.style.display = "none";
       }
-      header button, .toolbar button, #controlsBar button {
-        padding: 2px 6px !important;
-      }
-    `;
-    document.head.appendChild(st);
-  }
-
-  function mergeOrphanButtons(){
-    const btnAnalyses = document.getElementById("btnMesAnalyses");
-    const btnChat = Array.from(document.querySelectorAll("button")).find(b => /chat/i.test(b.textContent || ""));
-    if(btnAnalyses && btnChat && btnAnalyses.parentElement !== btnChat.parentElement){
-      const oldBar = btnAnalyses.parentElement;
-      const btnAide = Array.from(oldBar.querySelectorAll("button")).find(b => b !== btnAnalyses);
-      btnChat.parentElement.appendChild(btnAnalyses);
-      if(btnAide) btnChat.parentElement.appendChild(btnAide);
-      if(oldBar.children.length === 0) oldBar.style.display = "none";
+    }
+    const chEl = document.getElementById("mainChart");
+    const footerEl = document.getElementById("statusBar") || document.getElementById("statusText")?.parentElement;
+    if(chEl){
+      const topY = chEl.getBoundingClientRect().top;
+      const botH = footerEl ? footerEl.getBoundingClientRect().height : 28;
+      chEl.style.height = Math.max(280, Math.floor(window.innerHeight - topY - botH - 4)) + "px";
     }
     if(typeof chart !== "undefined" && chart && typeof chart.resize === "function"){
       try { chart.resize(); } catch(e){}
@@ -7888,8 +7885,9 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
   }
 
   window.addEventListener("load", () => {
-    setTimeout(mergeOrphanButtons, 250);
-    setTimeout(mergeOrphanButtons, 800);
+    setTimeout(forceThreeHeaderLines, 150);
+    setTimeout(forceThreeHeaderLines, 600);
+    setTimeout(forceThreeHeaderLines, 1400);
   });
 })();
 </script>
