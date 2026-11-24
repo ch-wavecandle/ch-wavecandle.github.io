@@ -8202,7 +8202,6 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     const st = document.createElement("style");
     st.id = "ch-final-touch-css";
     st.textContent = `
-      /* 1. Titre valeur sans fond, noir gras sur fond clair (et blanc gras si fond sombre) */
       #chChartTickerBanner {
         background: transparent !important;
         border: none !important;
@@ -8213,18 +8212,17 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
         letter-spacing: 0.05em !important;
         top: 6px !important;
       }
-      body.dark-theme #chChartTickerBanner,
-      body[data-theme="dark"] #chChartTickerBanner {
-        color: #F8FAFC !important;
-      }
-
-      /* 2. Horloge marche bien lisible dans la barre d'etat sombre */
-      #boxHorlogeMarche, #lblHorlogeMarche {
+      #boxHorlogeMarche {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 4px !important;
         color: #4ADE80 !important;
         font-weight: 800 !important;
       }
-
-      /* 3. Masquer definitivement les boutons Replay doublons du haut */
+      #lblHorlogeMarche {
+        color: #4ADE80 !important;
+        font-weight: 800 !important;
+      }
       #btnSimulerLive, #btnTouteSeance {
         display: none !important;
       }
@@ -8232,23 +8230,23 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     document.head.appendChild(st);
   }
 
-  // Adapter la couleur du titre si le theme sombre/clair est bascule via fond du body
   function syncBannerThemeColor(){
     const banner = document.getElementById("chChartTickerBanner");
     if(!banner) return;
     const bg = getComputedStyle(document.body).backgroundColor || "";
     const m = bg.match(/\d+/g);
     if(m && m.length >= 3){
-      const lum = (Number(m) * 299 + Number(m) * 587 + Number(m) * 114) / 1000;
-      banner.style.setProperty("color", lum < 128 ? "#F8FAFC" : "#000000", "important");
+      const lum = (Number(m[0]) * 299 + Number(m[1]) * 587 + Number(m[2]) * 114) / 1000;
+      banner.style.setProperty("color", lum < 128 ? "#FFFFFF" : "#000000", "important");
     } else {
       banner.style.setProperty("color", "#000000", "important");
     }
   }
 
-  // Lire toujours l'heure du marche depuis DonneesSource.txt produit par le serveur
   async function syncHorlogeDepuisDonneesSource(){
+    const boxH = document.getElementById("boxHorlogeMarche");
     const lblH = document.getElementById("lblHorlogeMarche");
+    if(boxH) boxH.style.setProperty("display", "inline-flex", "important");
     if(!lblH) return;
     const chemins = [
       "/bvmt_api/DonneesSource.txt",
@@ -8261,7 +8259,6 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
         if(!r.ok) continue;
         const txt = await r.text();
         if(!txt || txt.trim().length < 5) continue;
-        // Extraire le dernier horodatage HH:MM:SS present dans DonneesSource.txt
         const matches = txt.match(/\b([01]\d|2[0-3]):[0-5]\d:[0-5]\d\b/g);
         if(matches && matches.length > 0){
           lblH.textContent = matches[matches.length - 1];
@@ -8274,7 +8271,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
   window.addEventListener("load", () => {
     syncBannerThemeColor();
     syncHorlogeDepuisDonneesSource();
-    setInterval(syncBannerThemeColor, 1000);
+    setInterval(syncBannerThemeColor, 800);
     setInterval(syncHorlogeDepuisDonneesSource, 2000);
   });
 })();
