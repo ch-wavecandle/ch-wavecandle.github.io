@@ -8193,106 +8193,119 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
   });
 })();
 </script>
-<script id="ch-title-and-donneessource-clock">
+<style id="ch-master-ui-css">
+  /* 1. Titre valeur sans fond, noir gras sur fond clair / blanc gras sur fond sombre */
+  #chChartTickerBanner {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: #000000 !important;
+    font-weight: 900 !important;
+    font-size: 16px !important;
+    letter-spacing: 0.05em !important;
+    top: 6px !important;
+  }
+
+  /* 2. Masquage definitif des anciens boutons doublons */
+  #btnSimulerLive, #btnTouteSeance, #selActionSeance, #btnDossierLive, #btnFichiersLive {
+    display: none !important;
+    visibility: hidden !important;
+    position: absolute !important;
+    left: -9999px !important;
+  }
+
+  /* 3. Bouton et menu "Toute la seance" stables sur 1 seule ligne */
+  #btnMenuSeanceStable {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    height: 28px !important;
+    padding: 0 11px !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    vertical-align: middle !important;
+    white-space: nowrap !important;
+    font-weight: 700 !important;
+    border-radius: 5px !important;
+    background: #FFFFFF !important;
+    color: #0F172A !important;
+    border: 1px solid #CBD5E1 !important;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06) !important;
+  }
+  body.dark-theme #btnMenuSeanceStable {
+    background: #1E293B !important;
+    color: #F8FAFC !important;
+    border-color: #475569 !important;
+  }
+  #chSeanceMenuWrap .ch-pop-panel {
+    min-width: 265px !important;
+    width: max-content !important;
+    padding: 8px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 25px rgba(2, 6, 23, 0.35) !important;
+  }
+  #optMenuTouteSeance, #optMenuReplaySeance {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    width: 100% !important;
+    height: 32px !important;
+    padding: 0 12px !important;
+    white-space: nowrap !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    border-radius: 6px !important;
+    background: #1E293B !important;
+    color: #F8FAFC !important;
+    border: 1px solid #334155 !important;
+    margin-top: 4px !important;
+    cursor: pointer !important;
+  }
+  #optMenuTouteSeance:hover { background: #064E3B !important; border-color: #10B981 !important; color: #6EE7B7 !important; }
+  #optMenuReplaySeance:hover { background: #451A03 !important; border-color: #F59E0B !important; color: #FDE68A !important; }
+
+  /* 4. Barre d'etat du bas et horloge marche */
+  #ch-statusbar-telemetry {
+    background: #0F172A !important;
+    color: #E2E8F0 !important;
+    border: 1px solid #334155 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+  }
+  body.light-theme #boxHorlogeMarche, #ch-statusbar-telemetry #boxHorlogeMarche, #boxHorlogeMarche {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    color: #F8FAFC !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    box-shadow: none !important;
+  }
+  #lblHorlogeMarche {
+    color: #4ADE80 !important;
+    font-weight: 900 !important;
+    background: transparent !important;
+  }
+</style>
+<script id="ch-master-ui-orchestrator">
 (function(){
-  if(!document.getElementById("ch-final-touch-css")){
-    const st = document.createElement("style");
-    st.id = "ch-final-touch-css";
-    st.textContent = `
-      #chChartTickerBanner { background:transparent!important; border:none!important; box-shadow:none!important; color:#000000!important; font-weight:900!important; font-size:16px!important; letter-spacing:0.05em!important; top:6px!important; }
-      #ch-statusbar-telemetry { background:#0F172A!important; color:#E2E8F0!important; border:1px solid #334155!important; display:inline-flex!important; align-items:center!important; gap:10px!important; }
-      body.light-theme #boxHorlogeMarche, #ch-statusbar-telemetry #boxHorlogeMarche, #boxHorlogeMarche { display:inline-flex!important; align-items:center!important; gap:4px!important; background:transparent!important; background-color:transparent!important; color:#F8FAFC!important; border:none!important; padding:0!important; margin:0!important; font-weight:700!important; line-height:1!important; box-shadow:none!important; }
-      #lblHorlogeMarche { color:#4ADE80!important; font-weight:900!important; background:transparent!important; }
-      #btnMenuSeanceStable {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 6px !important;
-  height: 28px !important;
-  padding: 0 11px !important;
-  line-height: 1 !important;
-  margin: 0 !important;
-  vertical-align: middle !important;
-  white-space: nowrap !important;
-  font-weight: 700 !important;
-  border-radius: 5px !important;
-  background: #FFFFFF !important;
-  color: #0F172A !important;
-  border: 1px solid #CBD5E1 !important;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06) !important;
-}
-body.dark-theme #btnMenuSeanceStable {
-  background: #1E293B !important;
-  color: #F8FAFC !important;
-  border-color: #475569 !important;
-}
-#chSeanceMenuWrap .ch-pop-panel {
-  min-width: 240px !important;
-  padding: 8px !important;
-  border-radius: 8px !important;
-  box-shadow: 0 10px 25px rgba(2, 6, 23, 0.35) !important;
-}
-#optMenuTouteSeance, #optMenuReplaySeance {
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  width: 100% !important;
-  height: 32px !important;
-  padding: 0 10px !important;
-  white-space: nowrap !important;
-  font-size: 12px !important;
-  font-weight: 700 !important;
-  border-radius: 6px !important;
-  background: #1E293B !important;
-  color: #F8FAFC !important;
-  border: 1px solid #334155 !important;
-  margin-top: 4px !important;
-  cursor: pointer !important;
-}
-#optMenuTouteSeance:hover {
-  background: #064E3B !important;
-  border-color: #10B981 !important;
-  color: #6EE7B7 !important;
-}
-#optMenuReplaySeance:hover {
-  background: #451A03 !important;
-  border-color: #F59E0B !important;
-  color: #FDE68A !important;
-}
-      #btnSimulerLive, #btnTouteSeance, #selActionSeance { display:none!important; visibility:hidden!important; position:absolute!important; left:-9999px!important; }
-      #chHorlogeTraceBadge { display:inline-flex; align-items:center; gap:4px; background:#0F172A; color:#38BDF8; border:1px solid #334155; border-radius:4px; padding:1px 7px; font-size:10.5px; font-weight:700; max-width:260px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    `;
-    document.head.appendChild(st);
-  }
-
   let heureMarcheVerrouillee = "";
-
-  function setTraceHorloge(txt, isErr){
-    let b = document.getElementById("chHorlogeTraceBadge");
-    if(!b){
-      const diag = document.getElementById("diagBadge");
-      if(diag && diag.parentElement){
-        b = document.createElement("span");
-        b.id = "chHorlogeTraceBadge";
-        diag.insertAdjacentElement("afterend", b);
-      }
-    }
-    if(b){
-      b.textContent = txt;
-      b.title = txt;
-      b.style.color = isErr ? "#FCA5A5" : "#38BDF8";
-      b.style.borderColor = isErr ? "#EF4444" : "#334155";
-    }
-  }
+  let topBarOrganisee = false;
 
   function getDateEtHeureTunis(){
     try {
-      const now = new Date();
       const parts = new Intl.DateTimeFormat("fr-FR", {
         timeZone: "Africa/Tunis",
         year: "numeric", month: "2-digit", day: "2-digit",
         hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false
-      }).formatToParts(now);
+      }).formatToParts(new Date());
       const map = {};
       parts.forEach(pt => { map[pt.type] = pt.value; });
       return {
@@ -8339,7 +8352,7 @@ body.dark-theme #btnMenuSeanceStable {
 
   async function lireFichierViaGradio(relPath){
     const tk = getSessionToken();
-    if(!tk) return { status: 401, err: "Token absent" };
+    if(!tk) return null;
     if(typeof appelerGradioApi === "function"){
       return await appelerGradioApi("bvmt_data", { token: tk, path: relPath });
     }
@@ -8349,57 +8362,44 @@ body.dark-theme #btnMenuSeanceStable {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ data: [JSON.stringify({ token: tk, path: relPath })] })
     });
-    if(!rPost.ok) return { status: rPost.status, err: "POST " + rPost.status };
+    if(!rPost.ok) return null;
     const jPost = await rPost.json();
     const eid = jPost && jPost.event_id;
-    if(!eid) return { status: 500, err: "event_id absent" };
+    if(!eid) return null;
     const rSse = await fetch(base + "/gradio_api/call/bvmt_data/" + eid);
     const txtSse = await rSse.text();
     const dataLine = txtSse.split(/\r?\n/).reverse().find(l => l.startsWith("data:"));
-    if(!dataLine) return { status: 500, err: "SSE vide" };
+    if(!dataLine) return null;
     const arr = JSON.parse(dataLine.slice(5).trim());
     return JSON.parse(arr.at(0));
   }
+
   async function lireHeureConfigSystem(){
     const lh = document.getElementById("lblHorlogeMarche");
     if(!lh) return;
     const tunisNow = getDateEtHeureTunis();
-    const marcheFerme = (tunisNow.heureStr >= "15:00:00");
-
-    if(marcheFerme){
+    if(tunisNow.heureStr >= "15:00:00"){
       const dInp = (document.getElementById("selDateReplay")?.value || document.getElementById("txtDateSeance")?.value || "").trim();
       const mIso = dInp.match(/^(\d{4})-(\d{2})-(\d{2})$/);
       const mFr = dInp.match(/(\d{2})\/(\d{2})\/(\d{4})/);
       const dActive = mIso ? (mIso.at(3) + mIso.at(2) + mIso.at(1)) : (mFr ? (mFr.at(1) + mFr.at(2) + mFr.at(3)) : tunisNow.dateStr);
       const datesEssai = dActive === tunisNow.dateStr ? [tunisNow.dateStr] : [dActive, tunisNow.dateStr];
-      const errs = [];
-
       for(const dt of datesEssai){
-        const pathSyn = "Synthese_cloture/synthese_cloture_reel_" + dt + ".csv";
         try {
-          const resSyn = await lireFichierViaGradio(pathSyn);
-          if(!resSyn || resSyn.status !== 200 || !resSyn.text){
-            errs.push(pathSyn + " (" + (resSyn ? (resSyn.status + " " + (resSyn.err || "")) : "null") + ")");
-            continue;
+          const resSyn = await lireFichierViaGradio("Synthese_cloture/synthese_cloture_reel_" + dt + ".csv");
+          if(resSyn && resSyn.status === 200 && resSyn.text){
+            const hSyn = extraireHeureConfigSystem(resSyn.text);
+            if(hSyn && hSyn !== "--:--:--"){
+              heureMarcheVerrouillee = hSyn;
+              if(typeof heureMarcheDs !== "undefined") heureMarcheDs = hSyn;
+              lh.innerText = hSyn;
+              return;
+            }
           }
-          const hSyn = extraireHeureConfigSystem(resSyn.text);
-          if(hSyn && hSyn !== "--:--:--"){
-            heureMarcheVerrouillee = hSyn;
-            if(typeof heureMarcheDs !== "undefined") heureMarcheDs = hSyn;
-            lh.innerText = hSyn;
-            setTraceHorloge("📄 " + pathSyn.split("/").at(-1) + " → " + hSyn, false);
-            return;
-          } else {
-            errs.push(pathSyn + " (colonne Heure vide)");
-          }
-        } catch(e){
-          errs.push(pathSyn + " (" + (e.message || e) + ")");
-        }
+        } catch(e){}
       }
-      setTraceHorloge("⚠️ " + errs.join(" | "), true);
       return;
     }
-
     try {
       const res = await lireFichierViaGradio("DonneesSource.txt");
       if(res && res.status === 200 && res.text){
@@ -8408,60 +8408,68 @@ body.dark-theme #btnMenuSeanceStable {
           heureMarcheVerrouillee = hDs;
           if(typeof heureMarcheDs !== "undefined") heureMarcheDs = hDs;
           lh.innerText = hDs;
-          setTraceHorloge("📄 DonneesSource.txt → " + hDs, false);
-          return;
         }
       }
-      setTraceHorloge("⚠️ DonneesSource.txt (" + (res ? res.status : "null") + ")", true);
-    } catch(e){
-      setTraceHorloge("⚠️ DonneesSource.txt (" + (e.message || e) + ")", true);
-    }
+    } catch(e){}
   }
 
-  function setupMenuSeanceStable(){
-    const selOld = document.getElementById("selActionSeance");
+  function organiserBarreSuperieureUneFois(){
+    if(topBarOrganisee) return;
     const btnReplay = document.getElementById("btnSimulerLive");
     const btnToute = document.getElementById("btnTouteSeance");
-    if(!btnReplay || !btnToute || document.getElementById("chSeanceMenuWrap")) return;
-    const wrap = document.createElement("div"); wrap.id = "chSeanceMenuWrap"; wrap.className = "ch-pop-wrap";
-    const btnMain = document.createElement("button"); btnMain.id = "btnMenuSeanceStable"; btnMain.type = "button"; btnMain.className = "btn-action";
-    btnMain.style.cssText = "display:inline-flex;align-items:center;justify-content:center;gap:5px;height:26px;padding:0 10px;line-height:24px;border-color:#FFD700;color:#FFD700;font-weight:700;";
-    btnMain.textContent = "📊 Toute la séance ▾";
-    const panel = document.createElement("div"); panel.className = "ch-pop-panel"; panel.style.minWidth = "265px"; panel.style.width = "max-content";
-    panel.innerHTML = '<div class="ch-pop-sec-title">Mode de lecture séance</div><button type="button" id="optMenuTouteSeance" style="text-align:left;border-color:#00FF66;color:#00FF66;">📊 Toute la séance</button><button type="button" id="optMenuReplaySeance" style="text-align:left;border-color:#FFD700;color:#FFD700;">🎬 Replay Séance (Tick/Tick)</button>';
-    wrap.appendChild(btnMain); wrap.appendChild(panel);
-    (selOld || btnReplay).insertAdjacentElement("beforebegin", wrap);
-    btnMain.onclick = e => { e.stopPropagation(); document.querySelectorAll(".ch-pop-panel").forEach(p => { if(p !== panel) p.classList.remove("open"); }); panel.classList.toggle("open"); };
-    panel.onclick = e => e.stopPropagation();
-    document.addEventListener("click", () => panel.classList.remove("open"));
-    document.getElementById("optMenuTouteSeance").onclick = () => { panel.classList.remove("open"); btnMain.textContent = "📊 Toute la séance ▾";  btnToute.click(); };
-    document.getElementById("optMenuReplaySeance").onclick = () => { panel.classList.remove("open"); btnMain.textContent = "🎬 Replay Séance ▾";  btnReplay.click(); };
-  }
+    if(!btnReplay || !btnToute) return;
 
-  function syncAll(){
-    setupMenuSeanceStable();
-    // Deplacer "Autres" et "?" juste a droite de "Camembert" sur la 1ere ligne
+    // 1. Creer le menu Seance stable (une seule fois)
+    if(!document.getElementById("chSeanceMenuWrap")){
+      const wrap = document.createElement("div");
+      wrap.id = "chSeanceMenuWrap";
+      wrap.className = "ch-pop-wrap";
+      const btnMain = document.createElement("button");
+      btnMain.id = "btnMenuSeanceStable";
+      btnMain.type = "button";
+      btnMain.textContent = "📊 Toute la séance ▾";
+      const panel = document.createElement("div");
+      panel.className = "ch-pop-panel";
+      panel.innerHTML = '<div class="ch-pop-sec-title">Mode de lecture séance</div><button type="button" id="optMenuTouteSeance">📊 Toute la séance</button><button type="button" id="optMenuReplaySeance">🎬 Replay Séance (Tick/Tick)</button>';
+      wrap.appendChild(btnMain);
+      wrap.appendChild(panel);
+      btnReplay.insertAdjacentElement("beforebegin", wrap);
+
+      btnMain.onclick = e => {
+        e.stopPropagation();
+        document.querySelectorAll(".ch-pop-panel").forEach(p => { if(p !== panel) p.classList.remove("open"); });
+        panel.classList.toggle("open");
+      };
+      panel.onclick = e => e.stopPropagation();
+      document.addEventListener("click", () => panel.classList.remove("open"));
+      document.getElementById("optMenuTouteSeance").onclick = () => { panel.classList.remove("open"); btnMain.textContent = "📊 Toute la séance ▾"; btnToute.click(); };
+      document.getElementById("optMenuReplaySeance").onclick = () => { panel.classList.remove("open"); btnMain.textContent = "🎬 Replay Séance ▾"; btnReplay.click(); };
+    }
+
+    // 2. Placer "Autres" et "?" juste a droite de "Camembert" sur la 1ere ligne (une seule fois)
     const btnCam = document.getElementById("btnCamembert") || document.getElementById("chkCamembert")?.closest("label, button, .btn-action") || Array.from(document.querySelectorAll("button, label")).find(el => /camembert/i.test(el.textContent || ""));
-    const popAutres = Array.from(document.querySelectorAll(".ch-pop-wrap")).find(w => /autres/i.test(w.textContent || ""));
+    const popAutres = Array.from(document.querySelectorAll(".ch-pop-wrap")).find(w => w.id !== "chSeanceMenuWrap" && /autres/i.test(w.textContent || ""));
     const btnAide = document.getElementById("btnAide") || document.getElementById("btnLegende") || Array.from(document.querySelectorAll("button")).find(b => (b.textContent || "").trim() === "?");
     if(btnCam && btnCam.parentElement){
-      if(popAutres && popAutres.parentElement !== btnCam.parentElement){
-        btnCam.insertAdjacentElement("afterend", popAutres);
-      }
-      if(btnAide && (popAutres || btnCam)){
-        (popAutres || btnCam).insertAdjacentElement("afterend", btnAide);
-      }
+      if(popAutres) btnCam.insertAdjacentElement("afterend", popAutres);
+      if(btnAide) (popAutres || btnCam).insertAdjacentElement("afterend", btnAide);
+      topBarOrganisee = true;
     }
+  }
+
+  function tickMaintenance(){
+    organiserBarreSuperieureUneFois();
     const lh = document.getElementById("lblHorlogeMarche");
     if(lh && !lh.dataset.obsAttached){
       lh.dataset.obsAttached = "1";
-      new MutationObserver(() => { if(heureMarcheVerrouillee && lh.innerText !== heureMarcheVerrouillee) lh.innerText = heureMarcheVerrouillee; }).observe(lh, { childList: true, characterData: true, subtree: true });
+      new MutationObserver(() => {
+        if(heureMarcheVerrouillee && lh.innerText !== heureMarcheVerrouillee) lh.innerText = heureMarcheVerrouillee;
+      }).observe(lh, { childList: true, characterData: true, subtree: true });
     }
     const bh = document.getElementById("boxHorlogeMarche");
     if(bh){
       bh.style.setProperty("display", "inline-flex", "important");
       bh.style.setProperty("background", "transparent", "important");
-      bh.style.setProperty("background-color", "transparent", "important");
     }
     const b = document.getElementById("chChartTickerBanner");
     if(b){
@@ -8473,7 +8481,10 @@ body.dark-theme #btnMenuSeanceStable {
     lireHeureConfigSystem();
   }
 
-  window.addEventListener("load", function(){ syncAll(); setInterval(syncAll, 2500); });
+  window.addEventListener("load", function(){
+    tickMaintenance();
+    setInterval(tickMaintenance, 2500);
+  });
 })();
 </script>
 </body>
