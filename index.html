@@ -2917,7 +2917,7 @@ function demarrerModeLive() {
   arreterModeLive();
   liveEnPause = false;
   document.getElementById('btnPauseLive').innerText = "Pause";
-  ['selDateReplay','selVitesseReplay','selCadenceLive','boxHorlogeMarche'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'inline-block'; });
+  ['selDateReplay','selCadenceLive','boxHorlogeMarche'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'inline-block'; });
   document.getElementById('lblAutoDernier').style.display = 'inline-flex'; const _sr = document.getElementById('selDateReplay'); if (_sr && typeof seancesLocales !== 'undefined' && seancesLocales.length > 0) { const _v = _sr.value; _sr.innerHTML = seancesLocales.map(s => '<option value="' + s.date_iso + '">Replay : ' + s.date_fr + '</option>').join(''); if (_v && seancesLocales.some(s => s.date_iso === _v)) _sr.value = _v; }
   const selRep = document.getElementById('selDateReplay');
   if (selRep && typeof seancesLocales !== 'undefined' && seancesLocales.length > 0) {
@@ -3215,7 +3215,7 @@ document.getElementById('btnSimulerLive').onclick = async () => {
   document.getElementById('badgeLive').style.display = 'inline-flex';
   document.getElementById('txtBadgeLive').innerText = 'REPLAY ' + dateSimul.date_fr;
 
-  window.chReplayEnPause = false; const jouerTick = () => { if(window.chReplayEnPause){ timerSimulLive = setTimeout(jouerTick, 200); return; }
+  window.chReplayEnPause = false; window.chReplayStopForce = false; const jouerTick = () => { if(window.chReplayStopForce){ timerSimulLive = null; return; } if(window.chReplayEnPause){ timerSimulLive = setTimeout(jouerTick, 150); return; }
     if (liveEnPause) return;
     const tranche = opsSimul.slice(0, idxSimul);
     let tk = document.getElementById('selTicker').value || '';
@@ -8453,10 +8453,12 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
         bPlay.style.background  = state === "PLAY"  ? "#1E293B" : "transparent";
       };
 
+      const selVit = document.getElementById("selVitesseReplay");
       const setUiState = (etat) => {
         btnMain.dataset.etat = etat;
         if(etat === "REPLAY"){
           ctrlBox.style.display = "none";
+          if(selVit) selVit.style.setProperty("display", "none", "important");
           wrap.style.display = "inline-flex";
           btnMain.textContent = "🎬 Replay Séance";
           btnMain.style.setProperty("border-color", "#D97706", "important");
@@ -8464,9 +8466,11 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
         } else if(etat === "CONTROLS"){
           wrap.style.display = "none";
           ctrlBox.style.display = "inline-flex";
+          if(selVit) selVit.style.setProperty("display", "inline-block", "important");
           setPlayVisual("PLAY");
         } else if(etat === "TOUTE"){
           ctrlBox.style.display = "none";
+          if(selVit) selVit.style.setProperty("display", "none", "important");
           wrap.style.display = "inline-flex";
           btnMain.textContent = "📊 Toute la séance";
           btnMain.style.setProperty("border-color", "#16A34A", "important");
@@ -8474,53 +8478,44 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
         }
       };
 
-      // Etat initial au demarrage : "🎬 Replay Séance" pret a etre clique
       setUiState("REPLAY");
 
       btnMain.onclick = (e) => {
         e.stopPropagation();
         const etat = btnMain.dataset.etat;
         if(etat === "REPLAY"){
-          // Demarrer le replay et afficher [Pause | Play | Stop]
+          window.chReplayStopForce = false;
           window.chReplayEnPause = false;
           setUiState("CONTROLS");
-          if(typeof timerSimulLive === "undefined" || !timerSimulLive){
-            btnReplay.click();
-          }
+          btnReplay.click();
         } else if(etat === "TOUTE"){
-          // Revenir a la seance totale et remettre le bouton sur "🎬 Replay Séance"
+          window.chReplayStopForce = false;
           window.chReplayEnPause = false;
           btnToute.click();
           setUiState("REPLAY");
         }
       };
 
-      // Pause : fige uniquement la boucle jouerTick sans detruire ni relancer un timer
       bPause.onclick = (e) => {
         e.stopPropagation();
         window.chReplayEnPause = true;
         setPlayVisual("PAUSE");
       };
 
-      // Play : debloque simplement la boucle jouerTick en cours (zero double timer!)
       bPlay.onclick = (e) => {
         e.stopPropagation();
         window.chReplayEnPause = false;
         setPlayVisual("PLAY");
       };
 
-      // Stop : arrete definitivement le replay et affiche "📊 Toute la séance"
       bStop.onclick = (e) => {
         e.stopPropagation();
+        window.chReplayStopForce = true;
         window.chReplayEnPause = false;
         if(typeof window.arreterSimulationLive === "function"){
           window.arreterSimulationLive();
         }
-        if(typeof timerSimulLive !== "undefined" && timerSimulLive){
-          clearTimeout(timerSimulLive);
-          clearInterval(timerSimulLive);
-          timerSimulLive = null;
-        }
+        btnReplay.innerHTML = "🎬 Replay Séance";
         setUiState("TOUTE");
       };
     }
