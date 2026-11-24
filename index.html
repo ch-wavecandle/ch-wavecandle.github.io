@@ -7859,7 +7859,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
   function forceThreeHeaderLines(){
     const btnAnalyses = document.getElementById("btnMesAnalyses") || Array.from(document.querySelectorAll("button")).find(b => /mes analyses/i.test(b.textContent || ""));
     const btnAide = Array.from(document.querySelectorAll("button")).find(b => /aide\s*&\s*lexique/i.test(b.textContent || ""));
-    const btnChat = Array.from(document.querySelectorAll("button")).find(b => /\bchat\b/i.test(b.textContent || ""));
+    const btnChat = Array.from(document.querySelectorAll("header button, .hdr-row button")).find(b => /\bchat\b/i.test(b.textContent || ""));
     if(btnAnalyses && btnChat){
       const oldRow = btnAnalyses.parentElement;
       const targetRow = btnChat.closest(".hdr-row") || btnChat.parentElement.parentElement || btnChat.parentElement;
