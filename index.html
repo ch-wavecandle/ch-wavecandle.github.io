@@ -7769,5 +7769,30 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
   });
 })();
 </script>
+<script id="ch-xaxis-bottom-fix">
+(function(){
+  function fixChartBottomMargin(){
+    if(typeof chart === "undefined" || !chart || typeof chart.getOption !== "function") return;
+    try {
+      const opt = chart.getOption();
+      if(!opt || !Array.isArray(opt.grid) || opt.grid.length === 0) return;
+      const g0 = opt.grid.at(0) || {};
+      const curBot = parseFloat(g0.bottom);
+      if(isNaN(curBot) || curBot < 46 || !g0.containLabel){
+        chart.setOption({
+          grid: opt.grid.map((g, idx) => idx === 0 ? Object.assign({}, g, { bottom: 48, containLabel: true }) : g),
+          xAxis: Array.isArray(opt.xAxis) ? opt.xAxis.map(ax => Object.assign({}, ax, {
+            axisLabel: Object.assign({}, ax.axisLabel || {}, { show: true, margin: 10, hideOverlap: true, color: "#CBD5E1", fontSize: 11 })
+          })) : opt.xAxis
+        });
+      }
+    } catch(e){}
+  }
+  window.addEventListener("load", () => {
+    setTimeout(fixChartBottomMargin, 400);
+    setInterval(fixChartBottomMargin, 1200);
+  });
+})();
+</script>
 </body>
 </html>
