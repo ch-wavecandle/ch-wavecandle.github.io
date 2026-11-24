@@ -8215,11 +8215,14 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
   function logDiagHorloge(msg){
     if(dernierDiagHorloge === msg) return;
     dernierDiagHorloge = msg;
-    console.warn("[HORLOGE_DIAG]", msg);
-    if(typeof window.enregistrerErreurDiag === "function") window.enregistrerErreurDiag("HORLOGE_DIAG", msg);
-    else if(typeof diagErreurs !== "undefined" && Array.isArray(diagErreurs)){
-      diagErreurs.push("[" + new Date().toLocaleTimeString("fr-FR") + "] [HORLOGE_DIAG] " + msg);
-      if(typeof majBadgeDiag === "function") majBadgeDiag();
+    console.error("[HORLOGE_TRACE]", msg);
+    const badge = document.getElementById("diagBadge");
+    if(badge){
+      badge.style.background = "#450A0A";
+      badge.style.borderColor = "#EF4444";
+      badge.style.color = "#FCA5A5";
+      badge.title = msg;
+      badge.innerHTML = '🛡️ Horloge : ' + msg.slice(0, 68);
     }
   }
 
@@ -8315,7 +8318,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       if(hDs && hDs !== "--:--:--"){
         heureMarcheVerrouillee = hDs;
         if(typeof heureMarcheDs !== "undefined") heureMarcheDs = hDs;
-        lh.innerText = hDs;
+        lh.innerText = hDs; logDiagHorloge("OK -> Fichier=DonneesSource.txt (" + res.text.length + "o) | Heure=" + hDs);
       } else {
         logDiagHorloge("DonneesSource.txt -> colonne Heure introuvable");
       }
