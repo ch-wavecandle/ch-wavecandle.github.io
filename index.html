@@ -2917,7 +2917,7 @@ function demarrerModeLive() {
   arreterModeLive();
   liveEnPause = false;
   document.getElementById('btnPauseLive').innerText = "Pause";
-  ['btnDossierLive','btnFichiersLive','selDateReplay','selDateReplay','btnSimulerLive','selVitesseReplay','selCadenceLive','selSourceLive','btnPauseLive','boxHorlogeMarche'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'inline-block'; });
+  ['selDateReplay','selVitesseReplay','selCadenceLive','boxHorlogeMarche'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'inline-block'; });
   document.getElementById('lblAutoDernier').style.display = 'inline-flex'; const _sr = document.getElementById('selDateReplay'); if (_sr && typeof seancesLocales !== 'undefined' && seancesLocales.length > 0) { const _v = _sr.value; _sr.innerHTML = seancesLocales.map(s => '<option value="' + s.date_iso + '">Replay : ' + s.date_fr + '</option>').join(''); if (_v && seancesLocales.some(s => s.date_iso === _v)) _sr.value = _v; }
   const selRep = document.getElementById('selDateReplay');
   if (selRep && typeof seancesLocales !== 'undefined' && seancesLocales.length > 0) {
