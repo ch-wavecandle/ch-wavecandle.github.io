@@ -8219,11 +8219,11 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     const sep = firstLine.includes(";") ? ";" : "\t";
     const hdr = firstLine.split(sep).map(c => c.trim().toLowerCase());
     const idxH = hdr.findIndex(c => c === "heure");
-    const cfgLine = lines.slice().reverse().find(l => l.toUpperCase().startsWith("CONFIG_SYSTEM")) || lines[lines.length - 1];
+    const cfgLine = lines.slice().reverse().find(l => /config[_\s-]*system/i.test(l)) || lines[lines.length - 1];
     const cols = cfgLine.split(sep);
     if(idxH >= 0 && cols[idxH] && cols[idxH].trim()) return cols[idxH].trim();
-    const m = cfgLine.match(/\b(\d|2[0-3]):[0-5]\d:[0-5]\d\b/);
-    return (m && m.length > 0) ? m.at(0) : "";
+    const m = cfgLine.match(/\b([01]\d|2[0-3]):[0-5]\d:[0-5]\d\b/g);
+    return (m && m.length > 0) ? m.at(-1) : "";
   }
 
     function getDateEtHeureTunis(){
