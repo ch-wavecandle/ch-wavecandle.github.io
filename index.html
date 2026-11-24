@@ -8201,28 +8201,32 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     st.textContent = `
       #chChartTickerBanner { background:transparent!important; border:none!important; box-shadow:none!important; color:#000000!important; font-weight:900!important; font-size:16px!important; letter-spacing:0.05em!important; top:6px!important; }
       #ch-statusbar-telemetry { background:#0F172A!important; color:#E2E8F0!important; border:1px solid #334155!important; display:inline-flex!important; align-items:center!important; gap:10px!important; }
-      #boxHorlogeMarche { display:inline-flex!important; align-items:center!important; gap:4px!important; background:transparent!important; color:#F8FAFC!important; border:none!important; padding:0!important; margin:0!important; font-weight:700!important; line-height:1!important; box-shadow:none!important; }
+      body.light-theme #boxHorlogeMarche, #ch-statusbar-telemetry #boxHorlogeMarche, #boxHorlogeMarche { display:inline-flex!important; align-items:center!important; gap:4px!important; background:transparent!important; background-color:transparent!important; color:#F8FAFC!important; border:none!important; padding:0!important; margin:0!important; font-weight:700!important; line-height:1!important; box-shadow:none!important; }
       #lblHorlogeMarche { color:#4ADE80!important; font-weight:900!important; background:transparent!important; }
       #btnMenuSeanceStable { display:inline-flex!important; align-items:center!important; justify-content:center!important; gap:5px!important; height:26px!important; padding:0 10px!important; line-height:24px!important; margin:0!important; vertical-align:middle!important; }
       #btnSimulerLive, #btnTouteSeance, #selActionSeance { display:none!important; visibility:hidden!important; position:absolute!important; left:-9999px!important; }
+      #chHorlogeTraceBadge { display:inline-flex; align-items:center; gap:4px; background:#0F172A; color:#38BDF8; border:1px solid #334155; border-radius:4px; padding:1px 7px; font-size:10.5px; font-weight:700; max-width:260px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     `;
     document.head.appendChild(st);
   }
 
   let heureMarcheVerrouillee = "";
-  let dernierDiagHorloge = "";
 
-  function logDiagHorloge(msg){
-    if(dernierDiagHorloge === msg) return;
-    dernierDiagHorloge = msg;
-    console.error("[HORLOGE_TRACE]", msg);
-    const badge = document.getElementById("diagBadge");
-    if(badge){
-      badge.style.background = "#450A0A";
-      badge.style.borderColor = "#EF4444";
-      badge.style.color = "#FCA5A5";
-      badge.title = msg;
-      badge.innerHTML = '🛡️ Horloge : ' + msg.slice(0, 68);
+  function setTraceHorloge(txt, isErr){
+    let b = document.getElementById("chHorlogeTraceBadge");
+    if(!b){
+      const diag = document.getElementById("diagBadge");
+      if(diag && diag.parentElement){
+        b = document.createElement("span");
+        b.id = "chHorlogeTraceBadge";
+        diag.insertAdjacentElement("afterend", b);
+      }
+    }
+    if(b){
+      b.textContent = txt;
+      b.title = txt;
+      b.style.color = isErr ? "#FCA5A5" : "#38BDF8";
+      b.style.borderColor = isErr ? "#EF4444" : "#334155";
     }
   }
 
@@ -8264,13 +8268,46 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     const m = cfgLine.match(/\b(\d|2[0-3]):[0-5]\d:[0-5]\d\b/g);
     return (m && m.length > 0) ? m.at(-1) : "";
   }
+
+  function getSessionToken(){
+    for(const store of [sessionStorage, localStorage]){
+      try {
+        for(let i = 0; i < store.length; i++){
+          const k = store.key(i) || "";
+          const v = store.getItem(k) || "";
+          if(/token|tk/i.test(k) && v.length >= 16) return v;
+        }
+      } catch(e){}
+    }
+    return "";
+  }
+
+  async function lireFichierViaGradio(relPath){
+    const tk = getSessionToken();
+    if(!tk) return { status: 401, err: "Token absent" };
+    if(typeof appelerGradioApi === "function"){
+      return await appelerGradioApi("bvmt_data", { token: tk, path: relPath });
+    }
+    const base = (window.CH_HF_BACKEND || ("https://" + "hafdev-ch-wavecandle" + ".hf.space")).replace(/\/+$/, "");
+    const rPost = await fetch(base + "/gradio_api/call/bvmt_data", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ data: [JSON.stringify({ token: tk, path: relPath })] })
+    });
+    if(!rPost.ok) return { status: rPost.status, err: "POST " + rPost.status };
+    const jPost = await rPost.json();
+    const eid = jPost && jPost.event_id;
+    if(!eid) return { status: 500, err: "event_id absent" };
+    const rSse = await fetch(base + "/gradio_api/call/bvmt_data/" + eid);
+    const txtSse = await rSse.text();
+    const dataLine = txtSse.split(/\r?\n/).reverse().find(l => l.startsWith("data:"));
+    if(!dataLine) return { status: 500, err: "SSE vide" };
+    const arr = JSON.parse(dataLine.slice(5).trim());
+    return JSON.parse(arr.at(0));
+  }
   async function lireHeureConfigSystem(){
     const lh = document.getElementById("lblHorlogeMarche");
-    if(!lh){ logDiagHorloge("Element #lblHorlogeMarche introuvable"); return; }
-    if(typeof appelerGradioApi !== "function"){ logDiagHorloge("appelerGradioApi indisponible"); return; }
-    let tk = (typeof CLE_TK !== "undefined" ? sessionStorage.getItem(CLE_TK) : "") || ""; if(!tk){ for(let i=0;i<sessionStorage.length;i++){ const v=sessionStorage.getItem(sessionStorage.key(i))||""; if(v.length>=16 && /^[a-f0-9_-]+$/i.test(v)){ tk=v; break; } } }
-    if(!tk){ logDiagHorloge("Token session introuvable"); return; }
-
+    if(!lh) return;
     const tunisNow = getDateEtHeureTunis();
     const marcheFerme = (tunisNow.heureStr >= "15:00:00");
 
@@ -8280,14 +8317,14 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       const mFr = dInp.match(/(\d{2})\/(\d{2})\/(\d{4})/);
       const dActive = mIso ? (mIso.at(3) + mIso.at(2) + mIso.at(1)) : (mFr ? (mFr.at(1) + mFr.at(2) + mFr.at(3)) : tunisNow.dateStr);
       const datesEssai = dActive === tunisNow.dateStr ? [tunisNow.dateStr] : [dActive, tunisNow.dateStr];
-      const rapports = [];
+      const errs = [];
 
       for(const dt of datesEssai){
         const pathSyn = "Synthese_cloture/synthese_cloture_reel_" + dt + ".csv";
         try {
-          const resSyn = await appelerGradioApi("bvmt_data", { token: tk, path: pathSyn });
+          const resSyn = await lireFichierViaGradio(pathSyn);
           if(!resSyn || resSyn.status !== 200 || !resSyn.text){
-            rapports.push(pathSyn + " -> status=" + (resSyn ? resSyn.status : "null"));
+            errs.push(pathSyn + " (" + (resSyn ? (resSyn.status + " " + (resSyn.err || "")) : "null") + ")");
             continue;
           }
           const hSyn = extraireHeureConfigSystem(resSyn.text);
@@ -8295,35 +8332,34 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
             heureMarcheVerrouillee = hSyn;
             if(typeof heureMarcheDs !== "undefined") heureMarcheDs = hSyn;
             lh.innerText = hSyn;
+            setTraceHorloge("📄 " + pathSyn.split("/").at(-1) + " → " + hSyn, false);
             return;
           } else {
-            const lastLn = resSyn.text.split(/\r?\n/).filter(l => l.trim().length > 0).at(-1) || "";
-            rapports.push(pathSyn + " -> colonne Heure introuvable | derniere ligne = " + lastLn.slice(0, 90));
+            errs.push(pathSyn + " (colonne Heure vide)");
           }
         } catch(e){
-          rapports.push(pathSyn + " -> exception " + (e && e.message ? e.message : String(e)));
+          errs.push(pathSyn + " (" + (e.message || e) + ")");
         }
       }
-      logDiagHorloge("Marche ferme (" + tunisNow.heureStr + " >= 15:00:00) -> " + rapports.join(" ; "));
+      setTraceHorloge("⚠️ " + errs.join(" | "), true);
       return;
     }
 
     try {
-      const res = await appelerGradioApi("bvmt_data", { token: tk, path: "DonneesSource.txt" });
-      if(!res || res.status !== 200 || !res.text){
-        logDiagHorloge("DonneesSource.txt -> status=" + (res ? res.status : "null"));
-        return;
+      const res = await lireFichierViaGradio("DonneesSource.txt");
+      if(res && res.status === 200 && res.text){
+        const hDs = extraireHeureConfigSystem(res.text);
+        if(hDs && hDs !== "--:--:--"){
+          heureMarcheVerrouillee = hDs;
+          if(typeof heureMarcheDs !== "undefined") heureMarcheDs = hDs;
+          lh.innerText = hDs;
+          setTraceHorloge("📄 DonneesSource.txt → " + hDs, false);
+          return;
+        }
       }
-      const hDs = extraireHeureConfigSystem(res.text);
-      if(hDs && hDs !== "--:--:--"){
-        heureMarcheVerrouillee = hDs;
-        if(typeof heureMarcheDs !== "undefined") heureMarcheDs = hDs;
-        lh.innerText = hDs; logDiagHorloge("OK -> Fichier=DonneesSource.txt (" + res.text.length + "o) | Heure=" + hDs);
-      } else {
-        logDiagHorloge("DonneesSource.txt -> colonne Heure introuvable");
-      }
+      setTraceHorloge("⚠️ DonneesSource.txt (" + (res ? res.status : "null") + ")", true);
     } catch(e){
-      logDiagHorloge("DonneesSource.txt exception: " + (e && e.message ? e.message : String(e)));
+      setTraceHorloge("⚠️ DonneesSource.txt (" + (e.message || e) + ")", true);
     }
   }
 
@@ -8355,7 +8391,11 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       new MutationObserver(() => { if(heureMarcheVerrouillee && lh.innerText !== heureMarcheVerrouillee) lh.innerText = heureMarcheVerrouillee; }).observe(lh, { childList: true, characterData: true, subtree: true });
     }
     const bh = document.getElementById("boxHorlogeMarche");
-    if(bh){ bh.removeAttribute("style"); bh.style.setProperty("display", "inline-flex", "important"); }
+    if(bh){
+      bh.style.setProperty("display", "inline-flex", "important");
+      bh.style.setProperty("background", "transparent", "important");
+      bh.style.setProperty("background-color", "transparent", "important");
+    }
     const b = document.getElementById("chChartTickerBanner");
     if(b){
       const bg = getComputedStyle(document.body).backgroundColor || "";
