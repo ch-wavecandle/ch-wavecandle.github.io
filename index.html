@@ -8255,17 +8255,6 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       }
     }
 
-    // 3. Repli direct GitHub raw sur Synthese_cloture si disponible
-    if(candidates.length === 0 && dStr.length === 8){
-      try {
-        const rRaw = await fetch("https://githubusercontent.com_" + dStr + ".csv?t=" + Date.now());
-        if(rRaw.ok){
-          const h3 = extraireHeureConfigSystem(await rRaw.text());
-          if(h3 && h3 !== "--:--:--") candidates.push(h3);
-        }
-      } catch(e){}
-    }
-
     if(candidates.length > 0){
       // Garder l'horodatage le plus recent (ex: 15:00:00 > 14:13:57)
       candidates.sort();
