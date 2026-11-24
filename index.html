@@ -8200,9 +8200,10 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     st.id = "ch-final-touch-css";
     st.textContent = `
       #chChartTickerBanner { background:transparent!important; border:none!important; box-shadow:none!important; color:#000000!important; font-weight:900!important; font-size:16px!important; letter-spacing:0.05em!important; top:6px!important; }
-      #ch-statusbar-telemetry { background:#0F172A!important; color:#E2E8F0!important; border:1px solid #334155!important; }
-      #boxHorlogeMarche { display:inline-flex!important; align-items:center!important; gap:4px!important; background:transparent!important; color:#E2E8F0!important; border:none!important; padding:0!important; font-weight:700!important; }
-      #lblHorlogeMarche { color:#15803D!important; font-weight:900!important; } body.dark-theme #lblHorlogeMarche { color:#4ADE80!important; }
+      #ch-statusbar-telemetry { background:#0F172A!important; color:#E2E8F0!important; border:1px solid #334155!important; display:inline-flex!important; align-items:center!important; gap:10px!important; }
+      #boxHorlogeMarche { display:inline-flex!important; align-items:center!important; gap:4px!important; background:#0F172A!important; color:#E2E8F0!important; border:none!important; padding:0!important; margin:0!important; font-weight:700!important; line-height:1!important; }
+      #lblHorlogeMarche { color:#4ADE80!important; font-weight:900!important; background:transparent!important; }
+      #btnMenuSeanceStable { display:inline-flex!important; align-items:center!important; justify-content:center!important; gap:4px!important; height:26px!important; padding:0 9px!important; line-height:1!important; vertical-align:middle!important; }
       #btnSimulerLive, #btnTouteSeance, #selActionSeance { display:none!important; visibility:hidden!important; position:absolute!important; left:-9999px!important; }
     `;
     document.head.appendChild(st);
@@ -8227,41 +8228,41 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
 
   async function lireHeureConfigSystem(){
     const lh = document.getElementById("lblHorlogeMarche");
-    if(!lh) return;
+    if(!lh || typeof appelerGradioApi !== "function") return;
     const tk = (typeof sessionStorage !== "undefined" && typeof CLE_TK !== "undefined") ? (sessionStorage.getItem(CLE_TK) || "") : "";
-    const rawD = (document.getElementById("selDateReplay")?.value || document.getElementById("txtDateSeance")?.value || document.getElementById("txtBadgeLive")?.textContent || "").trim(); const mIso = rawD.match(/^(\d{4})-(\d{2})-(\d{2})$/); const mFr = rawD.match(/(\d{2})\/(\d{2})\/(\d{4})/); const dInp = mIso ? (mIso[3]+"/"+mIso[2]+"/"+mIso[1]) : (mFr ? mFr[0] : new Date().toLocaleDateString("fr-FR"));
-    const dStr = dInp.replace(/\//g, "");
-    const candidates = [];
 
-    // 1. Lire DonneesSource.txt via RPC Gradio
-    if(typeof appelerGradioApi === "function"){
+    // Determiner la date active (JJMMAAAA)
+    const rawD = (document.getElementById("selDateReplay")?.value || document.getElementById("txtDateSeance")?.value || document.getElementById("txtBadgeLive")?.textContent || "").trim();
+    const mIso = rawD.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    const mFr = rawD.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+    const dStr = mIso ? (mIso.at(3) + mIso.at(2) + mIso.at(1)) : (mFr ? (mFr.at(1) + mFr.at(2) + mFr.at(3)) : new Date().toLocaleDateString("fr-FR").replace(/\//g, ""));
+
+    // 1. Lire Synthese_cloture/synthese_cloture_reel_JJMMAAAA.csv (reference officielle apres cloture = 15:00:00)
+    if(dStr.length === 8){
       try {
-        const res = await appelerGradioApi("bvmt_data", { token: tk, path: "DonneesSource.txt" });
-        if(res && res.status === 200 && res.text){
-          const h1 = extraireHeureConfigSystem(res.text);
-          if(h1 && h1 !== "--:--:--") candidates.push(h1);
+        const resSyn = await appelerGradioApi("bvmt_data", { token: tk, path: "Synthese_cloture/synthese_cloture_reel_" + dStr + ".csv" });
+        if(resSyn && resSyn.status === 200 && resSyn.text){
+          const hSyn = extraireHeureConfigSystem(resSyn.text);
+          if(hSyn && hSyn !== "--:--:--"){
+            heureMarcheVerrouillee = hSyn;
+            if(lh.textContent !== hSyn) lh.textContent = hSyn;
+            return;
+          }
         }
       } catch(e){}
+    }
 
-      // 2. Lire Synthese_cloture/synthese_cloture_reel_JJMMAAAA.csv (contient 15:00:00 apres cloture ou nettoyage cache)
-      if(dStr.length === 8){
-        try {
-          const resSyn = await appelerGradioApi("bvmt_data", { token: tk, path: "Synthese_cloture/synthese_cloture_reel_" + dStr + ".csv" });
-          if(resSyn && resSyn.status === 200 && resSyn.text){
-            const h2 = extraireHeureConfigSystem(resSyn.text);
-            if(h2 && h2 !== "--:--:--") candidates.push(h2);
-          }
-        } catch(e){}
+    // 2. Sinon lire DonneesSource.txt (en seance Live)
+    try {
+      const res = await appelerGradioApi("bvmt_data", { token: tk, path: "DonneesSource.txt" });
+      if(res && res.status === 200 && res.text){
+        const hDs = extraireHeureConfigSystem(res.text);
+        if(hDs && hDs !== "--:--:--"){
+          heureMarcheVerrouillee = hDs;
+          if(lh.textContent !== hDs) lh.textContent = hDs;
+        }
       }
-    }
-
-    if(candidates.length > 0){
-      // Garder l'horodatage le plus recent (ex: 15:00:00 > 14:13:57)
-      candidates.sort();
-      const bestH = candidates[candidates.length - 1];
-      heureMarcheVerrouillee = bestH;
-      if(lh.textContent !== bestH) lh.textContent = bestH;
-    }
+    } catch(e){}
   }
 
   function setupMenuSeanceStable(){
@@ -8278,7 +8279,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     btnMain.id = "btnMenuSeanceStable";
     btnMain.type = "button";
     btnMain.className = "btn-action";
-    btnMain.style.cssText = "border-color:#FFD700; color:#FFD700; font-weight:700;";
+    btnMain.style.cssText = "display:inline-flex;align-items:center;justify-content:center;height:26px;padding:0 9px;line-height:1;border-color:#FFD700;color:#FFD700;font-weight:700;";
     btnMain.textContent = "📊 Toute la séance ▾";
 
     const panel = document.createElement("div");
@@ -8329,15 +8330,19 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
         }
       }).observe(lh, { childList: true, characterData: true, subtree: true });
     }
+    const bh = document.getElementById("boxHorlogeMarche");
+    if(bh){
+      bh.style.setProperty("display", "inline-flex", "important");
+      bh.style.setProperty("background", "#0F172A", "important");
+      bh.style.setProperty("color", "#E2E8F0", "important");
+    }
     const b = document.getElementById("chChartTickerBanner");
     if(b){
       const bg = getComputedStyle(document.body).backgroundColor || "";
       const m = bg.match(/\d+/g);
-      const lum = (m && m.length >= 3) ? (parseInt(m,10)*299 + parseInt(m,10)*587 + parseInt(m,10)*114)/1000 : 255;
+      const lum = (m && m.length >= 3) ? (parseInt(m.at(0),10)*299 + parseInt(m.at(1),10)*587 + parseInt(m.at(2),10)*114)/1000 : 255;
       b.style.setProperty("color", lum < 128 ? "#FFFFFF" : "#000000", "important");
     }
-    const bh = document.getElementById("boxHorlogeMarche");
-    if(bh) bh.style.setProperty("display", "inline-flex", "important");
     lireHeureConfigSystem();
   }
 
