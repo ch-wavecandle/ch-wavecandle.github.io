@@ -8419,13 +8419,14 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     if(!btnReplay || !btnToute) return;
 
     if(!document.getElementById("chSeanceMenuWrap")){
+      // 1. Bloc libre des 3 boutons symboliques [Pause | Play | Stop] (masque au repos)
       const ctrlBox = document.createElement("div");
       ctrlBox.id = "chReplayControls";
-      ctrlBox.style.cssText = "display:none; align-items:center; gap:3px; background:#0F172A; border:1px solid #334155; border-radius:6px; padding:1px 4px; height:28px; margin-right:4px;";
+      ctrlBox.style.cssText = "display:none; align-items:center; gap:4px; background:#0F172A; border:1px solid #334155; border-radius:6px; padding:1px 6px; height:28px;";
       const mkSymBtn = (id, sym, title, color) => {
         const b = document.createElement("button");
         b.id = id; b.type = "button"; b.textContent = sym; b.title = title;
-        b.style.cssText = "display:inline-flex;align-items:center;justify-content:center;width:24px;height:22px;border:none;border-radius:4px;background:transparent;color:" + color + ";font-size:13px;font-weight:900;cursor:pointer;line-height:1;padding:0;";
+        b.style.cssText = "display:inline-flex;align-items:center;justify-content:center;width:26px;height:22px;border:none;border-radius:4px;background:transparent;color:" + color + ";font-size:13px;font-weight:900;cursor:pointer;line-height:1;padding:0;";
         return b;
       };
       const bPause = mkSymBtn("btnSymPause", "⏸", "Pause Replay", "#FBBF24");
@@ -8433,74 +8434,94 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       const bStop  = mkSymBtn("btnSymStop",  "⏹", "Arrêter Replay", "#F87171");
       ctrlBox.appendChild(bPause); ctrlBox.appendChild(bPlay); ctrlBox.appendChild(bStop);
 
+      // 2. Bouton principal d'action directe :
+      // Etat "REPLAY" (repos) -> affiche "🎬 Replay Séance"
+      // Etat "TOUTE" (apres Stop) -> affiche "📊 Toute la séance"
       const wrap = document.createElement("div");
-      wrap.id = "chSeanceMenuWrap"; wrap.className = "ch-pop-wrap";
+      wrap.id = "chSeanceMenuWrap";
+      wrap.style.cssText = "display:inline-flex; align-items:center;";
       const btnMain = document.createElement("button");
-      btnMain.id = "btnMenuSeanceStable"; btnMain.type = "button"; btnMain.textContent = "📊 Toute la séance ▾";
-      btnMain.dataset.directToute = "0";
-      const panel = document.createElement("div");
-      panel.className = "ch-pop-panel";
-      panel.innerHTML = '<div class="ch-pop-sec-title">Mode de lecture séance</div><button type="button" id="optMenuTouteSeance">📊 Toute la séance</button><button type="button" id="optMenuReplaySeance">🎬 Replay Séance (Tick/Tick)</button>';
-      wrap.appendChild(btnMain); wrap.appendChild(panel);
+      btnMain.id = "btnMenuSeanceStable";
+      btnMain.type = "button";
+      wrap.appendChild(btnMain);
+
       btnReplay.insertAdjacentElement("beforebegin", ctrlBox);
       btnReplay.insertAdjacentElement("beforebegin", wrap);
 
-      const setPlayState = (state) => {
+      const setPlayVisual = (state) => {
         bPause.style.background = state === "PAUSE" ? "#1E293B" : "transparent";
         bPlay.style.background  = state === "PLAY"  ? "#1E293B" : "transparent";
       };
-      btnMain.onclick = e => {
-        e.stopPropagation();
-        if(btnMain.dataset.directToute === "1"){
-          btnMain.dataset.directToute = "0";
-          btnMain.textContent = "📊 Toute la séance ▾";
-          btnMain.style.removeProperty("border-color");
-          btnMain.style.removeProperty("color");
-          btnToute.click();
-          return;
-        }
-        document.querySelectorAll(".ch-pop-panel").forEach(p => { if(p !== panel) p.classList.remove("open"); });
-        panel.classList.toggle("open");
-      };
-      panel.onclick = e => e.stopPropagation();
-      document.addEventListener("click", () => panel.classList.remove("open"));
 
-      document.getElementById("optMenuReplaySeance").onclick = () => {
-        panel.classList.remove("open");
-        btnMain.dataset.directToute = "0";
-        btnMain.style.removeProperty("border-color");
-        btnMain.style.removeProperty("color");
-        window.chReplayEnPause = false;
-        ctrlBox.style.display = "inline-flex";
-        setPlayState("PLAY");
-        btnMain.textContent = "🎬 Replay Séance ▾";
-        if(typeof timerSimulLive === "undefined" || !timerSimulLive) btnReplay.click();
+      const setUiState = (etat) => {
+        btnMain.dataset.etat = etat;
+        if(etat === "REPLAY"){
+          ctrlBox.style.display = "none";
+          wrap.style.display = "inline-flex";
+          btnMain.textContent = "🎬 Replay Séance";
+          btnMain.style.setProperty("border-color", "#D97706", "important");
+          btnMain.style.setProperty("color", "#B45309", "important");
+        } else if(etat === "CONTROLS"){
+          wrap.style.display = "none";
+          ctrlBox.style.display = "inline-flex";
+          setPlayVisual("PLAY");
+        } else if(etat === "TOUTE"){
+          ctrlBox.style.display = "none";
+          wrap.style.display = "inline-flex";
+          btnMain.textContent = "📊 Toute la séance";
+          btnMain.style.setProperty("border-color", "#16A34A", "important");
+          btnMain.style.setProperty("color", "#15803D", "important");
+        }
       };
-      document.getElementById("optMenuTouteSeance").onclick = () => {
-        panel.classList.remove("open");
-        btnMain.dataset.directToute = "0";
-        btnMain.style.removeProperty("border-color");
-        btnMain.style.removeProperty("color");
-        window.chReplayEnPause = false;
-        ctrlBox.style.display = "none";
-        btnMain.textContent = "📊 Toute la séance ▾";
-        btnToute.click();
+
+      // Etat initial au demarrage : "🎬 Replay Séance" pret a etre clique
+      setUiState("REPLAY");
+
+      btnMain.onclick = (e) => {
+        e.stopPropagation();
+        const etat = btnMain.dataset.etat;
+        if(etat === "REPLAY"){
+          // Demarrer le replay et afficher [Pause | Play | Stop]
+          window.chReplayEnPause = false;
+          setUiState("CONTROLS");
+          if(typeof timerSimulLive === "undefined" || !timerSimulLive){
+            btnReplay.click();
+          }
+        } else if(etat === "TOUTE"){
+          // Revenir a la seance totale et remettre le bouton sur "🎬 Replay Séance"
+          window.chReplayEnPause = false;
+          btnToute.click();
+          setUiState("REPLAY");
+        }
       };
-      bPause.onclick = () => { window.chReplayEnPause = true; setPlayState("PAUSE"); };
-      bPlay.onclick  = () => { window.chReplayEnPause = false; setPlayState("PLAY"); if((typeof timerSimulLive === "undefined" || !timerSimulLive) && (btnReplay.innerText || "").includes("Replay")) btnReplay.click(); };
-      bStop.onclick  = () => {
+
+      // Pause : fige uniquement la boucle jouerTick sans detruire ni relancer un timer
+      bPause.onclick = (e) => {
+        e.stopPropagation();
+        window.chReplayEnPause = true;
+        setPlayVisual("PAUSE");
+      };
+
+      // Play : debloque simplement la boucle jouerTick en cours (zero double timer!)
+      bPlay.onclick = (e) => {
+        e.stopPropagation();
+        window.chReplayEnPause = false;
+        setPlayVisual("PLAY");
+      };
+
+      // Stop : arrete definitivement le replay et affiche "📊 Toute la séance"
+      bStop.onclick = (e) => {
+        e.stopPropagation();
         window.chReplayEnPause = false;
         if(typeof window.arreterSimulationLive === "function"){
           window.arreterSimulationLive();
-        } else {
-          if(typeof timerSimulLive !== "undefined" && timerSimulLive){ clearTimeout(timerSimulLive); clearInterval(timerSimulLive); timerSimulLive = null; }
-          if(btnReplay && /stop/i.test(btnReplay.textContent || "")) btnReplay.click();
         }
-        ctrlBox.style.display = "none";
-        btnMain.dataset.directToute = "1";
-        btnMain.textContent = "📊 Toute la séance";
-        btnMain.style.setProperty("border-color", "#16A34A", "important");
-        btnMain.style.setProperty("color", "#15803D", "important");
+        if(typeof timerSimulLive !== "undefined" && timerSimulLive){
+          clearTimeout(timerSimulLive);
+          clearInterval(timerSimulLive);
+          timerSimulLive = null;
+        }
+        setUiState("TOUTE");
       };
     }
 
