@@ -6733,7 +6733,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     const last = getLastTradingStrings();
 
     const hSel = document.getElementById("selHorizon");
-    if(hSel && hSel.value === "LIVE"){
+    if(false && hSel && hSel.value === "LIVE"){
       const singleOpt = Array.from(hSel.options).find(o => o.value !== "LIVE" && /unique|seance|séance/i.test((o.textContent||"") + " " + (o.value||"")));
       if(singleOpt){
         hSel.value = singleOpt.value;
