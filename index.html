@@ -8222,7 +8222,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     const cols = cfgLine.split(sep);
     if(idxH >= 0 && cols[idxH] && cols[idxH].trim()) return cols[idxH].trim();
     const m = cfgLine.match(/\b(\d|2[0-3]):[0-5]\d:[0-5]\d\b/);
-    return m ? m : "";
+    return (m && m.length > 0) ? m.at(0) : "";
   }
 
   async function lireHeureConfigSystem(){
