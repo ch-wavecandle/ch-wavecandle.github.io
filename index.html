@@ -8552,6 +8552,36 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       };
     }
 
+        // 4. Integrer le selecteur d'Axes (Axes : Auto...) et le selecteur de Mode (Vagues Polygonales...) dans la palette flottante
+    if(!document.getElementById("chPaletteExtraControls")){
+      const palBody = document.getElementById("chFloatToolsBody") || Array.from(document.querySelectorAll("div")).find(d => (d.textContent || "").includes("Main libre") && (d.textContent || "").includes("Indicateurs") && (d.textContent || "").includes("Mes Analyses") && d.querySelectorAll("button, select").length >= 3);
+      const selAxesOrig = Array.from(document.querySelectorAll("select, button")).find(el => /axes\s*:/i.test(el.textContent || ""));
+      const selModeOrig = Array.from(document.querySelectorAll("select")).find(s => Array.from(s.options || []).some(o => /vagues|polygonale|bougie|chandelier/i.test(o.textContent || "")));
+
+      if(palBody && (selAxesOrig || selModeOrig)){
+        const extraBox = document.createElement("div");
+        extraBox.id = "chPaletteExtraControls";
+        extraBox.style.cssText = "display:flex; flex-direction:inherit; gap:5px; align-items:stretch; width:100%;";
+
+        if(selAxesOrig){
+          selAxesOrig.style.setProperty("width", "100%", "important");
+          selAxesOrig.style.setProperty("height", "26px", "important");
+          selAxesOrig.style.setProperty("font-size", "11.5px", "important");
+          selAxesOrig.style.setProperty("font-weight", "700", "important");
+          selAxesOrig.style.setProperty("border-radius", "5px", "important");
+          extraBox.appendChild(selAxesOrig);
+        }
+        if(selModeOrig){
+          selModeOrig.style.setProperty("width", "100%", "important");
+          selModeOrig.style.setProperty("height", "26px", "important");
+          selModeOrig.style.setProperty("font-size", "11.5px", "important");
+          selModeOrig.style.setProperty("font-weight", "700", "important");
+          selModeOrig.style.setProperty("border-radius", "5px", "important");
+          extraBox.appendChild(selModeOrig);
+        }
+        palBody.appendChild(extraBox);
+      }
+    }
     const btnCam = document.getElementById("btnCamembert") || document.getElementById("chkCamembert")?.closest("label, button, .btn-action") || Array.from(document.querySelectorAll("button, label")).find(el => /camembert/i.test(el.textContent || ""));
     const popAutres = Array.from(document.querySelectorAll(".ch-pop-wrap")).find(w => w.id !== "chSeanceMenuWrap" && /autres/i.test(w.textContent || ""));
     const btnAide = document.getElementById("btnAide") || document.getElementById("btnLegende") || Array.from(document.querySelectorAll("button")).find(b => (b.textContent || "").trim() === "?");
