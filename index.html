@@ -8210,28 +8210,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     document.head.appendChild(st);
   }
 
-  async function lireHeureConfigSystem(){
-    const lh = document.getElementById("lblHorlogeMarche");
-    if(!lh) return;
-    try {
-      const r = await fetch("/bvmt_api/DonneesSource.txt?t=" + Date.now());
-      if(!r.ok) return;
-      const raw = await r.text();
-      const lines = raw.split(/\r?\n/).filter(l => l.trim().length > 0);
-      if(lines.length < 2) return;
-      const sep = lines.includes(";") ? ";" : "\t";
-      const hdr = lines.split(sep).map(c => c.trim().toLowerCase());
-      const idxH = hdr.findIndex(c => c === "heure");
-      const cfgLine = lines.slice().reverse().find(l => l.toUpperCase().startsWith("CONFIG_SYSTEM")) || lines[lines.length - 1];
-      const cols = cfgLine.split(sep);
-      if(idxH >= 0 && cols[idxH] && cols[idxH].trim()){
-        lh.textContent = cols[idxH].trim();
-        return;
-      }
-      const m = cfgLine.match(/\b(\d|2[0-3]):[0-5]\d:[0-5]\d\b/);
-      if(m) lh.textContent = m;
-    } catch(e){}
-  }
+  async function lireHeureConfigSystem(){ const lh = document.getElementById("lblHorlogeMarche"); if(!lh) return; try { const tk = sessionStorage.getItem(typeof CLE_TK !== "undefined" ? CLE_TK : "ch_bvmt_token") || ""; const res = await appelerGradioApi("bvmt_data", { token: tk, path: "DonneesSource.txt" }); if(!res || res.status !== 200 || !res.text) return; const lines = res.text.split(/\r?\n/).filter(l => l.trim().length > 0); if(lines.length < 2) return; const sep = lines.includes(";") ? ";" : "\t"; const hdr = lines.split(sep).map(c => c.trim().toLowerCase()); const idxH = hdr.findIndex(c => c === "heure"); const cfgLine = lines.slice().reverse().find(l => l.toUpperCase().startsWith("CONFIG_SYSTEM")) || lines[lines.length - 1]; const cols = cfgLine.split(sep); if(idxH >= 0 && cols[idxH] && cols[idxH].trim()){ lh.textContent = cols[idxH].trim(); return; } const m = cfgLine.match(/\b(\d|2[0-3]):[0-5]\d:[0-5]\d\b/); if(m) lh.textContent = m; } catch(e){} }
 
   function syncAll(){
     const b = document.getElementById("chChartTickerBanner");
