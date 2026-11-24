@@ -8206,10 +8206,12 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       #ch-statusbar-telemetry { background:#0F172A!important; color:#E2E8F0!important; border:1px solid #334155!important; }
       #boxHorlogeMarche { display:inline-flex!important; align-items:center!important; gap:4px!important; background:transparent!important; color:#E2E8F0!important; border:none!important; padding:0!important; font-weight:700!important; }
       #lblHorlogeMarche { color:#4ADE80!important; font-weight:800!important; }
-      #btnSimulerLive, #btnTouteSeance { display:none!important; visibility:hidden!important; }
+      #btnSimulerLive, #btnTouteSeance { display:none!important; visibility:hidden!important; position:absolute!important; left:-9999px!important; }
     `;
     document.head.appendChild(st);
   }
+
+  let heureMarcheVerrouillee = "";
 
   function extraireHeureDepuisTexteGrille(raw){
     if(!raw) return "";
@@ -8231,16 +8233,20 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     if(!lh || typeof appelerGradioApi !== "function") return;
     const tk = sessionStorage.getItem(typeof CLE_TK !== "undefined" ? CLE_TK : "ch_bvmt_token") || "";
 
-    // 1. Lecture prioritaire depuis DonneesSource.txt (en séance Live)
+    // 1. Lecture prioritaire depuis DonneesSource.txt
     try {
       const res = await appelerGradioApi("bvmt_data", { token: tk, path: "DonneesSource.txt" });
       if(res && res.status === 200 && res.text){
         const hDs = extraireHeureDepuisTexteGrille(res.text);
-        if(hDs){ lh.textContent = hDs; return; }
+        if(hDs && hDs !== "--:--:--"){
+          heureMarcheVerrouillee = hDs;
+          if(lh.textContent !== hDs) lh.textContent = hDs;
+          return;
+        }
       }
     } catch(e){}
 
-    // 2. Repli automatique sur synthese_cloture_reel_JJMMAAAA.csv (quand le serveur est au repos / cache nettoye)
+    // 2. Repli automatique sur synthese_cloture_reel_JJMMAAAA.csv
     try {
       const dInp = document.getElementById("txtDateSeance")?.value || new Date().toLocaleDateString("fr-FR");
       const dStr = dInp.replace(/\//g, "");
@@ -8248,13 +8254,37 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
         const resSyn = await appelerGradioApi("bvmt_data", { token: tk, path: "Synthese_cloture/synthese_cloture_reel_" + dStr + ".csv" });
         if(resSyn && resSyn.status === 200 && resSyn.text){
           const hSyn = extraireHeureDepuisTexteGrille(resSyn.text);
-          if(hSyn){ lh.textContent = hSyn; return; }
+          if(hSyn && hSyn !== "--:--:--"){
+            heureMarcheVerrouillee = hSyn;
+            if(lh.textContent !== hSyn) lh.textContent = hSyn;
+            return;
+          }
         }
       }
     } catch(e){}
   }
 
+  function installerAntiClignotement(){
+    const lh = document.getElementById("lblHorlogeMarche");
+    if(lh && !lh.dataset.obsAttached){
+      lh.dataset.obsAttached = "1";
+      new MutationObserver(() => {
+        if(heureMarcheVerrouillee && lh.textContent !== heureMarcheVerrouillee){
+          lh.textContent = heureMarcheVerrouillee;
+        }
+      }).observe(lh, { childList: true, characterData: true, subtree: true });
+    }
+    const br = document.getElementById("btnSimulerLive");
+    if(br && !br.dataset.obsAttached){
+      br.dataset.obsAttached = "1";
+      new MutationObserver(() => {
+        if(br.style.display !== "none") br.style.setProperty("display", "none", "important");
+      }).observe(br, { attributes: true, attributeFilter: ["style"] });
+    }
+  }
+
   function syncAll(){
+    installerAntiClignotement();
     const b = document.getElementById("chChartTickerBanner");
     if(b){
       const bg = getComputedStyle(document.body).backgroundColor || "";
@@ -8263,18 +8293,13 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       b.style.setProperty("color", lum < 128 ? "#FFFFFF" : "#000000", "important");
     }
     const bh = document.getElementById("boxHorlogeMarche");
-    if(bh){
-      bh.style.setProperty("display", "inline-flex", "important");
-      bh.style.setProperty("background", "transparent", "important");
-    }
-    const br = document.getElementById("btnSimulerLive");
-    if(br) br.style.setProperty("display", "none", "important");
+    if(bh) bh.style.setProperty("display", "inline-flex", "important");
     lireHeureConfigSystem();
   }
 
   window.addEventListener("load", function(){
     syncAll();
-    setInterval(syncAll, 2500);
+    setInterval(syncAll, 2000);
   });
 })();
 </script>
