@@ -3215,7 +3215,7 @@ document.getElementById('btnSimulerLive').onclick = async () => {
   document.getElementById('badgeLive').style.display = 'inline-flex';
   document.getElementById('txtBadgeLive').innerText = 'REPLAY ' + dateSimul.date_fr;
 
-  const jouerTick = () => {
+  window.chReplayEnPause = false; const jouerTick = () => { if(window.chReplayEnPause){ timerSimulLive = setTimeout(jouerTick, 200); return; }
     if (liveEnPause) return;
     const tranche = opsSimul.slice(0, idxSimul);
     let tk = document.getElementById('selTicker').value || '';
@@ -8424,47 +8424,41 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       ctrlBox.style.cssText = "display:none; align-items:center; gap:3px; background:#0F172A; border:1px solid #334155; border-radius:6px; padding:1px 4px; height:28px; margin-right:4px;";
       const mkSymBtn = (id, sym, title, color) => {
         const b = document.createElement("button");
-        b.id = id;
-        b.type = "button";
-        b.textContent = sym;
-        b.title = title;
+        b.id = id; b.type = "button"; b.textContent = sym; b.title = title;
         b.style.cssText = "display:inline-flex;align-items:center;justify-content:center;width:24px;height:22px;border:none;border-radius:4px;background:transparent;color:" + color + ";font-size:13px;font-weight:900;cursor:pointer;line-height:1;padding:0;";
-        b.onmouseenter = () => { b.style.background = "#1E293B"; };
-        b.onmouseleave = () => { b.style.background = b.dataset.active === "1" ? "#1E293B" : "transparent"; };
         return b;
       };
       const bPause = mkSymBtn("btnSymPause", "⏸", "Pause Replay", "#FBBF24");
       const bPlay  = mkSymBtn("btnSymPlay",  "▶", "Reprendre Replay", "#4ADE80");
       const bStop  = mkSymBtn("btnSymStop",  "⏹", "Arrêter Replay", "#F87171");
-      ctrlBox.appendChild(bPause);
-      ctrlBox.appendChild(bPlay);
-      ctrlBox.appendChild(bStop);
+      ctrlBox.appendChild(bPause); ctrlBox.appendChild(bPlay); ctrlBox.appendChild(bStop);
 
       const wrap = document.createElement("div");
-      wrap.id = "chSeanceMenuWrap";
-      wrap.className = "ch-pop-wrap";
+      wrap.id = "chSeanceMenuWrap"; wrap.className = "ch-pop-wrap";
       const btnMain = document.createElement("button");
-      btnMain.id = "btnMenuSeanceStable";
-      btnMain.type = "button";
-      btnMain.textContent = "📊 Toute la séance ▾";
+      btnMain.id = "btnMenuSeanceStable"; btnMain.type = "button"; btnMain.textContent = "📊 Toute la séance ▾";
+      btnMain.dataset.directToute = "0";
       const panel = document.createElement("div");
       panel.className = "ch-pop-panel";
       panel.innerHTML = '<div class="ch-pop-sec-title">Mode de lecture séance</div><button type="button" id="optMenuTouteSeance">📊 Toute la séance</button><button type="button" id="optMenuReplaySeance">🎬 Replay Séance (Tick/Tick)</button>';
-      wrap.appendChild(btnMain);
-      wrap.appendChild(panel);
-
+      wrap.appendChild(btnMain); wrap.appendChild(panel);
       btnReplay.insertAdjacentElement("beforebegin", ctrlBox);
       btnReplay.insertAdjacentElement("beforebegin", wrap);
 
       const setPlayState = (state) => {
-        bPause.dataset.active = state === "PAUSE" ? "1" : "0";
-        bPlay.dataset.active  = state === "PLAY"  ? "1" : "0";
         bPause.style.background = state === "PAUSE" ? "#1E293B" : "transparent";
         bPlay.style.background  = state === "PLAY"  ? "#1E293B" : "transparent";
       };
-
       btnMain.onclick = e => {
         e.stopPropagation();
+        if(btnMain.dataset.directToute === "1"){
+          btnMain.dataset.directToute = "0";
+          btnMain.textContent = "📊 Toute la séance ▾";
+          btnMain.style.removeProperty("border-color");
+          btnMain.style.removeProperty("color");
+          btnToute.click();
+          return;
+        }
         document.querySelectorAll(".ch-pop-panel").forEach(p => { if(p !== panel) p.classList.remove("open"); });
         panel.classList.toggle("open");
       };
@@ -8473,40 +8467,36 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
 
       document.getElementById("optMenuReplaySeance").onclick = () => {
         panel.classList.remove("open");
+        btnMain.dataset.directToute = "0";
+        btnMain.style.removeProperty("border-color");
+        btnMain.style.removeProperty("color");
+        window.chReplayEnPause = false;
         ctrlBox.style.display = "inline-flex";
         setPlayState("PLAY");
         btnMain.textContent = "🎬 Replay Séance ▾";
         if(typeof timerSimulLive === "undefined" || !timerSimulLive) btnReplay.click();
       };
-
       document.getElementById("optMenuTouteSeance").onclick = () => {
         panel.classList.remove("open");
+        btnMain.dataset.directToute = "0";
+        btnMain.style.removeProperty("border-color");
+        btnMain.style.removeProperty("color");
+        window.chReplayEnPause = false;
         ctrlBox.style.display = "none";
         btnMain.textContent = "📊 Toute la séance ▾";
         btnToute.click();
       };
-
-      bPause.onclick = () => {
-        setPlayState("PAUSE");
-        if(typeof timerSimulLive !== "undefined" && timerSimulLive){
-          clearInterval(timerSimulLive);
-          timerSimulLive = null;
-        }
-      };
-
-      bPlay.onclick = () => {
-        setPlayState("PLAY");
-        if((typeof timerSimulLive === "undefined" || !timerSimulLive) && (btnReplay.innerText || "").includes("Replay")){
-          btnReplay.click();
-        }
-      };
-
-      bStop.onclick = () => {
+      bPause.onclick = () => { window.chReplayEnPause = true; setPlayState("PAUSE"); };
+      bPlay.onclick  = () => { window.chReplayEnPause = false; setPlayState("PLAY"); if((typeof timerSimulLive === "undefined" || !timerSimulLive) && (btnReplay.innerText || "").includes("Replay")) btnReplay.click(); };
+      bStop.onclick  = () => {
+        window.chReplayEnPause = false;
         if(typeof arreterSimulationLive === "function") arreterSimulationLive();
         else if((btnReplay.innerText || "").includes("Stop")) btnReplay.click();
         ctrlBox.style.display = "none";
-        btnMain.textContent = "📊 Toute la séance ▾";
-        btnMain.focus();
+        btnMain.dataset.directToute = "1";
+        btnMain.textContent = "📊 Toute la séance";
+        btnMain.style.setProperty("border-color", "#16A34A", "important");
+        btnMain.style.setProperty("color", "#15803D", "important");
       };
     }
 
