@@ -3419,7 +3419,7 @@ async function demarrageAutomatiqueHttp() {
     }
 
     // 2. VERIFICATION DE CONCORDANCE AVEC LE SERVEUR EN ARRIERE-PLAN
-    if(window.__chIdxEnCours) return; window.__chIdxEnCours = true; try { const r = await fetch('/bvmt_api/index' + (document.getElementById('selHorizon')?.value === 'LIVE' ? '?live=1' : ''));
+    const r = await fetch('/bvmt_api/index' + (document.getElementById('selHorizon')?.value === 'LIVE' ? '?live=1' : ''));
     if (!r.ok) return;
     const rawIdx = await r.text();
     let idx = null;
