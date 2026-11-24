@@ -8430,20 +8430,50 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       btnMain.textContent = "📊 Toute la séance ▾";
       const panel = document.createElement("div");
       panel.className = "ch-pop-panel";
-      panel.innerHTML = '<div class="ch-pop-sec-title">Mode de lecture séance</div><button type="button" id="optMenuTouteSeance">📊 Toute la séance</button><button type="button" id="optMenuReplaySeance">🎬 Replay Séance (Tick/Tick)</button>';
+      panel.innerHTML = '<div class="ch-pop-sec-title">Mode de lecture séance</div><button type="button" id="optMenuTouteSeance">📊 Toute la séance</button><button type="button" id="optMenuReplaySeance">🎬 Replay Séance (Tick/Tick)</button><button type="button" id="optMenuPauseSeance" style="display:flex;align-items:center;gap:8px;width:100%;height:32px;padding:0 12px;white-space:nowrap;font-size:12px;font-weight:700;border-radius:6px;background:#1E293B;color:#F8FAFC;border:1px solid #334155;margin-top:4px;cursor:pointer;">⏸ Pause</button>';
       wrap.appendChild(btnMain);
       wrap.appendChild(panel);
       btnReplay.insertAdjacentElement("beforebegin", wrap);
 
+      const btnPauseOrig = document.getElementById("btnPauseLive");
+      btnMain.dataset.modeReplay = "0";
+
+      function setEtatBoutonSeance(mode){
+        btnMain.dataset.modeReplay = mode;
+        if(mode === "PAUSE"){
+          btnMain.textContent = "⏸ Pause";
+          btnMain.style.setProperty("border-color", "#F59E0B", "important");
+          btnMain.style.setProperty("color", "#D97706", "important");
+        } else {
+          btnMain.textContent = "📊 Toute la séance ▾";
+          btnMain.style.removeProperty("border-color");
+          btnMain.style.removeProperty("color");
+        }
+      }
+
       btnMain.onclick = e => {
         e.stopPropagation();
+        if(btnMain.dataset.modeReplay === "PAUSE"){
+          if(btnPauseOrig) btnPauseOrig.click();
+          setEtatBoutonSeance("TOUTE");
+          return;
+        }
         document.querySelectorAll(".ch-pop-panel").forEach(p => { if(p !== panel) p.classList.remove("open"); });
         panel.classList.toggle("open");
       };
       panel.onclick = e => e.stopPropagation();
       document.addEventListener("click", () => panel.classList.remove("open"));
-      document.getElementById("optMenuTouteSeance").onclick = () => { panel.classList.remove("open"); btnMain.textContent = "📊 Toute la séance ▾"; btnToute.click(); };
-      document.getElementById("optMenuReplaySeance").onclick = () => { panel.classList.remove("open"); btnMain.textContent = "🎬 Replay Séance ▾"; btnReplay.click(); };
+
+      document.getElementById("optMenuTouteSeance").onclick = () => {
+        panel.classList.remove("open");
+        setEtatBoutonSeance("TOUTE");
+        btnToute.click();
+      };
+      document.getElementById("optMenuReplaySeance").onclick = () => {
+        panel.classList.remove("open");
+        setEtatBoutonSeance("PAUSE");
+        btnReplay.click();
+      };
     }
 
     // 2. Placer "Autres" et "?" juste a droite de "Camembert" sur la 1ere ligne (une seule fois)
