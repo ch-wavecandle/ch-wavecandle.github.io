@@ -8427,8 +8427,8 @@ body.dark-theme #btnMenuSeanceStable {
     const btnMain = document.createElement("button"); btnMain.id = "btnMenuSeanceStable"; btnMain.type = "button"; btnMain.className = "btn-action";
     btnMain.style.cssText = "display:inline-flex;align-items:center;justify-content:center;gap:5px;height:26px;padding:0 10px;line-height:24px;border-color:#FFD700;color:#FFD700;font-weight:700;";
     btnMain.textContent = "📊 Toute la séance ▾";
-    const panel = document.createElement("div"); panel.className = "ch-pop-panel"; panel.style.minWidth = "205px";
-    panel.innerHTML = '<div class="ch-pop-sec-title">Mode de lecture séance</div><button type="button" id="optMenuTouteSeance" class="btn-action" style="text-align:left;border-color:#00FF66;color:#00FF66;">📊 Toute la séance</button><button type="button" id="optMenuReplaySeance" class="btn-action" style="text-align:left;border-color:#FFD700;color:#FFD700;">🎬 Replay Séance (Tick/Tick)</button>';
+    const panel = document.createElement("div"); panel.className = "ch-pop-panel"; panel.style.minWidth = "265px"; panel.style.width = "max-content";
+    panel.innerHTML = '<div class="ch-pop-sec-title">Mode de lecture séance</div><button type="button" id="optMenuTouteSeance" style="text-align:left;border-color:#00FF66;color:#00FF66;">📊 Toute la séance</button><button type="button" id="optMenuReplaySeance" style="text-align:left;border-color:#FFD700;color:#FFD700;">🎬 Replay Séance (Tick/Tick)</button>';
     wrap.appendChild(btnMain); wrap.appendChild(panel);
     (selOld || btnReplay).insertAdjacentElement("beforebegin", wrap);
     btnMain.onclick = e => { e.stopPropagation(); document.querySelectorAll(".ch-pop-panel").forEach(p => { if(p !== panel) p.classList.remove("open"); }); panel.classList.toggle("open"); };
