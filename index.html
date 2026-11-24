@@ -8454,7 +8454,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
 
       const getDateReplayFr = () => {
         const selR = document.getElementById("selDateReplay");
-        const txtR = selR && selR.selectedOptions && selR.selectedOptions.at(0) ? selR.selectedOptions.at(0).textContent : (selR ? selR.value : "");
+        const txtR = selR && selR.selectedOptions && selR.selectedOptions.item(0) ? selR.selectedOptions.item(0).textContent : (selR ? selR.value : "");
         const mFr = (txtR || "").match(/(\d{2}\/\d{2}\/\d{4})/);
         if(mFr) return mFr.at(1);
         const mIso = (txtR || "").match(/(\d{4})-(\d{2})-(\d{2})/);
@@ -8575,7 +8575,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     if(bLive && bLive.dataset.showReplay === "1"){
       const stRep = bLive.dataset.replayState || "PLAY";
       const selR = document.getElementById("selDateReplay");
-      const rawR = (selR && selR.selectedOptions && selR.selectedOptions.at(0) ? selR.selectedOptions.at(0).textContent : (selR ? selR.value : "")) || document.getElementById("txtDateSeance")?.value || "";
+      const rawR = (selR && selR.selectedOptions && selR.selectedOptions.item(0) ? selR.selectedOptions.item(0).textContent : (selR ? selR.value : "")) || document.getElementById("txtDateSeance")?.value || "";
       const mFr = rawR.match(/(\d{2}\/\d{2}\/\d{4})/);
       const mIso = rawR.match(/(\d{4})-(\d{2})-(\d{2})/);
       const dtR = mFr ? mFr.at(1) : (mIso ? (mIso.at(3)+"/"+mIso.at(2)+"/"+mIso.at(1)) : "");
