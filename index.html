@@ -8226,33 +8226,62 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     return (m && m.length > 0) ? m.at(0) : "";
   }
 
+    function getDateEtHeureTunis(){
+    try {
+      const now = new Date();
+      const parts = new Intl.DateTimeFormat("fr-FR", {
+        timeZone: "Africa/Tunis",
+        year: "numeric", month: "2-digit", day: "2-digit",
+        hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false
+      }).formatToParts(now);
+      const map = {};
+      parts.forEach(pt => { map[pt.type] = pt.value; });
+      return {
+        dateStr: (map.day || "24") + (map.month || "11") + (map.year || "2026"),
+        heureStr: (map.hour || "00") + ":" + (map.minute || "00") + ":" + (map.second || "00")
+      };
+    } catch(e){
+      const d = new Date();
+      const dd = String(d.getDate()).padStart(2,"0");
+      const mm = String(d.getMonth()+1).padStart(2,"0");
+      const yyyy = String(d.getFullYear());
+      const hh = String(d.getHours()).padStart(2,"0");
+      const mi = String(d.getMinutes()).padStart(2,"0");
+      const ss = String(d.getSeconds()).padStart(2,"0");
+      return { dateStr: dd + mm + yyyy, heureStr: hh + ":" + mi + ":" + ss };
+    }
+  }
+
   async function lireHeureConfigSystem(){
     const lh = document.getElementById("lblHorlogeMarche");
     if(!lh || typeof appelerGradioApi !== "function") return;
     const tk = (typeof sessionStorage !== "undefined" && typeof CLE_TK !== "undefined") ? (sessionStorage.getItem(CLE_TK) || "") : "";
+    const tunisNow = getDateEtHeureTunis();
 
-    // Determiner la date active (JJMMAAAA)
-    const rawD = (document.getElementById("selDateReplay")?.value || document.getElementById("txtDateSeance")?.value || document.getElementById("txtBadgeLive")?.textContent || "").trim();
-    const mIso = rawD.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    const mFr = rawD.match(/(\d{2})\/(\d{2})\/(\d{4})/);
-    const dStr = mIso ? (mIso.at(3) + mIso.at(2) + mIso.at(1)) : (mFr ? (mFr.at(1) + mFr.at(2) + mFr.at(3)) : new Date().toLocaleDateString("fr-FR").replace(/\//g, ""));
-
-    // 1. Lire Synthese_cloture/synthese_cloture_reel_JJMMAAAA.csv (reference officielle apres cloture = 15:00:00)
-    if(dStr.length === 8){
-      try {
-        const resSyn = await appelerGradioApi("bvmt_data", { token: tk, path: "Synthese_cloture/synthese_cloture_reel_" + dStr + ".csv" });
-        if(resSyn && resSyn.status === 200 && resSyn.text){
-          const hSyn = extraireHeureConfigSystem(resSyn.text);
-          if(hSyn && hSyn !== "--:--:--"){
-            heureMarcheVerrouillee = hSyn;
-            if(lh.textContent !== hSyn) lh.textContent = hSyn;
-            return;
+    // Si 15h00 est depasse : arreter de lire DonneesSource.txt et lire Historique/Synthese_cloture/synthese_cloture_reel_<DateDuJour>.csv
+    if(tunisNow.heureStr >= "15:00:00"){
+      if(heureMarcheVerrouillee === "15:00:00" && lh.textContent === "15:00:00") return;
+      const cheminsSynth = [
+        "Historique/Synthese_cloture/synthese_cloture_reel_" + tunisNow.dateStr + ".csv",
+        "Synthese_cloture/synthese_cloture_reel_" + tunisNow.dateStr + ".csv"
+      ];
+      for(const chPath of cheminsSynth){
+        try {
+          const resSyn = await appelerGradioApi("bvmt_data", { token: tk, path: chPath });
+          if(resSyn && resSyn.status === 200 && resSyn.text){
+            const hSyn = extraireHeureConfigSystem(resSyn.text);
+            if(hSyn && hSyn !== "--:--:--"){
+              heureMarcheVerrouillee = hSyn;
+              if(lh.textContent !== hSyn) lh.textContent = hSyn;
+              return;
+            }
           }
-        }
-      } catch(e){}
+        } catch(e){}
+      }
+      return;
     }
 
-    // 2. Sinon lire DonneesSource.txt (en seance Live)
+    // Avant 15h00 (en seance Live) : lire DonneesSource.txt -> CONFIG_SYSTEM -> Heure
     try {
       const res = await appelerGradioApi("bvmt_data", { token: tk, path: "DonneesSource.txt" });
       if(res && res.status === 200 && res.text){
