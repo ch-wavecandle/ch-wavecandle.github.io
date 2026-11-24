@@ -8312,12 +8312,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     padding: 0 !important;
   }
 
-  /* 2. Mode Masque automatique de la barre Info Bourse (KPIs) */
-  #statsBar, .stats-bar, #kpiBar {
-    transition: max-height 0.24s ease, opacity 0.2s ease, padding 0.2s ease, margin 0.2s ease !important;
-    overflow: hidden !important;
-  }
-  body.ch-autohide-kpi #statsBar.kpi-collapsed,
+    body.ch-autohide-kpi #statsBar.kpi-collapsed,
   body.ch-autohide-kpi .stats-bar.kpi-collapsed,
   body.ch-autohide-kpi #kpiBar.kpi-collapsed {
     max-height: 0 !important;
@@ -8647,18 +8642,24 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     row.appendChild(span);
     panelAutres.appendChild(row);
 
-    const getKpiBar = () => {
-      if(window.__chKpiBarEl && document.body.contains(window.__chKpiBarEl)) return window.__chKpiBarEl;
-      const elDernier = Array.from(document.querySelectorAll("div, span")).find(el => (el.textContent || "").trim() === "DERNIER COURS");
+        const getKpiBar = () => {
+      const existingGrp = document.getElementById("chGroupeInfoBourse");
+      if(existingGrp) return existingGrp;
+      const elDernier = Array.from(document.querySelectorAll("div, span, small, label")).find(el => /dernier cours/i.test((el.textContent || "").trim()));
       let cur = elDernier ? elDernier.parentElement : null;
       while(cur && cur !== document.body){
-        if((cur.textContent || "").includes("VOLUME SÉANCE") && (cur.textContent || "").includes("ECART NET")){
-          window.__chKpiBarEl = cur;
-          return cur;
+        const txt = cur.textContent || "";
+        if(/dernier cours/i.test(txt) && /volume/i.test(txt) && /[eé]cart net/i.test(txt)){
+          const grp = document.createElement("div");
+          grp.id = "chGroupeInfoBourse";
+          grp.style.width = "100%";
+          cur.parentElement.insertBefore(grp, cur);
+          grp.appendChild(cur);
+          return grp;
         }
         cur = cur.parentElement;
       }
-      return document.getElementById("statsBar") || document.querySelector(".stats-bar, #kpiBar");
+      return null;
     };
 
     const setCollapsed = (collapsed) => {
@@ -8691,9 +8692,9 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       if(!document.body.classList.contains("ch-autohide-kpi")) return;
       const bar = getKpiBar();
       if(!bar) return;
-      if(e.clientY <= 115){
+      if(e.clientY <= 95){
         if(bar.classList.contains("kpi-collapsed")) setCollapsed(false);
-      } else if(e.clientY > 145){
+      } else if(e.clientY > 125){
         if(!bar.classList.contains("kpi-collapsed")) setCollapsed(true);
       }
     });
