@@ -8196,6 +8196,61 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
   });
 })();
 </script>
-<script id="ch-title-and-donneessource-clock">(function(){ if(!document.getElementById("ch-final-touch-css")){ const st=document.createElement("style"); st.id="ch-final-touch-css"; st.textContent="#chChartTickerBanner{background:transparent!important;border:none!important;box-shadow:none!important;color:#000000!important;font-weight:900!important;font-size:16px!important;letter-spacing:0.05em!important;top:6px!important;}#boxHorlogeMarche,#lblHorlogeMarche{display:inline-flex!important;align-items:center!important;gap:4px!important;color:#4ADE80!important;font-weight:800!important;}#btnSimulerLive,#btnTouteSeance{display:none!important;}"; document.head.appendChild(st); } async function lireHeureConfigSystem(){ const lh=document.getElementById("lblHorlogeMarche"); if(!lh) return; try { const r=await fetch("/bvmt_api/DonneesSource.txt?t="+Date.now()); if(!r.ok) return; const lines=(await r.text()).split(/\r?\n/).filter(l=>l.trim().length>0); if(lines.length<2) return; const sep=lines.includes(";")?";":"\t"; const hdr=lines.split(sep).map(c=>c.trim().toLowerCase()); const idxH=hdr.findIndex(c=>c==="heure"); const cfgLine=lines.slice().reverse().find(l=>/config[_\s-]*system/i.test(l)) || lines[lines.length-1]; const cols=cfgLine.split(sep); if(idxH>=0 && cols[idxH] && cols[idxH].trim()){ lh.textContent=cols[idxH].trim(); return; } const m=cfgLine.match(/\b(\d|2[0-3]):[0-5]\d:[0-5]\d\b/); if(m) lh.textContent=m; } catch(e){} } function syncAll(){ const b=document.getElementById("chChartTickerBanner"); if(b){ const bg=getComputedStyle(document.body).backgroundColor||""; const m=bg.match(/\d+/g); const lum=(m&&m.length>=3)?(parseInt(m,10)*299+parseInt(m,10)*587+parseInt(m,10)*114)/1000:255; b.style.setProperty("color",lum<128?"#FFFFFF":"#000000","important"); } const bh=document.getElementById("boxHorlogeMarche"); if(bh) bh.style.setProperty("display","inline-flex","important"); lireHeureConfigSystem(); } window.addEventListener("load",function(){ syncAll(); setInterval(syncAll,2000); }); })();</script>
+<script id="ch-title-and-donneessource-clock">
+(function(){
+  if(!document.getElementById("ch-final-touch-css")){
+    const st = document.createElement("style");
+    st.id = "ch-final-touch-css";
+    st.textContent = `
+      #chChartTickerBanner { background:transparent!important; border:none!important; box-shadow:none!important; color:#000000!important; font-weight:900!important; font-size:16px!important; letter-spacing:0.05em!important; top:6px!important; }
+      #boxHorlogeMarche { display:inline-flex!important; align-items:center!important; gap:4px!important; background:#0F172A!important; color:#E2E8F0!important; padding:0 6px!important; border-radius:3px!important; font-weight:700!important; }
+      #lblHorlogeMarche { color:#4ADE80!important; font-weight:800!important; }
+      #btnSimulerLive, #btnTouteSeance { display:none!important; }
+    `;
+    document.head.appendChild(st);
+  }
+
+  async function lireHeureConfigSystem(){
+    const lh = document.getElementById("lblHorlogeMarche");
+    if(!lh) return;
+    try {
+      const r = await fetch("/bvmt_api/DonneesSource.txt?t=" + Date.now());
+      if(!r.ok) return;
+      const raw = await r.text();
+      const lines = raw.split(/\r?\n/).filter(l => l.trim().length > 0);
+      if(lines.length < 2) return;
+      const sep = lines.includes(";") ? ";" : "\t";
+      const hdr = lines.split(sep).map(c => c.trim().toLowerCase());
+      const idxH = hdr.findIndex(c => c === "heure");
+      const cfgLine = lines.slice().reverse().find(l => l.toUpperCase().startsWith("CONFIG_SYSTEM")) || lines[lines.length - 1];
+      const cols = cfgLine.split(sep);
+      if(idxH >= 0 && cols[idxH] && cols[idxH].trim()){
+        lh.textContent = cols[idxH].trim();
+        return;
+      }
+      const m = cfgLine.match(/\b(\d|2[0-3]):[0-5]\d:[0-5]\d\b/);
+      if(m) lh.textContent = m;
+    } catch(e){}
+  }
+
+  function syncAll(){
+    const b = document.getElementById("chChartTickerBanner");
+    if(b){
+      const bg = getComputedStyle(document.body).backgroundColor || "";
+      const m = bg.match(/\d+/g);
+      const lum = (m && m.length >= 3) ? (parseInt(m,10)*299 + parseInt(m,10)*587 + parseInt(m,10)*114)/1000 : 255;
+      b.style.setProperty("color", lum < 128 ? "#FFFFFF" : "#000000", "important");
+    }
+    const bh = document.getElementById("boxHorlogeMarche");
+    if(bh) bh.style.setProperty("display", "inline-flex", "important");
+    lireHeureConfigSystem();
+  }
+
+  window.addEventListener("load", function(){
+    syncAll();
+    setInterval(syncAll, 2000);
+  });
+})();
+</script>
 </body>
 </html>
