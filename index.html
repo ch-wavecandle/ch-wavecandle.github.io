@@ -8207,7 +8207,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
   }
 
   /* 2. Masquage definitif des anciens boutons doublons */
-  #btnSimulerLive, #btnTouteSeance, #selActionSeance, #btnDossierLive, #btnFichiersLive {
+  #btnSimulerLive, #btnTouteSeance, #selActionSeance, #btnDossierLive, #btnFichiersLive, #selVitesseReplay:not([data-show-vit="1"]) {
     display: none !important;
     visibility: hidden !important;
     position: absolute !important;
@@ -8458,7 +8458,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
         btnMain.dataset.etat = etat;
         if(etat === "REPLAY"){
           ctrlBox.style.display = "none";
-          if(selVit) selVit.style.setProperty("display", "none", "important");
+          if(selVit){ selVit.dataset.showVit = "0"; selVit.style.setProperty("display", "none", "important"); }
           wrap.style.display = "inline-flex";
           btnMain.textContent = "🎬 Replay Séance";
           btnMain.style.setProperty("border-color", "#D97706", "important");
@@ -8466,11 +8466,11 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
         } else if(etat === "CONTROLS"){
           wrap.style.display = "none";
           ctrlBox.style.display = "inline-flex";
-          if(selVit) selVit.style.setProperty("display", "inline-block", "important");
+          if(selVit){ selVit.dataset.showVit = "1"; selVit.style.setProperty("display", "inline-block", "important"); }
           setPlayVisual("PLAY");
         } else if(etat === "TOUTE"){
           ctrlBox.style.display = "none";
-          if(selVit) selVit.style.setProperty("display", "none", "important");
+          if(selVit){ selVit.dataset.showVit = "0"; selVit.style.setProperty("display", "none", "important"); }
           wrap.style.display = "inline-flex";
           btnMain.textContent = "📊 Toute la séance";
           btnMain.style.setProperty("border-color", "#16A34A", "important");
@@ -8489,10 +8489,12 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
           setUiState("CONTROLS");
           btnReplay.click();
         } else if(etat === "TOUTE"){
-          window.chReplayStopForce = false;
+          window.chReplayStopForce = true;
           window.chReplayEnPause = false;
-          btnToute.click();
           setUiState("REPLAY");
+          const btnChg = document.getElementById("btnChargerDate");
+          if(btnChg) btnChg.click();
+          else btnToute.click();
         }
       };
 
