@@ -8243,30 +8243,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     }
   }
 
-  async function syncHorlogeDepuisDonneesSource(){
-    const boxH = document.getElementById("boxHorlogeMarche");
-    const lblH = document.getElementById("lblHorlogeMarche");
-    if(boxH) boxH.style.setProperty("display", "inline-flex", "important");
-    if(!lblH) return;
-    const chemins = [
-      "/bvmt_api/DonneesSource.txt",
-      "/bvmt_api/Cache_Live/DonneesSource.txt",
-      "/bvmt_api/Donn%C3%A9esSource.txt"
-    ];
-    for(const url of chemins){
-      try {
-        const r = await fetch(url + "?t=" + Date.now());
-        if(!r.ok) continue;
-        const txt = await r.text();
-        if(!txt || txt.trim().length < 5) continue;
-        const matches = txt.match(/\b([01]\d|2[0-3]):[0-5]\d:[0-5]\d\b/g);
-        if(matches && matches.length > 0){
-          lblH.textContent = matches[matches.length - 1];
-          break;
-        }
-      } catch(e){}
-    }
-  }
+  async function syncHorlogeDepuisDonneesSource(){ const boxH = document.getElementById("boxHorlogeMarche"); const lblH = document.getElementById("lblHorlogeMarche"); if(boxH) boxH.style.setProperty("display","inline-flex","important"); if(!lblH) return; try { const r = await fetch("/bvmt_api/Cache_Live/temp_DonneesSource.txt?t=" + Date.now()); if(r.ok){ const txt = await r.text(); const m = txt.match(/\b(\d|2[0-3]):[0-5]\d:[0-5]\d\b/g); if(m && m.length > 0){ lblH.textContent = m[m.length - 1]; return; } } } catch(e){} if(typeof heureMarcheDs !== "undefined" && heureMarcheDs){ lblH.textContent = heureMarcheDs; } else if(typeof globalData !== "undefined" && globalData && globalData.derniere_op_globale && globalData.derniere_op_globale.heure){ lblH.textContent = globalData.derniere_op_globale.heure; } }
 
   window.addEventListener("load", () => {
     syncBannerThemeColor();
