@@ -8564,11 +8564,11 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
 
   function integrerOutilsDansPalette(){
     if(document.getElementById("chPaletteExtraControls")) return;
-    const btnMainLibre = Array.from(document.querySelectorAll("button, select")).find(el => /main libre/i.test(el.textContent || ""));
-    const palBody = btnMainLibre ? btnMainLibre.parentElement : null;
+    const btnMesAn = Array.from(document.querySelectorAll("button")).find(el => /mes analyses/i.test(el.textContent || ""));
+    const palBody = btnMesAn ? btnMesAn.parentElement : null;
     if(!palBody) return;
 
-    const btnAxes = Array.from(document.querySelectorAll("button, select")).find(el => /^axes\s*:/i.test((el.textContent || "").trim()) && !palBody.contains(el));
+    const btnAxes = Array.from(document.querySelectorAll("button, select")).find(el => /axes\s*:/i.test(el.textContent || "") && !palBody.contains(el));
     const selMode = Array.from(document.querySelectorAll("select")).find(s => !palBody.contains(s) && Array.from(s.options || []).some(o => /vagues polygonales/i.test(o.textContent || "")));
     if(!btnAxes && !selMode) return;
 
