@@ -8203,34 +8203,54 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     st.id = "ch-final-touch-css";
     st.textContent = `
       #chChartTickerBanner { background:transparent!important; border:none!important; box-shadow:none!important; color:#000000!important; font-weight:900!important; font-size:16px!important; letter-spacing:0.05em!important; top:6px!important; }
-      #boxHorlogeMarche { display:inline-flex!important; align-items:center!important; gap:4px!important; background:#0F172A!important; color:#E2E8F0!important; padding:1px 7px!important; border-radius:4px!important; border:1px solid #334155!important; font-weight:700!important; height:20px!important; }
+      #ch-statusbar-telemetry { background:#0F172A!important; color:#E2E8F0!important; border:1px solid #334155!important; }
+      #boxHorlogeMarche { display:inline-flex!important; align-items:center!important; gap:4px!important; background:transparent!important; color:#E2E8F0!important; border:none!important; padding:0!important; font-weight:700!important; }
       #lblHorlogeMarche { color:#4ADE80!important; font-weight:800!important; }
       #btnSimulerLive, #btnTouteSeance { display:none!important; visibility:hidden!important; }
     `;
     document.head.appendChild(st);
   }
 
+  function extraireHeureDepuisTexteGrille(raw){
+    if(!raw) return "";
+    const lines = raw.split(/\r?\n/).filter(l => l.trim().length > 0);
+    if(lines.length < 2) return "";
+    const firstLine = lines.at(0) || "";
+    const sep = firstLine.includes(";") ? ";" : "\t";
+    const hdr = firstLine.split(sep).map(c => c.trim().toLowerCase());
+    const idxH = hdr.findIndex(c => c === "heure");
+    const cfgLine = lines.slice().reverse().find(l => l.toUpperCase().startsWith("CONFIG_SYSTEM")) || lines[lines.length - 1];
+    const cols = cfgLine.split(sep);
+    if(idxH >= 0 && cols[idxH] && cols[idxH].trim()) return cols[idxH].trim();
+    const m = cfgLine.match(/\b(\d|2[0-3]):[0-5]\d:[0-5]\d\b/);
+    return m ? m : "";
+  }
+
   async function lireHeureConfigSystem(){
     const lh = document.getElementById("lblHorlogeMarche");
     if(!lh || typeof appelerGradioApi !== "function") return;
+    const tk = sessionStorage.getItem(typeof CLE_TK !== "undefined" ? CLE_TK : "ch_bvmt_token") || "";
+
+    // 1. Lecture prioritaire depuis DonneesSource.txt (en séance Live)
     try {
-      const tk = sessionStorage.getItem(typeof CLE_TK !== "undefined" ? CLE_TK : "ch_bvmt_token") || "";
       const res = await appelerGradioApi("bvmt_data", { token: tk, path: "DonneesSource.txt" });
-      if(!res || res.status !== 200 || !res.text) return;
-      const lines = res.text.split(/\r?\n/).filter(l => l.trim().length > 0);
-      if(lines.length < 2) return;
-      const firstLine = lines.at(0) || "";
-      const sep = firstLine.includes(";") ? ";" : "\t";
-      const hdr = firstLine.split(sep).map(c => c.trim().toLowerCase());
-      const idxH = hdr.findIndex(c => c === "heure");
-      const cfgLine = lines.slice().reverse().find(l => l.toUpperCase().startsWith("CONFIG_SYSTEM")) || lines[lines.length - 1];
-      const cols = cfgLine.split(sep);
-      if(idxH >= 0 && cols[idxH] && cols[idxH].trim()){
-        lh.textContent = cols[idxH].trim();
-        return;
+      if(res && res.status === 200 && res.text){
+        const hDs = extraireHeureDepuisTexteGrille(res.text);
+        if(hDs){ lh.textContent = hDs; return; }
       }
-      const m = cfgLine.match(/\b(\d|2[0-3]):[0-5]\d:[0-5]\d\b/);
-      if(m) lh.textContent = m;
+    } catch(e){}
+
+    // 2. Repli automatique sur synthese_cloture_reel_JJMMAAAA.csv (quand le serveur est au repos / cache nettoye)
+    try {
+      const dInp = document.getElementById("txtDateSeance")?.value || new Date().toLocaleDateString("fr-FR");
+      const dStr = dInp.replace(/\//g, "");
+      if(dStr.length === 8){
+        const resSyn = await appelerGradioApi("bvmt_data", { token: tk, path: "Synthese_cloture/synthese_cloture_reel_" + dStr + ".csv" });
+        if(resSyn && resSyn.status === 200 && resSyn.text){
+          const hSyn = extraireHeureDepuisTexteGrille(resSyn.text);
+          if(hSyn){ lh.textContent = hSyn; return; }
+        }
+      }
     } catch(e){}
   }
 
@@ -8245,8 +8265,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     const bh = document.getElementById("boxHorlogeMarche");
     if(bh){
       bh.style.setProperty("display", "inline-flex", "important");
-      bh.style.setProperty("background", "#0F172A", "important");
-      bh.style.setProperty("color", "#E2E8F0", "important");
+      bh.style.setProperty("background", "transparent", "important");
     }
     const br = document.getElementById("btnSimulerLive");
     if(br) br.style.setProperty("display", "none", "important");
@@ -8255,7 +8274,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
 
   window.addEventListener("load", function(){
     syncAll();
-    setInterval(syncAll, 2000);
+    setInterval(syncAll, 2500);
   });
 })();
 </script>
