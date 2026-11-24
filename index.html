@@ -8217,7 +8217,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     if(lines.length < 2) return "";
     const firstLine = lines.at(0) || "";
     const sep = firstLine.includes(";") ? ";" : "\t";
-    const hdr = firstLine.split(sep).map(c => c.trim().toLowerCase());
+    const hdr = firstLine.replace(/^\uFEFF/, "").split(sep).map(c => c.trim().toLowerCase());
     const idxH = hdr.findIndex(c => c === "heure");
     const cfgLine = lines.slice().reverse().find(l => /config[_\s-]*system/i.test(l)) || lines[lines.length - 1];
     const cols = cfgLine.split(sep);
