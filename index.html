@@ -8324,6 +8324,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     border-width: 0 !important;
     pointer-events: none !important;
   }
+  #chGroupeInfoBourse.kpi-collapsed { display: none !important; visibility: hidden !important; height: 0 !important; overflow: hidden !important; }
 </style>
 <script id="ch-master-ui-orchestrator">
 (function(){
@@ -8642,14 +8643,14 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     row.appendChild(span);
     panelAutres.appendChild(row);
 
-        const getKpiBar = () => {
+            const getKpiBar = () => {
       const existingGrp = document.getElementById("chGroupeInfoBourse");
       if(existingGrp) return existingGrp;
-      const elDernier = Array.from(document.querySelectorAll("div, span, small, label")).find(el => /dernier cours/i.test((el.textContent || "").trim()));
-      let cur = elDernier ? elDernier.parentElement : null;
+      const leaf = Array.from(document.querySelectorAll("div, span, small, label")).find(el => el.children.length === 0 && /dernier cours/i.test((el.textContent || "").trim()));
+      let cur = leaf ? leaf.parentElement : null;
       while(cur && cur !== document.body){
         const txt = cur.textContent || "";
-        if(/dernier cours/i.test(txt) && /volume/i.test(txt) && /[eé]cart net/i.test(txt)){
+        if(cur.children.length >= 6 && cur.children.length <= 12 && /dernier cours/i.test(txt) && /volume/i.test(txt) && !cur.querySelector("canvas")){
           const grp = document.createElement("div");
           grp.id = "chGroupeInfoBourse";
           grp.style.width = "100%";
