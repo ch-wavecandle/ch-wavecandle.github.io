@@ -8647,15 +8647,47 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     row.appendChild(span);
     panelAutres.appendChild(row);
 
-    const getKpiBar = () => document.getElementById("statsBar") || document.querySelector(".stats-bar, #kpiBar");
+    const getKpiBar = () => {
+      if(window.__chKpiBarEl && document.body.contains(window.__chKpiBarEl)) return window.__chKpiBarEl;
+      const elDernier = Array.from(document.querySelectorAll("div, span")).find(el => (el.textContent || "").trim() === "DERNIER COURS");
+      let cur = elDernier ? elDernier.parentElement : null;
+      while(cur && cur !== document.body){
+        if((cur.textContent || "").includes("VOLUME SÉANCE") && (cur.textContent || "").includes("ECART NET")){
+          window.__chKpiBarEl = cur;
+          return cur;
+        }
+        cur = cur.parentElement;
+      }
+      return document.getElementById("statsBar") || document.querySelector(".stats-bar, #kpiBar");
+    };
 
     const setCollapsed = (collapsed) => {
       const bar = getKpiBar();
       if(!bar) return;
-      if(collapsed) bar.classList.add("kpi-collapsed");
-      else bar.classList.remove("kpi-collapsed");
+      if(collapsed){
+        bar.classList.add("kpi-collapsed");
+        bar.style.setProperty("max-height", "0px", "important");
+        bar.style.setProperty("opacity", "0", "important");
+        bar.style.setProperty("padding-top", "0px", "important");
+        bar.style.setProperty("padding-bottom", "0px", "important");
+        bar.style.setProperty("margin-top", "0px", "important");
+        bar.style.setProperty("margin-bottom", "0px", "important");
+        bar.style.setProperty("border-width", "0px", "important");
+        bar.style.setProperty("overflow", "hidden", "important");
+        bar.style.setProperty("pointer-events", "none", "important");
+      } else {
+        bar.classList.remove("kpi-collapsed");
+        bar.style.removeProperty("max-height");
+        bar.style.removeProperty("opacity");
+        bar.style.removeProperty("padding-top");
+        bar.style.removeProperty("padding-bottom");
+        bar.style.removeProperty("margin-top");
+        bar.style.removeProperty("margin-bottom");
+        bar.style.removeProperty("border-width");
+        bar.style.removeProperty("pointer-events");
+      }
       if(typeof chart !== "undefined" && chart && typeof chart.resize === "function"){
-        setTimeout(() => chart.resize(), 250);
+        setTimeout(() => chart.resize(), 240);
       }
     };
 
