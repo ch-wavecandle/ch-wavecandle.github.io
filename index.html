@@ -8300,12 +8300,34 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     font-weight: 900 !important;
     background: transparent !important;
   }
+  /* 1. Alignement compact du haut en mode LIVE et UNIQUE */
   body[data-horizon="LIVE"] #chSeanceMenuWrap,
   body[data-horizon="LIVE"] #chReplayControls,
   body[data-horizon="LIVE"] #selDateReplay,
-  body[data-horizon="LIVE"] #selVitesseReplay {
+  body[data-horizon="LIVE"] #selVitesseReplay,
+  body[data-horizon="UNIQUE"] #selDateReplay {
     display: none !important;
-    visibility: hidden !important;
+    width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* 2. Mode Masque automatique de la barre Info Bourse (KPIs) */
+  #statsBar, .stats-bar, #kpiBar {
+    transition: max-height 0.24s ease, opacity 0.2s ease, padding 0.2s ease, margin 0.2s ease !important;
+    overflow: hidden !important;
+  }
+  body.ch-autohide-kpi #statsBar.kpi-collapsed,
+  body.ch-autohide-kpi .stats-bar.kpi-collapsed,
+  body.ch-autohide-kpi #kpiBar.kpi-collapsed {
+    max-height: 0 !important;
+    opacity: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    border-width: 0 !important;
+    pointer-events: none !important;
   }
 </style>
 <script id="ch-master-ui-orchestrator">
@@ -8608,7 +8630,63 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     palBody.appendChild(extraBox);
   }
 
+    function initAutoHideInfoBourse(){
+    const popAutres = Array.from(document.querySelectorAll(".ch-pop-wrap")).find(w => w.id !== "chSeanceMenuWrap" && /autres/i.test(w.textContent || ""));
+    const panelAutres = popAutres ? popAutres.querySelector(".ch-pop-panel") : null;
+    if(!panelAutres || document.getElementById("chkAutoHideKpi")) return;
+
+    const row = document.createElement("label");
+    row.style.cssText = "display:flex; align-items:center; gap:8px; padding:6px 8px; margin-top:4px; border-radius:6px; cursor:pointer; font-size:12px; font-weight:700; color:#F8FAFC; background:#1E293B; border:1px solid #334155; user-select:none;";
+    const chk = document.createElement("input");
+    chk.type = "checkbox";
+    chk.id = "chkAutoHideKpi";
+    chk.style.cssText = "width:14px; height:14px; accent-color:#38BDF8; cursor:pointer; margin:0;";
+    const span = document.createElement("span");
+    span.textContent = "Masque automatique barre Info bourse";
+    row.appendChild(chk);
+    row.appendChild(span);
+    panelAutres.appendChild(row);
+
+    const getKpiBar = () => document.getElementById("statsBar") || document.querySelector(".stats-bar, #kpiBar");
+
+    const setCollapsed = (collapsed) => {
+      const bar = getKpiBar();
+      if(!bar) return;
+      if(collapsed) bar.classList.add("kpi-collapsed");
+      else bar.classList.remove("kpi-collapsed");
+      if(typeof chart !== "undefined" && chart && typeof chart.resize === "function"){
+        setTimeout(() => chart.resize(), 250);
+      }
+    };
+
+    const applyMode = (enabled) => {
+      document.body.classList.toggle("ch-autohide-kpi", enabled);
+      try { localStorage.setItem("ch_autohide_kpi", enabled ? "1" : "0"); } catch(e){}
+      setCollapsed(enabled);
+    };
+
+    chk.checked = (localStorage.getItem("ch_autohide_kpi") === "1");
+    applyMode(chk.checked);
+
+    chk.onchange = () => applyMode(chk.checked);
+
+    document.addEventListener("mousemove", (e) => {
+      if(!document.body.classList.contains("ch-autohide-kpi")) return;
+      const bar = getKpiBar();
+      if(!bar) return;
+      if(e.clientY <= 115){
+        if(bar.classList.contains("kpi-collapsed")) setCollapsed(false);
+      } else if(e.clientY > 145){
+        if(!bar.classList.contains("kpi-collapsed")) setCollapsed(true);
+      }
+    });
+  }
+
   function tickMaintenance(){
+    initAutoHideInfoBourse();
+    const chkRad = document.getElementById("chkAutoDernier");
+    const hzCurNow = document.getElementById("selHorizon")?.value || "UNIQUE";
+    if(chkRad){ const lblR = chkRad.closest("label") || chkRad; lblR.style.setProperty("display", (hzCurNow === "LIVE" || hzCurNow === "UNIQUE") ? "inline-flex" : "none", "important"); }
     const hzCur = document.getElementById("selHorizon")?.value || "UNIQUE";
     if(document.body && document.body.dataset.horizon !== hzCur) document.body.dataset.horizon = hzCur;
     integrerOutilsDansPalette();
