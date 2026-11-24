@@ -8440,6 +8440,18 @@ body.dark-theme #btnMenuSeanceStable {
 
   function syncAll(){
     setupMenuSeanceStable();
+    // Deplacer "Autres" et "?" juste a droite de "Camembert" sur la 1ere ligne
+    const btnCam = document.getElementById("btnCamembert") || document.getElementById("chkCamembert")?.closest("label, button, .btn-action") || Array.from(document.querySelectorAll("button, label")).find(el => /camembert/i.test(el.textContent || ""));
+    const popAutres = Array.from(document.querySelectorAll(".ch-pop-wrap")).find(w => /autres/i.test(w.textContent || ""));
+    const btnAide = document.getElementById("btnAide") || document.getElementById("btnLegende") || Array.from(document.querySelectorAll("button")).find(b => (b.textContent || "").trim() === "?");
+    if(btnCam && btnCam.parentElement){
+      if(popAutres && popAutres.parentElement !== btnCam.parentElement){
+        btnCam.insertAdjacentElement("afterend", popAutres);
+      }
+      if(btnAide && (popAutres || btnCam)){
+        (popAutres || btnCam).insertAdjacentElement("afterend", btnAide);
+      }
+    }
     const lh = document.getElementById("lblHorlogeMarche");
     if(lh && !lh.dataset.obsAttached){
       lh.dataset.obsAttached = "1";
