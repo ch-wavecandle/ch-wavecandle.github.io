@@ -8196,55 +8196,6 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
   });
 })();
 </script>
-<script id="ch-title-and-donneessource-clock">
-(function(){
-  if(!document.getElementById("ch-final-touch-css")){
-    const st = document.createElement("style");
-    st.id = "ch-final-touch-css";
-    st.textContent = `
-      #chChartTickerBanner {
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        color: #000000 !important;
-        font-weight: 900 !important;
-        font-size: 16px !important;
-        letter-spacing: 0.05em !important;
-        top: 6px !important;
-      }
-      #boxHorlogeMarche {
-        display: inline-flex !important;
-        align-items: center !important;
-        gap: 4px !important;
-        color: #4ADE80 !important;
-        font-weight: 800 !important;
-      }
-      #lblHorlogeMarche {
-        color: #4ADE80 !important;
-        font-weight: 800 !important;
-      }
-      #btnSimulerLive, #btnTouteSeance {
-        display: none !important;
-      }
-    `;
-    document.head.appendChild(st);
-  }
-
-  function syncBannerThemeColor(){
-    const banner = document.getElementById("chChartTickerBanner");
-    if(!banner) return;
-    const bg = getComputedStyle(document.body).backgroundColor || "";
-    const m = bg.match(/\d+/g);
-    if(m && m.length >= 3){
-      const lum = (Number(m[0]) * 299 + Number(m[1]) * 587 + Number(m[2]) * 114) / 1000;
-      banner.style.setProperty("color", lum < 128 ? "#FFFFFF" : "#000000", "important");
-    } else {
-      banner.style.setProperty("color", "#000000", "important");
-    }
-  }
-
-  async function syncHorlogeDepuisDonneesSource(){ const boxH = document.getElementById("boxHorlogeMarche"); const lblH = document.getElementById("lblHorlogeMarche"); if(boxH){ boxH.style.setProperty("display","inline-flex","important"); boxH.style.setProperty("color","#E2E8F0","important"); } if(lblH){ lblH.style.setProperty("color","#4ADE80","important"); if(typeof heureMarcheDs !== "undefined" && heureMarcheDs) lblH.textContent = heureMarcheDs; else if(typeof globalData !== "undefined" && globalData && globalData.derniere_op_globale && globalData.derniere_op_globale.heure) lblH.textContent = globalData.derniere_op_globale.heure; } });
-})();
-</script>
+<script id="ch-title-and-donneessource-clock">(function(){ if(!document.getElementById("ch-final-touch-css")){ const st=document.createElement("style"); st.id="ch-final-touch-css"; st.textContent="#chChartTickerBanner{background:transparent!important;border:none!important;box-shadow:none!important;color:#000000!important;font-weight:900!important;font-size:16px!important;letter-spacing:0.05em!important;top:6px!important;}#boxHorlogeMarche,#lblHorlogeMarche{display:inline-flex!important;align-items:center!important;gap:4px!important;color:#4ADE80!important;font-weight:800!important;}#btnSimulerLive,#btnTouteSeance{display:none!important;}"; document.head.appendChild(st); } function syncAll(){ const b=document.getElementById("chChartTickerBanner"); if(b){ const bg=getComputedStyle(document.body).backgroundColor||""; const m=bg.match(/\d+/g); const lum=(m&&m.length>=3)?(Number(m)*299+Number(m)*587+Number(m)*114)/1000:255; b.style.setProperty("color",lum<128?"#FFFFFF":"#000000","important"); } const bh=document.getElementById("boxHorlogeMarche"), lh=document.getElementById("lblHorlogeMarche"); if(bh) bh.style.setProperty("display","inline-flex","important"); if(lh){ if(typeof heureMarcheDs!=="undefined"&&heureMarcheDs) lh.textContent=heureMarcheDs; else if(typeof globalData!=="undefined"&&globalData&&globalData.derniere_op_globale&&globalData.derniere_op_globale.heure) lh.textContent=globalData.derniere_op_globale.heure; } } window.addEventListener("load",()=>{ syncAll(); setInterval(syncAll,1000); }); })();</script>
 </body>
 </html>
