@@ -7863,7 +7863,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     if(btnAnalyses && btnChat){
       const oldRow = btnAnalyses.parentElement;
       const targetRow = btnChat.closest(".hdr-row") || btnChat.parentElement.parentElement || btnChat.parentElement;
-      if(oldRow && targetRow && oldRow !== targetRow){
+      if(targetRow){ targetRow.style.flexWrap = "nowrap"; targetRow.style.gap = "4px"; Array.from(targetRow.querySelectorAll("button,select,span,div")).forEach(el => { if(el.style){ el.style.marginLeft = "0"; el.style.whiteSpace = "nowrap"; } }); } if(oldRow && targetRow && oldRow !== targetRow){
         targetRow.style.flexWrap = "nowrap";
         targetRow.style.gap = "5px";
         Array.from(targetRow.children).forEach(el => { if(el.style) el.style.marginLeft = "0"; });
