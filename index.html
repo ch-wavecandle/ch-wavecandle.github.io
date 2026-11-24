@@ -8666,25 +8666,10 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       if(!bar) return;
       if(collapsed){
         bar.classList.add("kpi-collapsed");
-        bar.style.setProperty("max-height", "0px", "important");
-        bar.style.setProperty("opacity", "0", "important");
-        bar.style.setProperty("padding-top", "0px", "important");
-        bar.style.setProperty("padding-bottom", "0px", "important");
-        bar.style.setProperty("margin-top", "0px", "important");
-        bar.style.setProperty("margin-bottom", "0px", "important");
-        bar.style.setProperty("border-width", "0px", "important");
-        bar.style.setProperty("overflow", "hidden", "important");
-        bar.style.setProperty("pointer-events", "none", "important");
+        bar.style.setProperty("display", "none", "important");
       } else {
         bar.classList.remove("kpi-collapsed");
-        bar.style.removeProperty("max-height");
-        bar.style.removeProperty("opacity");
-        bar.style.removeProperty("padding-top");
-        bar.style.removeProperty("padding-bottom");
-        bar.style.removeProperty("margin-top");
-        bar.style.removeProperty("margin-bottom");
-        bar.style.removeProperty("border-width");
-        bar.style.removeProperty("pointer-events");
+        bar.style.removeProperty("display");
       }
       if(typeof chart !== "undefined" && chart && typeof chart.resize === "function"){
         setTimeout(() => chart.resize(), 240);
@@ -8716,6 +8701,16 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
 
   function tickMaintenance(){
     initAutoHideInfoBourse();
+    if(!window.__chEtiquetteInitDone){
+      const chkEtiq = document.getElementById("chkEtiquettes") || Array.from(document.querySelectorAll("input[type='checkbox']")).find(c => /étiquettes|etiquettes/i.test(c.parentElement?.textContent || ""));
+      if(chkEtiq){
+        window.__chEtiquetteInitDone = true;
+        if(!chkEtiq.checked){
+          chkEtiq.checked = true;
+          chkEtiq.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+      }
+    }
     const chkRad = document.getElementById("chkAutoDernier");
     const hzCurNow = document.getElementById("selHorizon")?.value || "UNIQUE";
     if(chkRad){ const lblR = chkRad.closest("label") || chkRad; lblR.style.setProperty("display", (hzCurNow === "LIVE" || hzCurNow === "UNIQUE") ? "inline-flex" : "none", "important"); }
