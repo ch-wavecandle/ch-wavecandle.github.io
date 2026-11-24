@@ -8196,5 +8196,88 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
   });
 })();
 </script>
+<script id="ch-title-and-donneessource-clock">
+(function(){
+  if(!document.getElementById("ch-final-touch-css")){
+    const st = document.createElement("style");
+    st.id = "ch-final-touch-css";
+    st.textContent = `
+      /* 1. Titre valeur sans fond, noir gras sur fond clair (et blanc gras si fond sombre) */
+      #chChartTickerBanner {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        color: #000000 !important;
+        font-weight: 900 !important;
+        font-size: 16px !important;
+        letter-spacing: 0.05em !important;
+        top: 6px !important;
+      }
+      body.dark-theme #chChartTickerBanner,
+      body[data-theme="dark"] #chChartTickerBanner {
+        color: #F8FAFC !important;
+      }
+
+      /* 2. Horloge marche bien lisible dans la barre d'etat sombre */
+      #boxHorlogeMarche, #lblHorlogeMarche {
+        color: #4ADE80 !important;
+        font-weight: 800 !important;
+      }
+
+      /* 3. Masquer definitivement les boutons Replay doublons du haut */
+      #btnSimulerLive, #btnTouteSeance {
+        display: none !important;
+      }
+    `;
+    document.head.appendChild(st);
+  }
+
+  // Adapter la couleur du titre si le theme sombre/clair est bascule via fond du body
+  function syncBannerThemeColor(){
+    const banner = document.getElementById("chChartTickerBanner");
+    if(!banner) return;
+    const bg = getComputedStyle(document.body).backgroundColor || "";
+    const m = bg.match(/\d+/g);
+    if(m && m.length >= 3){
+      const lum = (Number(m) * 299 + Number(m) * 587 + Number(m) * 114) / 1000;
+      banner.style.setProperty("color", lum < 128 ? "#F8FAFC" : "#000000", "important");
+    } else {
+      banner.style.setProperty("color", "#000000", "important");
+    }
+  }
+
+  // Lire toujours l'heure du marche depuis DonneesSource.txt produit par le serveur
+  async function syncHorlogeDepuisDonneesSource(){
+    const lblH = document.getElementById("lblHorlogeMarche");
+    if(!lblH) return;
+    const chemins = [
+      "/bvmt_api/DonneesSource.txt",
+      "/bvmt_api/Cache_Live/DonneesSource.txt",
+      "/bvmt_api/Donn%C3%A9esSource.txt"
+    ];
+    for(const url of chemins){
+      try {
+        const r = await fetch(url + "?t=" + Date.now());
+        if(!r.ok) continue;
+        const txt = await r.text();
+        if(!txt || txt.trim().length < 5) continue;
+        // Extraire le dernier horodatage HH:MM:SS present dans DonneesSource.txt
+        const matches = txt.match(/\b([01]\d|2[0-3]):[0-5]\d:[0-5]\d\b/g);
+        if(matches && matches.length > 0){
+          lblH.textContent = matches[matches.length - 1];
+          break;
+        }
+      } catch(e){}
+    }
+  }
+
+  window.addEventListener("load", () => {
+    syncBannerThemeColor();
+    syncHorlogeDepuisDonneesSource();
+    setInterval(syncBannerThemeColor, 1000);
+    setInterval(syncHorlogeDepuisDonneesSource, 2000);
+  });
+})();
+</script>
 </body>
 </html>
