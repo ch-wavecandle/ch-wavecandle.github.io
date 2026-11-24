@@ -7836,8 +7836,8 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
         row3.style.flexWrap = "nowrap";
         row3.style.gap = "4px";
         Array.from(row3.children).forEach(el => { if(el.style) el.style.marginLeft = "0"; });
-        if(btnAnalyses && btnAnalyses.parentElement !== row3) row3.appendChild(btnAnalyses);
-        if(btnAide && btnAide.parentElement !== row3) row3.appendChild(btnAide);
+        const oldR = btnAnalyses ? btnAnalyses.parentElement : null; if(btnAnalyses){ chatBtn.insertAdjacentElement("afterend", btnAnalyses); } if(btnAide){ (btnAnalyses || chatBtn).insertAdjacentElement("afterend", btnAide); } if(oldR && oldR !== row3 && oldR.children.length === 0){ oldR.style.display = "none"; }
+        
       }
     }
 
