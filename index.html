@@ -7794,5 +7794,64 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
   });
 })();
 </script>
+<script id="ch-live-toolbar-resize-fix">
+(function(){
+  // 1. CSS compact pour que la barre d'outils reste sur 2 lignes maximum meme en mode Horizon Live
+  if(!document.getElementById("ch-compact-live-toolbar-css")){
+    const st = document.createElement("style");
+    st.id = "ch-compact-live-toolbar-css";
+    st.textContent = `
+      header, .top-bar, .toolbar, #controlsBar, #topControls {
+        row-gap: 4px !important;
+        column-gap: 5px !important;
+        padding-top: 4px !important;
+        padding-bottom: 4px !important;
+      }
+      header select, header button, .toolbar select, .toolbar button,
+      #controlsBar select, #controlsBar button {
+        padding: 3px 7px !important;
+        font-size: 11px !important;
+        height: 25px !important;
+        line-height: 1.1 !important;
+      }
+      #mainChart {
+        max-height: calc(100vh - 175px) !important;
+      }
+    `;
+    document.head.appendChild(st);
+  }
+
+  // 2. Recalculer automatiquement la hauteur exacte du graphique des que la barre du haut change de hauteur
+  function syncChartHeightAndResize(){
+    const chEl = document.getElementById("mainChart");
+    const footerEl = document.getElementById("statusBar") || document.getElementById("statusText")?.parentElement;
+    if(chEl){
+      const topY = chEl.getBoundingClientRect().top;
+      const botH = footerEl ? footerEl.getBoundingClientRect().height : 28;
+      const availH = Math.max(260, Math.floor(window.innerHeight - topY - botH - 4));
+      if(Math.abs(chEl.clientHeight - availH) > 4){
+        chEl.style.height = availH + "px";
+      }
+    }
+    if(typeof chart !== "undefined" && chart && typeof chart.resize === "function"){
+      try { chart.resize(); } catch(e){}
+    }
+  }
+
+  window.addEventListener("load", () => {
+    syncChartHeightAndResize();
+    setTimeout(syncChartHeightAndResize, 300);
+    setTimeout(syncChartHeightAndResize, 900);
+    if(typeof ResizeObserver === "function"){
+      const ro = new ResizeObserver(() => syncChartHeightAndResize());
+      ro.observe(document.body);
+      const chEl = document.getElementById("mainChart");
+      if(chEl && chEl.parentElement) ro.observe(chEl.parentElement);
+    }
+    window.addEventListener("resize", syncChartHeightAndResize);
+    document.addEventListener("change", () => setTimeout(syncChartHeightAndResize, 60));
+  });
+})();
+</script>
 </body>
 </html>
