@@ -7862,7 +7862,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     const btnChat = Array.from(document.querySelectorAll("button")).find(b => /\bchat\b/i.test(b.textContent || ""));
     if(btnAnalyses && btnChat){
       const oldRow = btnAnalyses.parentElement;
-      const targetRow = btnChat.parentElement;
+      const targetRow = btnChat.closest(".hdr-row") || btnChat.parentElement.parentElement || btnChat.parentElement;
       if(oldRow && targetRow && oldRow !== targetRow){
         targetRow.style.flexWrap = "nowrap";
         targetRow.style.gap = "5px";
