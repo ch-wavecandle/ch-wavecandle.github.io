@@ -3239,7 +3239,7 @@ document.getElementById('btnSimulerLive').onclick = async () => {
     dessinerGraphique(data);
 
     const op = data.derniere_op_globale;
-    document.getElementById('lblHorlogeMarche').innerText = op ? op.heure : '--:--:--';
+    if(op && op.heure){ window.chHeureTickReplay = op.heure; const bLiveTick = document.getElementById('badgeLive'); const lblTick = document.getElementById('txtBadgeLive'); if(bLiveTick && bLiveTick.dataset.showReplay === '1' && lblTick){ const dtBase = (lblTick.textContent || '').replace(/\s+à\s+\d{2}:\d{2}:\d{2}$/, ''); lblTick.textContent = dtBase + ' à ' + op.heure; } } document.getElementById('lblHorlogeMarche').innerText = op ? op.heure : '--:--:--';
     const infoOp = op ? ` | Dernière op. : ${op.ticker} (${op.sens} ${op.qte.toLocaleString('fr-FR')} @ ${op.prix.toFixed(2)} à ${op.heure})` : '';
     document.getElementById('statusText').style.color = '#FFD700';
     document.getElementById('statusText').innerText = `REPLAY SÉANCE [${idxSimul}/${opsSimul.length} ops] — ${data.ticker}${infoOp}`;
@@ -8471,7 +8471,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
           const dtRep = getDateReplayFr();
           badgeRep.dataset.replayState = state;
           const lblTxt = document.getElementById("txtBadgeLive");
-          const msg = (state === "PAUSE" ? "Pause Séance du " : "Replay Séance du ") + dtRep;
+          const hCur = window.chHeureTickReplay ? (" à " + window.chHeureTickReplay) : ""; const msg = (state === "PAUSE" ? "Pause Séance du " : "Replay Séance du ") + dtRep + hCur;
           if(lblTxt) lblTxt.textContent = msg;
           else badgeRep.textContent = msg;
         }
@@ -8519,7 +8519,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
           setUiState("CONTROLS");
           btnReplay.click();
         } else if(etat === "TOUTE"){ if(badgeRep) badgeRep.dataset.showReplay = "0";
-          window.chReplayStopForce = true;
+          window.chHeureTickReplay = ""; window.chReplayStopForce = true;
           window.chReplayEnPause = false;
           setUiState("REPLAY");
           const btnChg = document.getElementById("btnChargerDate");
@@ -8542,7 +8542,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
 
       bStop.onclick = (e) => {
         e.stopPropagation();
-        window.chReplayStopForce = true;
+        window.chHeureTickReplay = ""; window.chReplayStopForce = true;
         window.chReplayEnPause = false;
         if(typeof window.arreterSimulationLive === "function"){
           window.arreterSimulationLive();
@@ -8580,7 +8580,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       const mIso = rawR.match(/(\d{4})-(\d{2})-(\d{2})/);
       const dtR = mFr ? mFr.at(1) : (mIso ? (mIso.at(3)+"/"+mIso.at(2)+"/"+mIso.at(1)) : "");
       if(dtR){
-        const expected = (stRep === "PAUSE" ? "Pause Séance du " : "Replay Séance du ") + dtR;
+        const hCurM = window.chHeureTickReplay ? (" à " + window.chHeureTickReplay) : ""; const expected = (stRep === "PAUSE" ? "Pause Séance du " : "Replay Séance du ") + dtR + hCurM;
         const lblTxt = document.getElementById("txtBadgeLive");
         if(lblTxt && lblTxt.textContent !== expected) lblTxt.textContent = expected;
       }
