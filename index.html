@@ -3419,9 +3419,12 @@ async function demarrageAutomatiqueHttp() {
     }
 
     // 2. VERIFICATION DE CONCORDANCE AVEC LE SERVEUR EN ARRIERE-PLAN
-    const r = await fetch('/bvmt_api/index' + (document.getElementById('selHorizon')?.value === 'LIVE' ? '?live=1' : ''));
+    if(window.__chIdxEnCours) return; window.__chIdxEnCours = true; try { const r = await fetch('/bvmt_api/index' + (document.getElementById('selHorizon')?.value === 'LIVE' ? '?live=1' : ''));
     if (!r.ok) return;
-    const idx = await r.json();
+    const rawIdx = await r.text();
+    let idx = null;
+    if(rawIdx.trim().startsWith('{')){ idx = JSON.parse(rawIdx); } else { const dLn = rawIdx.split(/\r?\n/).reverse().find(l => l.startsWith('data:')); if(dLn){ const arr = JSON.parse(dLn.slice(5).trim()); idx = typeof arr.at(0) === 'string' ? JSON.parse(arr.at(0)) : arr.at(0); } }
+    if(!idx) return;
 
     const nouvellesSeances = construireSeancesDepuisListe(idx.hist || []);
     const avantCount = seancesLocales.length;
@@ -8297,6 +8300,13 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     font-weight: 900 !important;
     background: transparent !important;
   }
+  body[data-horizon="LIVE"] #chSeanceMenuWrap,
+  body[data-horizon="LIVE"] #chReplayControls,
+  body[data-horizon="LIVE"] #selDateReplay,
+  body[data-horizon="LIVE"] #selVitesseReplay {
+    display: none !important;
+    visibility: hidden !important;
+  }
 </style>
 <script id="ch-master-ui-orchestrator">
 (function(){
@@ -8599,6 +8609,8 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
   }
 
   function tickMaintenance(){
+    const hzCur = document.getElementById("selHorizon")?.value || "UNIQUE";
+    if(document.body && document.body.dataset.horizon !== hzCur) document.body.dataset.horizon = hzCur;
     integrerOutilsDansPalette();
     organiserBarreSuperieureUneFois();
     const lh = document.getElementById("lblHorlogeMarche");
