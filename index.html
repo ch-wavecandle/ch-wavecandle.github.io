@@ -5038,7 +5038,7 @@ window.__chInjecterIndicateurs = function() {
     grid: grids,
     xAxis: xAxes,
     yAxis: yAxes,
-    dataZoom: new Array({ id: "zoomX_inside", type: "inside", xAxisIndex: allXIdx, filterMode: "none", zoomOnMouseWheel: true, moveOnMouseMove: false }, { id: "zoomX_slider", type: "slider", xAxisIndex: allXIdx, filterMode: "none" }),
+    dataZoom: new Array({ id: "zoomX_inside", type: "inside", xAxisIndex: allXIdx, filterMode: "none", zoomOnMouseWheel: true, moveOnMouseMove: false }, { id: "zoomX_slider", type: "slider", xAxisIndex: allXIdx, filterMode: "none", bottom: 24, height: 14, showDetail: false }),
     series: extra
   });
 };
@@ -9239,10 +9239,11 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
 
     let panDragging = false, panStartX = 0, panStartS = 0, panStartE = 100, panRaf = 0, panLastX = 0;
     const isMainHandActive = () => {
-      const s1 = document.getElementById("selOutilDessin")?.value || "";
-      const s2 = document.getElementById("selOutil")?.value || "";
-      const v = (s1 || s2).toUpperCase();
-      return v === "" || v === "NONE" || v === "MAIN" || v === "CURSEUR";
+      if (typeof outilDessinActif !== "undefined" && outilDessinActif && outilDessinActif !== "NONE" && outilDessinActif !== "MAIN") return false;
+      if (typeof modeDessinActif !== "undefined" && modeDessinActif) return false;
+      const btnMain = Array.from(document.querySelectorAll("button,div,span")).find(el => el.children.length === 0 && (el.textContent || "").trim() === "Main libre");
+      if (btnMain && btnMain.parentElement && btnMain.parentElement.style.background && btnMain.parentElement.style.background.includes("255")) return true;
+      return true;
     };
 
     document.addEventListener("mousedown", function(e) {
