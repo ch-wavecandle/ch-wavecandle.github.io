@@ -8124,7 +8124,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     chkBoiteOutils.id = "chkBoiteOutils";
     chkBoiteOutils.checked = localStorage.getItem("ch_hud_visible") !== "0";
     chkBoiteOutils.onchange = () => {
-      const hud = document.getElementById("chHudTools") || document.querySelector(".ch-hud-tools");
+      const hud = document.getElementById("ch-hud-tools");
       if (hud) {
         hud.style.display = chkBoiteOutils.checked ? "flex" : "none";
         if (chkBoiteOutils.checked && (!hud.style.left || hud.style.left === "auto")) {
@@ -8135,7 +8135,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       localStorage.setItem("ch_hud_visible", chkBoiteOutils.checked ? "1" : "0");
     };
     lblBoiteOutils.appendChild(chkBoiteOutils);
-    lblBoiteOutils.appendChild(document.createTextNode("🧰 Boîte Outils"));
+    lblBoiteOutils.appendChild(document.createTextNode("\uD83E\uDDF0 Bo\u00EEte Outils"));
     rAff.appendChild(lblBoiteOutils);
     panelAutres.appendChild(rAff);
     autresWrap.appendChild(btnAutres); autresWrap.appendChild(panelAutres);
@@ -8356,7 +8356,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       const handle = document.createElement("span");
       handle.id = "chHudDragHandle";
       handle.title = "Glisser pour déplacer la barre d'outils sur le graphique";
-      handle.textContent = "⠿";
+      handle.textContent = "\u283F";
 
       const btnOrient = document.createElement("button");
       btnOrient.id = "chHudOrientBtn";
@@ -8365,23 +8365,23 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
 
       const savedOrient = localStorage.getItem("ch_hud_orient") || "H";
       if(savedOrient === "V") hudTools.classList.add("vertical");
-      btnOrient.textContent = hudTools.classList.contains("vertical") ? "⬌" : "⬍";
+      btnOrient.textContent = hudTools.classList.contains("vertical") ? "\u2194" : "\u2195";
 
       btnOrient.onclick = (e) => {
         e.stopPropagation();
         const isV = hudTools.classList.toggle("vertical");
-        btnOrient.textContent = isV ? "⬌" : "⬍";
+        btnOrient.textContent = isV ? "\u2194" : "\u2195";
         localStorage.setItem("ch_hud_orient", isV ? "V" : "H");
       };
 
       const lblTitleHud = document.createElement("span");
-      lblTitleHud.textContent = "🧰 Outils";
+      lblTitleHud.textContent = "\uD83E\uDDF0 Outils";
       lblTitleHud.style.cssText = "color:#E2E8F0;font-weight:700;font-size:12px;letter-spacing:0.3px;margin-right:auto;padding-left:4px;user-select:none;";
 
       const btnCloseHud = document.createElement("button");
       btnCloseHud.type = "button";
       btnCloseHud.title = "Fermer la boîte Outils (rouvrir via Autres → Boîte Outils)";
-      btnCloseHud.textContent = "✕";
+      btnCloseHud.textContent = "\u2715";
       btnCloseHud.style.cssText = "background:rgba(239,68,68,0.16);color:#FCA5A5;border:1px solid rgba(239,68,68,0.45);border-radius:6px;width:26px;height:26px;font-weight:800;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;margin-left:4px;";
       btnCloseHud.onclick = (e) => {
         e.stopPropagation();
