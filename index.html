@@ -1115,6 +1115,10 @@ body.theme-clair #ch-hud-tools .ch-hud-title-lbl {
   border-radius: 8px !important;
   font-size: 12px !important;
   font-weight: 600 !important;
+  text-align: left !important;
+  justify-content: flex-start !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
   transition: transform 0.12s ease, background-color 0.15s ease, border-color 0.15s ease !important;
 }
 #ch-hud-tools > select:hover,
@@ -1139,10 +1143,11 @@ body.theme-clair #ch-hud-tools .ch-hud-title-lbl {
   color: #F8FAFC !important;
   border: 1px solid rgba(148, 163, 184, 0.55) !important;
 }
-body.theme-clair #chHudMinBtn {
-  background: #E2E8F0 !important;
+body.theme-clair #chHudMinBtn, html.theme-clair #chHudMinBtn {
+  background: #CBD5E1 !important;
   color: #0F172A !important;
-  border: 1px solid #94A3B8 !important;
+  border: 1px solid #64748B !important;
+  font-weight: 900 !important;
 }
 #chHudOrientBtn {
   background: #0F172A !important;
@@ -2960,7 +2965,7 @@ async function rafraichirFluxLive(forcer = false) {
     const sig = `${dernierFichier.name}_${dernierFichier.lastModified}_${dernierFichier.size}`;
     if (!forcer && sig === dernierTailleLive) {
       const opAct = globalData ? globalData.derniere_op_globale : null;
-      if(document.getElementById('lblHorlogeMarche')) document.getElementById('lblHorlogeMarche').innerText = (typeof heureMarcheVerrouillee !== 'undefined' && heureMarcheVerrouillee && heureMarcheVerrouillee !== '08:30:00') ? heureMarcheVerrouillee : ((heureMarcheDs && heureMarcheDs !== '08:30:00') ? heureMarcheDs : (opAct ? opAct.heure : '15:00:00'));
+      if(document.getElementById('lblHorlogeMarche')) document.getElementById('lblHorlogeMarche').innerText = (typeof heureMarcheVerrouillee !== 'undefined' && heureMarcheVerrouillee && heureMarcheVerrouillee !== '08:30:00') ? heureMarcheVerrouillee : ((typeof getDateEtHeureTunis === 'function' && getDateEtHeureTunis().heureStr >= '15:00:00') ? '15:00:00' : ((heureMarcheDs && heureMarcheDs !== '08:30:00') ? heureMarcheDs : (opAct ? opAct.heure : '15:00:00')));
       const txtOp = opAct ? ` | Dernière op. : ${opAct.ticker} (${opAct.sens} ${opAct.qte.toLocaleString('fr-FR')} @ ${opAct.prix.toFixed(2)} à ${opAct.heure})` : "";
       document.getElementById('statusText').style.color = "#00E5FF";
       document.getElementById('statusText').innerText = `LIVE [${new Date().toTimeString().slice(0,8)}] — ${dernierFichier.name}${txtOp}`;
@@ -2988,7 +2993,7 @@ async function rafraichirFluxLive(forcer = false) {
     dessinerGraphique(data);
 
     const op = data.derniere_op_globale;
-    if(document.getElementById('lblHorlogeMarche')) document.getElementById('lblHorlogeMarche').innerText = (typeof heureMarcheVerrouillee !== 'undefined' && heureMarcheVerrouillee && heureMarcheVerrouillee !== '08:30:00') ? heureMarcheVerrouillee : ((heureMarcheDs && heureMarcheDs !== '08:30:00') ? heureMarcheDs : (op ? op.heure : '15:00:00'));
+    if(document.getElementById('lblHorlogeMarche')) document.getElementById('lblHorlogeMarche').innerText = (typeof heureMarcheVerrouillee !== 'undefined' && heureMarcheVerrouillee && heureMarcheVerrouillee !== '08:30:00') ? heureMarcheVerrouillee : ((typeof getDateEtHeureTunis === 'function' && getDateEtHeureTunis().heureStr >= '15:00:00') ? '15:00:00' : ((heureMarcheDs && heureMarcheDs !== '08:30:00') ? heureMarcheDs : (op ? op.heure : '15:00:00')));
     const infoOp = op ? ` | Dernière op. : ${op.ticker} (${op.sens} ${op.qte.toLocaleString('fr-FR')} @ ${op.prix.toFixed(2)} à ${op.heure})` : "";
     document.getElementById('statusText').style.color = "#00FF66";
     document.getElementById('statusText').innerText = `LIVE [${new Date().toTimeString().slice(0,8)}] [${dernierFichier.name} | ${parsed.ops.length} ops] — ${data.ticker}${infoOp}`;
@@ -8483,7 +8488,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       btnMinHud.type = "button";
       btnMinHud.title = "Masquer / Réduire la boîte Outils";
       btnMinHud.textContent = "\u2014";
-      btnMinHud.style.cssText = "background:rgba(148,163,184,0.18);color:#E2E8F0;border:1px solid rgba(148,163,184,0.45);border-radius:6px;width:24px;min-width:24px;max-width:24px;height:24px;flex:0 0 24px;border-radius:6px;font-weight:700;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;";
+      btnMinHud.style.cssText = "background:#CBD5E1;color:#0F172A;border:1px solid rgba(148,163,184,0.45);border-radius:6px;width:24px;min-width:24px;max-width:24px;height:24px;flex:0 0 24px;border-radius:6px;font-weight:700;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;";
 
       const hideRecadrerBtn = () => { const pairRow = document.createElement("div"); pairRow.className = "ch-hud-pair-row"; pairRow.style.cssText = "display:flex;gap:6px;width:100%;"; Array.from(hudTools.querySelectorAll("button")).forEach(b => { if (b.closest(".ch-hud-ctrl-bar")) return; const t = (b.title || "") + " " + (b.id || "") + " " + (b.textContent || ""); if (/recadr|zoom\s*auto|réinitialiser\s*le\s*zoom/i.test(t) && !/analyse/i.test(t)) { b.style.display = "none"; } else if (/annul|undo|effac|vider|corbeille|supprim/i.test(t) && !/analyse/i.test(t)) { b.style.flex = "1"; pairRow.appendChild(b); } }); if (pairRow.children.length > 0 && !hudTools.querySelector(".ch-hud-pair-row")) { const selTool = hudTools.querySelector("select"); if (selTool) selTool.insertAdjacentElement("afterend", pairRow); } };
       hideRecadrerBtn();
