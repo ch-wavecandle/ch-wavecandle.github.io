@@ -2965,7 +2965,7 @@ async function rafraichirFluxLive(forcer = false) {
     const sig = `${dernierFichier.name}_${dernierFichier.lastModified}_${dernierFichier.size}`;
     if (!forcer && sig === dernierTailleLive) {
       const opAct = globalData ? globalData.derniere_op_globale : null;
-      if(document.getElementById('lblHorlogeMarche')) document.getElementById('lblHorlogeMarche').innerText = (typeof heureMarcheVerrouillee !== 'undefined' && heureMarcheVerrouillee && heureMarcheVerrouillee !== '08:30:00') ? heureMarcheVerrouillee : ((typeof getDateEtHeureTunis === 'function' && getDateEtHeureTunis().heureStr >= '15:00:00') ? '15:00:00' : ((heureMarcheDs && heureMarcheDs !== '08:30:00') ? heureMarcheDs : (opAct ? opAct.heure : '15:00:00')));
+      if(document.getElementById('lblHorlogeMarche')) document.getElementById('lblHorlogeMarche').innerText = (typeof heureMarcheVerrouillee !== 'undefined' && heureMarcheVerrouillee) ? heureMarcheVerrouillee : (heureMarcheDs || (opAct ? opAct.heure : '--:--:--'));
       const txtOp = opAct ? ` | Dernière op. : ${opAct.ticker} (${opAct.sens} ${opAct.qte.toLocaleString('fr-FR')} @ ${opAct.prix.toFixed(2)} à ${opAct.heure})` : "";
       document.getElementById('statusText').style.color = "#00E5FF";
       document.getElementById('statusText').innerText = `LIVE [${new Date().toTimeString().slice(0,8)}] — ${dernierFichier.name}${txtOp}`;
@@ -2993,7 +2993,7 @@ async function rafraichirFluxLive(forcer = false) {
     dessinerGraphique(data);
 
     const op = data.derniere_op_globale;
-    if(document.getElementById('lblHorlogeMarche')) document.getElementById('lblHorlogeMarche').innerText = (typeof heureMarcheVerrouillee !== 'undefined' && heureMarcheVerrouillee && heureMarcheVerrouillee !== '08:30:00') ? heureMarcheVerrouillee : ((typeof getDateEtHeureTunis === 'function' && getDateEtHeureTunis().heureStr >= '15:00:00') ? '15:00:00' : ((heureMarcheDs && heureMarcheDs !== '08:30:00') ? heureMarcheDs : (op ? op.heure : '15:00:00')));
+    if(document.getElementById('lblHorlogeMarche')) document.getElementById('lblHorlogeMarche').innerText = (typeof heureMarcheVerrouillee !== 'undefined' && heureMarcheVerrouillee) ? heureMarcheVerrouillee : (heureMarcheDs || (op ? op.heure : '--:--:--'));
     const infoOp = op ? ` | Dernière op. : ${op.ticker} (${op.sens} ${op.qte.toLocaleString('fr-FR')} @ ${op.prix.toFixed(2)} à ${op.heure})` : "";
     document.getElementById('statusText').style.color = "#00FF66";
     document.getElementById('statusText').innerText = `LIVE [${new Date().toTimeString().slice(0,8)}] [${dernierFichier.name} | ${parsed.ops.length} ops] — ${data.ticker}${infoOp}`;
@@ -8924,12 +8924,19 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     const lh = document.getElementById("lblHorlogeMarche");
     if(!lh) return;
     const tunisNow = getDateEtHeureTunis();
-    if(tunisNow.heureStr >= "15:00:00"){
-      const dInp = (document.getElementById("selDateReplay")?.value || document.getElementById("txtDateSeance")?.value || "").trim();
-      const mIso = dInp.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-      const mFr = dInp.match(/(\d{2})\/(\d{2})\/(\d{4})/);
-      const dActive = mIso ? (mIso.at(3) + mIso.at(2) + mIso.at(1)) : (mFr ? (mFr.at(1) + mFr.at(2) + mFr.at(3)) : tunisNow.dateStr);
-      const datesEssai = dActive === tunisNow.dateStr ? [tunisNow.dateStr] : [dActive, tunisNow.dateStr];
+    const dowTunis = new Date(new Date().toLocaleString("en-US", { timeZone: "Africa/Tunis" })).getDay();
+    const isWeekend = (dowTunis === 0 || dowTunis === 6);
+    const isAfterClose = (tunisNow.heureStr >= "15:01:00");
+    const isBeforeOpen = (tunisNow.heureStr < "08:30:00");
+    if(isAfterClose || isBeforeOpen || isWeekend){
+      const datesEssai = [];
+      const baseDt = new Date(new Date().toLocaleString("en-US", { timeZone: "Africa/Tunis" }));
+      const startOffset = isAfterClose && !isWeekend ? 0 : 1;
+      for(let off = startOffset; off <= 5; off++){
+        const dTmp = new Date(baseDt.getTime() - off * 86400000);
+        const ds = String(dTmp.getDate()).padStart(2, "0") + String(dTmp.getMonth() + 1).padStart(2, "0") + String(dTmp.getFullYear());
+        if(!datesEssai.includes(ds)) datesEssai.push(ds);
+      }
       for(const dt of datesEssai){
         try {
           const resSyn = await lireFichierViaGradio("Synthese_cloture/synthese_cloture_reel_" + dt + ".csv");
