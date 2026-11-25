@@ -1076,6 +1076,52 @@ body.theme-clair .statusbar {
 <style id="ch-hand-cursor-css">
 body.ch-mode-hand [_echarts_instance_], body.ch-mode-hand [_echarts_instance_] canvas { cursor: grab !important; } body.ch-mode-hand [_echarts_instance_]:active, body.ch-mode-hand [_echarts_instance_] canvas:active { cursor: grabbing !important; } html body.ch-mode-draw [_echarts_instance_], html body.ch-mode-draw [_echarts_instance_] * { cursor: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3czLm9yZyIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9IiNGQkJGMjQiIHN0cm9rZT0iIzBGMTcyQSIgc3Ryb2tlLXdpZHRoPSIxLjYiIGQ9Ik0zIDE3LjI1VjIxaDMuNzVMMTcuODEgOS45NGwtMy43NS0zLjc1TDMgMTcuMjV6TTIwLjcxIDcuMDRhMSAxIDAgMCAwIDAtMS40MmwtMi4zNC0yLjM0YTEgMSAwIDAgMC0xLjQyIDBsLTEuODMgMS44MyAzLjc1IDMuNzUgMS44NC0xLjgyeiIvPjwvc3ZnPg==') 2 22, auto !important; }
 </style>
+<style id="ch-hud-pro-ui">
+#ch-hud-tools {
+  background: rgba(15, 23, 42, 0.86) !important;
+  backdrop-filter: blur(14px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
+  border: 1px solid rgba(148, 163, 184, 0.25) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 12px 30px rgba(2, 6, 23, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  padding: 8px !important;
+  gap: 6px !important;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease !important;
+}
+body.theme-clair #ch-hud-tools {
+  background: rgba(255, 255, 255, 0.90) !important;
+  border: 1px solid rgba(15, 23, 42, 0.14) !important;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+}
+#ch-hud-tools .ch-hud-ctrl-bar {
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  padding: 2px 2px 6px 2px !important;
+  margin-bottom: 2px !important;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.16) !important;
+}
+body.theme-clair #ch-hud-tools .ch-hud-ctrl-bar {
+  border-bottom-color: rgba(15, 23, 42, 0.10) !important;
+}
+body.theme-clair #ch-hud-tools .ch-hud-title-lbl {
+  color: #0F172A !important;
+}
+#ch-hud-tools > select,
+#ch-hud-tools > button,
+#ch-hud-tools > .ch-hud-item {
+  height: 30px !important;
+  min-height: 30px !important;
+  border-radius: 8px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  transition: transform 0.12s ease, background-color 0.15s ease, border-color 0.15s ease !important;
+}
+#ch-hud-tools > select:hover,
+#ch-hud-tools > button:hover {
+  border-color: #38BDF8 !important;
+}
+</style>
 </head>
 <body>
 <style>
@@ -8376,13 +8422,13 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
 
       const lblTitleHud = document.createElement("span");
       lblTitleHud.textContent = "\uD83E\uDDF0 Outils";
-      lblTitleHud.style.cssText = "color:#E2E8F0;font-weight:700;font-size:12px;letter-spacing:0.3px;margin-right:auto;padding-left:4px;user-select:none;";
+      lblTitleHud.className = "ch-hud-title-lbl"; lblTitleHud.style.cssText = "color:#F1F5F9;font-weight:700;font-size:12px;letter-spacing:0.2px;margin-right:auto;padding:0 6px 0 4px;user-select:none;white-space:nowrap;";
 
       const btnCloseHud = document.createElement("button");
       btnCloseHud.type = "button";
       btnCloseHud.title = "Fermer la boîte Outils (rouvrir via Autres → Boîte Outils)";
       btnCloseHud.textContent = "\u2715";
-      btnCloseHud.style.cssText = "background:rgba(239,68,68,0.16);color:#FCA5A5;border:1px solid rgba(239,68,68,0.45);border-radius:6px;width:26px;height:26px;font-weight:800;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;margin-left:4px;";
+      btnCloseHud.style.cssText = "background:rgba(239,68,68,0.16);color:#FCA5A5;border:1px solid rgba(239,68,68,0.45);border-radius:6px;width:24px;min-width:24px;max-width:24px;height:24px;flex:0 0 24px;border-radius:6px;font-weight:700;font-size:11px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;";
       btnCloseHud.onclick = (e) => {
         e.stopPropagation();
         hudTools.style.display = "none";
@@ -8399,12 +8445,15 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       btnMinHud.type = "button";
       btnMinHud.title = "Masquer / Réduire la boîte Outils";
       btnMinHud.textContent = "\u2014";
-      btnMinHud.style.cssText = "background:rgba(148,163,184,0.18);color:#E2E8F0;border:1px solid rgba(148,163,184,0.45);border-radius:6px;width:26px;height:26px;font-weight:800;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;margin-left:4px;padding:0;";
+      btnMinHud.style.cssText = "background:rgba(148,163,184,0.18);color:#E2E8F0;border:1px solid rgba(148,163,184,0.45);border-radius:6px;width:24px;min-width:24px;max-width:24px;height:24px;flex:0 0 24px;border-radius:6px;font-weight:700;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;";
 
+      const hideRecadrerBtn = () => { Array.from(hudTools.querySelectorAll("button")).forEach(b => { if (b.closest(".ch-hud-ctrl-bar")) return; const t = (b.title || "") + " " + (b.id || "") + " " + (b.textContent || ""); if (/recadr|reset|zoom\s*auto|réinitialiser/i.test(t)) b.style.display = "none"; }); };
+      hideRecadrerBtn();
       const setHudCollapsed = (collapsed) => {
         Array.from(hudTools.children).forEach(chEl => {
           if (chEl !== ctrlBar) chEl.style.display = collapsed ? "none" : "";
         });
+        if (!collapsed) hideRecadrerBtn();
         btnMinHud.textContent = collapsed ? "\u25A1" : "\u2014";
         btnMinHud.title = collapsed ? "Démasquer la boîte Outils" : "Masquer / Réduire la boîte Outils";
         hudTools.style.padding = collapsed ? "4px 8px" : "";
@@ -8467,6 +8516,9 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
           localStorage.setItem("ch_hud_pos", JSON.stringify({ x: hudTools.offsetLeft, y: hudTools.offsetTop }));
         } catch(e){}
       });
+      handle.addEventListener("touchstart", (e) => { if(e.touches.length !== 1) return; e.preventDefault(); dragging = true; startX = e.touches.item(0).clientX; startY = e.touches.item(0).clientY; origL = hudTools.offsetLeft; origT = hudTools.offsetTop; }, { passive: false });
+      window.addEventListener("touchmove", (e) => { if(!dragging || e.touches.length !== 1) return; const t0 = e.touches.item(0); const maxL = Math.max(4, chartBox.clientWidth - hudTools.offsetWidth - 4); const maxT = Math.max(4, chartBox.clientHeight - hudTools.offsetHeight - 4); hudTools.style.left = Math.min(maxL, Math.max(4, origL + (t0.clientX - startX))) + "px"; hudTools.style.top = Math.min(maxT, Math.max(4, origT + (t0.clientY - startY))) + "px"; }, { passive: true });
+      window.addEventListener("touchend", () => { if(!dragging) return; dragging = false; try { localStorage.setItem("ch_hud_pos", JSON.stringify({ x: hudTools.offsetLeft, y: hudTools.offsetTop })); } catch(e){} });
     }
 
     // B. Afficher le nom de la valeur en haut du graphique sans toucher a l'axe
