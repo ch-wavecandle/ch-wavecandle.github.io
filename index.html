@@ -4607,51 +4607,82 @@ window.__CH_CHAT_CORE = {
   body.theme-clair .ch-ind-num, body.light-mode .ch-ind-num, body.theme-clair .ch-ind-type, body.light-mode .ch-ind-type { background:#F1F5F9; color:#0F172A; border-color:#CBD5E1; }
 </style>
 
-<div id="chIndPopover" style="max-height:82vh; overflow-y:auto; width:360px;">
-  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid #334155; padding-bottom:6px; position:sticky; top:0; background:#0F172A; z-index:10;">
-    <span style="font-weight:800; font-size:13px; color:#E2E8F0;">📐 Indicateurs & Order Flow BVMT</span>
-    <button type="button" id="btnCloseInd" style="background:none; border:none; color:#94A3B8; font-size:15px; cursor:pointer;">✕</button>
+<div id="chIndPopover">
+  <div class="ch-ind-hdr">
+    <div style="display:flex; align-items:center; gap:8px;">
+      <span style="font-weight:800; font-size:13px;">📐 Indicateurs Techniques & Order Flow BVMT</span>
+      <span id="chIndCountBadge" style="font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:99px; background:#0284C7; color:#FFF;">0 actif</span>
+    </div>
+    <button type="button" id="btnCloseInd" style="background:none; border:none; color:inherit; font-size:16px; font-weight:bold; cursor:pointer; padding:0 4px;">✕</button>
   </div>
 
-  <div class="ch-ind-sec">Combinaisons Recommandées (1 Clic)</div>
-  <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-bottom:8px;">
-    <button type="button" class="ch-preset-ind" data-preset="BVMT_FLOW" style="font-size:10.5px; padding:5px 6px; border-radius:5px; background:#0F172A; color:#38BDF8; border:1px solid #0284C7; font-weight:700; cursor:pointer;">⚡ Intraday BVMT & Flux</button>
-    <button type="button" class="ch-preset-ind" data-preset="ORDERFLOW_PRO" style="font-size:10.5px; padding:5px 6px; border-radius:5px; background:#0F172A; color:#10B981; border:1px solid #059669; font-weight:700; cursor:pointer;">🐋 Order Flow & POC</button>
-    <button type="button" class="ch-preset-ind" data-preset="SWING_TREND" style="font-size:10.5px; padding:5px 6px; border-radius:5px; background:#0F172A; color:#FBBF24; border:1px solid #D97706; font-weight:700; cursor:pointer;">📈 Swing & Tendance</button>
-    <button type="button" class="ch-preset-ind" data-preset="SQUEEZE_VOL" style="font-size:10.5px; padding:5px 6px; border-radius:5px; background:#0F172A; color:#C084FC; border:1px solid #9333EA; font-weight:700; cursor:pointer;">🎯 Squeeze Volatilité</button>
+  <div class="ch-ind-body">
+    <div class="ch-ind-presets">
+      <button type="button" class="ch-preset-ind" data-preset="BVMT_FLOW">
+        <strong style="color:#0284C7;">⚡ Intraday BVMT</strong>
+        <small>VWAP + Delta + CVD + MFI</small>
+      </button>
+      <button type="button" class="ch-preset-ind" data-preset="ORDERFLOW_PRO">
+        <strong style="color:#059669;">🐋 Order Flow & POC</strong>
+        <small>VWAP + POC + Delta + Agress.</small>
+      </button>
+      <button type="button" class="ch-preset-ind" data-preset="SWING_TREND">
+        <strong style="color:#D97706;">📈 Swing & Tendance</strong>
+        <small>EMA + SMA + Ichimoku + RSI/MACD</small>
+      </button>
+      <button type="button" class="ch-preset-ind" data-preset="SQUEEZE_VOL">
+        <strong style="color:#9333EA;">🎯 Squeeze Volatilité</strong>
+        <small>Bollinger + Keltner + ADX + Stoch</small>
+      </button>
+    </div>
+
+    <div class="ch-ind-cols">
+      <div>
+        <div class="ch-ind-card">
+          <div class="ch-ind-sec">1. SUR LE PRIX (TENDANCE & VOLATILITÉ)</div>
+          <div class="ch-ind-row"><label><input type="checkbox" id="chkIndMA1"> MA 1 <select id="selIndMA1Type" class="ch-ind-sel"><option value="EMA">EMA</option><option value="SMA">SMA</option></select></label><span>P:<input type="number" id="inpIndMA1P" class="ch-ind-num" value="20" min="2" max="300"></span></div>
+          <div class="ch-ind-row"><label><input type="checkbox" id="chkIndMA2"> MA 2 <select id="selIndMA2Type" class="ch-ind-sel"><option value="SMA">SMA</option><option value="EMA">EMA</option></select></label><span>P:<input type="number" id="inpIndMA2P" class="ch-ind-num" value="50" min="2" max="300"></span></div>
+          <div class="ch-ind-row"><label><input type="checkbox" id="chkIndVWAP"> VWAP + Bandes (±1σ)</label><span class="ch-ind-tag" style="color:#059669;">Instit.</span></div>
+          <div class="ch-ind-row"><label><input type="checkbox" id="chkIndBB"> Bollinger</label><span>P:<input type="number" id="inpIndBBP" class="ch-ind-num" value="20" min="5" max="150"> σ:<input type="number" id="inpIndBBK" class="ch-ind-num" value="2" step="0.5" min="1" max="4" style="width:32px;"></span></div>
+          <div class="ch-ind-row"><label><input type="checkbox" id="chkIndIchi"> Nuage d'Ichimoku</label><span class="ch-ind-tag" style="color:#0284C7;">9, 26, 52</span></div>
+          <div class="ch-ind-row"><label><input type="checkbox" id="chkIndPSAR"> SAR Parabolique (PSAR)</label><span class="ch-ind-tag" style="color:#D97706;">0.02, 0.2</span></div>
+          <div class="ch-ind-row"><label><input type="checkbox" id="chkIndKC"> Canaux de Keltner (KC)</label><span class="ch-ind-tag" style="color:#7C3AED;">20, 10, 2</span></div>
+          <div class="ch-ind-row"><label><input type="checkbox" id="chkIndPOC"> Volume Profile (POC)</label><span class="ch-ind-tag" style="color:#E11D48;">Niveau Clé</span></div>
+        </div>
+
+        <div class="ch-ind-card" style="margin-bottom:0;">
+          <div class="ch-ind-sec">2. ORDER FLOW NATIF (ACHAT / VENTE / NEUTRE)</div>
+          <div class="ch-ind-row"><label><input type="checkbox" class="ch-osc-chk" value="DELTA"> Delta Net (Achat - Vente)</label><span class="ch-ind-tag" style="color:#059669;">Par Vague</span></div>
+          <div class="ch-ind-row"><label><input type="checkbox" class="ch-osc-chk" value="CVD"> CVD (Delta Cumulé)</label><span class="ch-ind-tag" style="color:#059669;">Cumulé</span></div>
+          <div class="ch-ind-row"><label><input type="checkbox" class="ch-osc-chk" value="AGGR"> Ratio d'Agressivité (%)</label><span class="ch-ind-tag" style="color:#0284C7;">0–100%</span></div>
+          <div class="ch-ind-row"><label><input type="checkbox" class="ch-osc-chk" value="NEUT"> Taux Neutralité / Blocs (%)</label><span class="ch-ind-tag">Part Neutre</span></div>
+          <div class="ch-ind-row"><label><input type="checkbox" class="ch-osc-chk" value="IMPACT"> Impact de Prix (Amihud)</label><span class="ch-ind-tag" style="color:#D97706;">Fragilité</span></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="ch-ind-card" style="margin-bottom:0;">
+          <div class="ch-ind-sec">3. OSCILLATEURS & VOLUMES (SOUS-GRAPHIQUES)</div>
+          <div class="ch-ind-row"><label><input type="checkbox" class="ch-osc-chk" value="VOL"> Volume par Vague / Barre</label><span class="ch-ind-tag">Titres</span></div>
+          <div class="ch-ind-row"><label><input type="checkbox" class="ch-osc-chk" value="OBV"> OBV (On-Balance Volume)</label><span class="ch-ind-tag" style="color:#0284C7;">Cumulé</span></div>
+          <div class="ch-ind-row"><label><input type="checkbox" class="ch-osc-chk" value="RSI"> RSI (70 / 30)</label><span>P:<input type="number" id="inpIndRSIP" class="ch-ind-num" value="14" min="2" max="100"></span></div>
+          <div class="ch-ind-row"><label><input type="checkbox" class="ch-osc-chk" value="MFI"> MFI (RSI Pondéré Volume)</label><span class="ch-ind-tag" style="color:#059669;">14 (80/20)</span></div>
+          <div class="ch-ind-row"><label><input type="checkbox" class="ch-osc-chk" value="MACD"> MACD (Momentum)</label><span class="ch-ind-tag">12, 26, 9</span></div>
+          <div class="ch-ind-row"><label><input type="checkbox" class="ch-osc-chk" value="STOCH"> Stochastique (%K / %D)</label><span class="ch-ind-tag" style="color:#0284C7;">14, 3, 3</span></div>
+          <div class="ch-ind-row"><label><input type="checkbox" class="ch-osc-chk" value="ADX"> ADX (+DI / -DI)</label><span class="ch-ind-tag" style="color:#D97706;">14 (Seuil 25)</span></div>
+          <div class="ch-ind-row"><label><input type="checkbox" class="ch-osc-chk" value="CCI"> CCI (+100 / -100)</label><span class="ch-ind-tag" style="color:#7C3AED;">P: 20</span></div>
+          <div class="ch-ind-row"><label><input type="checkbox" class="ch-osc-chk" value="ATR"> ATR (Volatilité Réelle)</label><span class="ch-ind-tag" style="color:#E11D48;">P: 14</span></div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="ch-ind-sec">1. Superpositions sur le Prix (Tendance & Volatilité)</div>
-  <div class="ch-ind-row"><label><input type="checkbox" id="chkIndMA1"> MA 1 (<select id="selIndMA1Type" class="ch-ind-sel"><option value="EMA">EMA</option><option value="SMA">SMA</option></select>)</label><span>P:<input type="number" id="inpIndMA1P" class="ch-ind-num" value="20" min="2" max="300"></span></div>
-  <div class="ch-ind-row"><label><input type="checkbox" id="chkIndMA2"> MA 2 (<select id="selIndMA2Type" class="ch-ind-sel"><option value="SMA">SMA</option><option value="EMA">EMA</option></select>)</label><span>P:<input type="number" id="inpIndMA2P" class="ch-ind-num" value="50" min="2" max="300"></span></div>
-  <div class="ch-ind-row"><label><input type="checkbox" id="chkIndVWAP"> VWAP + Bandes (±1σ)</label><span style="font-size:10.5px;color:#10B981;">Instit.</span></div>
-  <div class="ch-ind-row"><label><input type="checkbox" id="chkIndBB"> Bandes de Bollinger</label><span>P:<input type="number" id="inpIndBBP" class="ch-ind-num" value="20" min="5" max="150"> σ:<input type="number" id="inpIndBBK" class="ch-ind-num" value="2" step="0.5" min="1" max="4" style="width:36px;"></span></div>
-  <div class="ch-ind-row"><label><input type="checkbox" id="chkIndIchi"> Nuage d'Ichimoku</label><span style="font-size:10.5px;color:#38BDF8;">9, 26, 52</span></div>
-  <div class="ch-ind-row"><label><input type="checkbox" id="chkIndPSAR"> SAR Parabolique (PSAR)</label><span style="font-size:10.5px;color:#F59E0B;">0.02, 0.2</span></div>
-  <div class="ch-ind-row"><label><input type="checkbox" id="chkIndKC"> Canaux de Keltner (KC)</label><span style="font-size:10.5px;color:#A855F7;">20, 10, 2</span></div>
-  <div class="ch-ind-row"><label><input type="checkbox" id="chkIndPOC"> Volume Profile (POC)</label><span style="font-size:10.5px;color:#F43F5E;">Niveau Clé</span></div>
-
-  <div class="ch-ind-sec" style="margin-top:8px;">2. Order Flow Natif (Pression Achat / Vente / Neutre)</div>
-  <div class="ch-ind-row"><label><input type="checkbox" class="ch-osc-chk" value="DELTA"> Delta Net (Achat - Vente)</label><span style="font-size:10.5px;color:#10B981;">Par Vague</span></div>
-  <div class="ch-ind-row"><label><input type="checkbox" class="ch-osc-chk" value="CVD"> CVD (Delta Cumulé)</label><span style="font-size:10.5px;color:#10B981;">Flux Cumulé</span></div>
-  <div class="ch-ind-row"><label><input type="checkbox" class="ch-osc-chk" value="AGGR"> Ratio d'Agressivité (%)</label><span style="font-size:10.5px;color:#38BDF8;">0–100%</span></div>
-  <div class="ch-ind-row"><label><input type="checkbox" class="ch-osc-chk" value="NEUT"> Taux Neutralité / Blocs (%)</label><span style="font-size:10.5px;color:#94A3B8;">Part Neutre</span></div>
-  <div class="ch-ind-row"><label><input type="checkbox" class="ch-osc-chk" value="IMPACT"> Impact de Prix (Amihud)</label><span style="font-size:10.5px;color:#F59E0B;">Fragilité</span></div>
-  <div class="ch-ind-row"><label><input type="checkbox" class="ch-osc-chk" value="VOL"> Volume par Vague / Barre</label><span style="font-size:10.5px;color:#94A3B8;">Titres</span></div>
-  <div class="ch-ind-row"><label><input type="checkbox" class="ch-osc-chk" value="OBV"> OBV (On-Balance Volume)</label><span style="font-size:10.5px;color:#38BDF8;">Cumulé</span></div>
-
-  <div class="ch-ind-sec" style="margin-top:8px;">3. Oscillateurs Momentum & Volatilité (Cumulables)</div>
-  <div class="ch-ind-row"><label><input type="checkbox" class="ch-osc-chk" value="RSI"> RSI (70 / 30)</label><span>P:<input type="number" id="inpIndRSIP" class="ch-ind-num" value="14" min="2" max="100"></span></div>
-  <div class="ch-ind-row"><label><input type="checkbox" class="ch-osc-chk" value="MFI"> MFI (RSI Pondéré Volume)</label><span style="font-size:10.5px;color:#10B981;">14 (80/20)</span></div>
-  <div class="ch-ind-row"><label><input type="checkbox" class="ch-osc-chk" value="MACD"> MACD (Momentum)</label><span style="font-size:10.5px;color:#94A3B8;">12, 26, 9</span></div>
-  <div class="ch-ind-row"><label><input type="checkbox" class="ch-osc-chk" value="STOCH"> Stochastique (%K / %D)</label><span style="font-size:10.5px;color:#38BDF8;">14, 3, 3</span></div>
-  <div class="ch-ind-row"><label><input type="checkbox" class="ch-osc-chk" value="ADX"> ADX (+DI / -DI)</label><span style="font-size:10.5px;color:#F59E0B;">14 (Seuil 25)</span></div>
-  <div class="ch-ind-row"><label><input type="checkbox" class="ch-osc-chk" value="CCI"> CCI (+100 / -100)</label><span style="font-size:10.5px;color:#C084FC;">P: 20</span></div>
-  <div class="ch-ind-row"><label><input type="checkbox" class="ch-osc-chk" value="ATR"> ATR (Volatilité Réelle)</label><span style="font-size:10.5px;color:#F43F5E;">P: 14</span></div>
-
-  <div style="display:flex; gap:8px; margin-top:10px; position:sticky; bottom:0; background:#0F172A; padding-top:6px;">
-    <button type="button" id="btnResetInd" class="btn-action" style="flex:1; background:#1E293B; color:#CBD5E1;">Réinitialiser</button>
-    <button type="button" id="btnApplyInd" class="btn-action" style="flex:1; background:#0284C7; color:#FFFFFF; border-color:#38BDF8; font-weight:800;">Appliquer</button>
+  <div class="ch-ind-ftr">
+    <span id="chIndSubHint" style="font-size:11px; opacity:0.8;">Cochez librement plusieurs indicateurs</span>
+    <div style="display:flex; gap:8px;">
+      <button type="button" id="btnResetInd" class="btn-action" style="padding:5px 14px; font-weight:700;">Réinitialiser</button>
+      <button type="button" id="btnApplyInd" class="btn-action" style="padding:5px 18px; background:#0284C7; color:#FFFFFF; border-color:#0284C7; font-weight:800;">Appliquer</button>
+    </div>
   </div>
 </div>
 
@@ -5024,6 +5055,15 @@ document.addEventListener("click", (e) => {
   else if (preset === "SWING_TREND") { setChk("chkIndMA1"); setChk("chkIndMA2"); setChk("chkIndIchi"); setOsc(new Array("RSI", "MACD", "ATR")); }
   else if (preset === "SQUEEZE_VOL") { setChk("chkIndBB"); setChk("chkIndKC"); setOsc(new Array("ADX", "STOCH")); }
   document.getElementById("btnApplyInd")?.click();
+});
+document.addEventListener("change", (e) => {
+  if (!e.target.closest("#chIndPopover")) return;
+  const tot = document.querySelectorAll("#chIndPopover input[type='checkbox']:checked").length;
+  const subs = document.querySelectorAll("#chIndPopover .ch-osc-chk:checked").length;
+  const b = document.getElementById("chIndCountBadge");
+  const hint = document.getElementById("chIndSubHint");
+  if (b) b.textContent = tot + (tot > 1 ? " actifs" : " actif");
+  if (hint) hint.textContent = subs > 0 ? (subs + " sous-graphique(s) empilé(s) en bas") : "Superpositions uniquement sur le prix";
 });
 </script>
 <!-- CH_TECH_RENDER_END -->
@@ -8543,6 +8583,94 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     max-height: calc(100vh - 88px) !important;
     z-index: 9500 !important;
     box-shadow: 0 12px 32px rgba(2, 6, 23, 0.55) !important;
+  }
+  #chIndPopover {
+    top: 46px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: min(690px, 95vw) !important;
+    max-height: calc(100vh - 82px) !important;
+    padding: 0 !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+    display: none;
+    flex-direction: column !important;
+    z-index: 100015 !important;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.28) !important;
+  }
+  #chIndPopover.open { display: flex !important; }
+  .ch-ind-hdr {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 14px; border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+    background: #1E293B; color: #F8FAFC;
+  }
+  body.theme-clair .ch-ind-hdr, body.light-mode .ch-ind-hdr {
+    background: #F1F5F9; color: #0F172A; border-bottom-color: #CBD5E1;
+  }
+  .ch-ind-body {
+    padding: 10px 14px; overflow-y: auto; flex: 1 1 auto;
+  }
+  .ch-ind-presets {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px;
+  }
+  .ch-preset-ind {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+    padding: 6px 8px; border-radius: 7px; text-align: left; cursor: pointer;
+    background: #1E293B; border: 1px solid #334155; transition: all 0.15s ease;
+  }
+  body.theme-clair .ch-preset-ind, body.light-mode .ch-preset-ind {
+    background: #F8FAFC; border-color: #CBD5E1;
+  }
+  .ch-preset-ind:hover { border-color: #0284C7; transform: translateY(-1px); }
+  .ch-preset-ind strong { font-size: 11px; font-weight: 800; }
+  .ch-preset-ind small { font-size: 9.5px; opacity: 0.78; line-height: 1.2; }
+  .ch-ind-cols {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start;
+  }
+  @media (max-width: 680px) {
+    .ch-ind-presets { grid-template-columns: 1fr 1fr; }
+    .ch-ind-cols { grid-template-columns: 1fr; }
+  }
+  .ch-ind-card {
+    border: 1px solid rgba(148, 163, 184, 0.25); border-radius: 8px; padding: 8px 10px;
+    background: rgba(15, 23, 42, 0.35); margin-bottom: 8px;
+  }
+  body.theme-clair .ch-ind-card, body.light-mode .ch-ind-card {
+    background: #F8FAFC; border-color: #E2E8F0;
+  }
+  .ch-ind-card .ch-ind-sec {
+    margin: 0 0 6px 0 !important; padding-bottom: 4px;
+    border-bottom: 1px dashed rgba(148, 163, 184, 0.3);
+    font-size: 10.5px; font-weight: 800; letter-spacing: 0.03em; color: #0284C7;
+  }
+  #chIndPopover .ch-ind-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 6px;
+    padding: 3.5px 5px; border-radius: 5px; min-height: 24px;
+  }
+  #chIndPopover .ch-ind-row:hover { background: rgba(2, 132, 199, 0.08); }
+  #chIndPopover .ch-ind-row label {
+    display: inline-flex; align-items: center; gap: 5px; margin: 0;
+    font-size: 11.5px; font-weight: 600; white-space: nowrap; cursor: pointer;
+  }
+  #chIndPopover .ch-ind-sel {
+    height: 20px !important; min-height: 20px !important; padding: 0 4px !important;
+    font-size: 10.5px !important; border-radius: 4px !important;
+  }
+  #chIndPopover .ch-ind-num {
+    width: 38px !important; height: 20px !important; min-height: 20px !important;
+    padding: 0 4px !important; font-size: 10.5px !important; text-align: center;
+  }
+  .ch-ind-tag {
+    font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 4px;
+    background: rgba(148, 163, 184, 0.16); white-space: nowrap;
+  }
+  .ch-ind-ftr {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 9px 14px; border-top: 1px solid rgba(148, 163, 184, 0.25);
+    background: #1E293B;
+  }
+  body.theme-clair .ch-ind-ftr, body.light-mode .ch-ind-ftr {
+    background: #F1F5F9; border-top-color: #CBD5E1;
   }
 </style>
 <script id="ch-master-ui-orchestrator">
