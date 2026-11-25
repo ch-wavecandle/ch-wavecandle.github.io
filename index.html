@@ -4932,7 +4932,7 @@ window.__chInjecterIndicateurs = function() {
     let yOsc = { gridIndex: gIdx, position: "right", axisLabel: { color: axisCol, fontSize: 10 }, splitLine: { lineStyle: { color: splitCol } } };
 
     if (oscName === "DELTA") {
-      extra.push({ id: "ind_osc_delta", name: "Delta Net", type: "bar", xAxisIndex: gIdx, yAxisIndex: gIdx, itemStyle: { color: (p) => (p.value && p.value.at(1) >= 0) ? "#10B981" : "#EF4444" }, data: pair(deltaArr) });
+      extra.push({ id: "ind_osc_delta", name: "Delta Net", type: "bar", xAxisIndex: gIdx, yAxisIndex: gIdx, itemStyle: { color: (p) => ((Array.isArray(p.value) ? p.value.at(1) : p.value) >= 0) ? "#10B981" : "#EF4444" }, data: pair(deltaArr) });
     } else if (oscName === "CVD") {
       extra.push({ id: "ind_osc_cvd", name: "CVD", type: "line", xAxisIndex: gIdx, yAxisIndex: gIdx, showSymbol: false, lineStyle: { width: 1.8, color: "#10B981" }, areaStyle: { color: "rgba(16,185,129,0.16)" }, data: pair(cvdArr) });
     } else if (oscName === "AGGR") {
@@ -4964,7 +4964,7 @@ window.__chInjecterIndicateurs = function() {
     }
     else if (oscName === "MACD") {
       const mObj = CH_MathInd.macd(closes, 12, 26, 9);
-      extra.push({ id: "ind_osc_macd_h", name: "MACD Hist", type: "bar", xAxisIndex: gIdx, yAxisIndex: gIdx, itemStyle: { color: (p) => (p.value && p.value.at(1) >= 0) ? "rgba(16,185,129,0.65)" : "rgba(239,68,68,0.65)" }, data: pair(mObj.hist) });
+      extra.push({ id: "ind_osc_macd_h", name: "MACD Hist", type: "bar", xAxisIndex: gIdx, yAxisIndex: gIdx, itemStyle: { color: (p) => ((Array.isArray(p.value) ? p.value.at(1) : p.value) >= 0) ? "rgba(16,185,129,0.65)" : "rgba(239,68,68,0.65)" }, data: pair(mObj.hist) });
       extra.push({ id: "ind_osc_macd_l", name: "MACD", type: "line", xAxisIndex: gIdx, yAxisIndex: gIdx, showSymbol: false, lineStyle: { width: 1.5, color: "#38BDF8" }, data: pair(mObj.line) });
       extra.push({ id: "ind_osc_macd_s", name: "Signal", type: "line", xAxisIndex: gIdx, yAxisIndex: gIdx, showSymbol: false, lineStyle: { width: 1.5, color: "#F59E0B" }, data: pair(mObj.signal) });
     } else if (oscName === "STOCH") {
