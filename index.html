@@ -9237,6 +9237,48 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       }
     }, { passive: false, capture: true });
 
+    let panDragging = false, panStartX = 0, panStartS = 0, panStartE = 100;
+    dom.addEventListener("mousedown", function(e) {
+      if (e.button !== 0) return;
+      const toolSel = document.getElementById("selOutilDessin") || document.getElementById("selOutil");
+      if (toolSel && toolSel.value && toolSel.value !== "NONE" && toolSel.value !== "MAIN") return;
+      const opt = ch.getOption();
+      if (!opt || !Array.isArray(opt.grid) || opt.grid.length <= 1 || !Array.isArray(opt.dataZoom) || !opt.dataZoom.length) return;
+      const dz0 = opt.dataZoom.at(0) || {};
+      panStartS = typeof dz0.start === "number" ? dz0.start : 0;
+      panStartE = typeof dz0.end === "number" ? dz0.end : 100;
+      if (panStartE - panStartS >= 99.5) return;
+      panDragging = true;
+      panStartX = e.clientX;
+      dom.style.cursor = "grabbing";
+    }, true);
+
+    window.addEventListener("mousemove", function(e) {
+      if (!panDragging) return;
+      const opt = ch.getOption();
+      if (!opt || !Array.isArray(opt.dataZoom)) return;
+      const rect = dom.getBoundingClientRect();
+      const plotW = Math.max(100, rect.width - 137);
+      const span = panStartE - panStartS;
+      const deltaPct = -((e.clientX - panStartX) / plotW) * span;
+      let nextS = panStartS + deltaPct;
+      let nextE = panStartE + deltaPct;
+      if (nextS < 0) { nextE -= nextS; nextS = 0; }
+      if (nextE > 100) { nextS -= (nextE - 100); nextE = 100; }
+      const batch = [];
+      opt.dataZoom.forEach((dz, idx) => {
+        if (dz && dz.yAxisIndex !== undefined && dz.xAxisIndex === undefined) return;
+        batch.push({ dataZoomIndex: idx, start: nextS, end: nextE });
+      });
+      if (batch.length) ch.dispatchAction({ type: "dataZoom", batch: batch });
+    }, true);
+
+    window.addEventListener("mouseup", function() {
+      if (!panDragging) return;
+      panDragging = false;
+      dom.style.cursor = "";
+    }, true);
+
     ch.on("datazoom", function() {
       try {
         const opt = ch.getOption();
