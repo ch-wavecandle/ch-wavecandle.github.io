@@ -4933,7 +4933,7 @@ window.__chInjecterIndicateurs = function() {
         yAxis: baseYAxes,
         dataZoom: (Array.isArray(opt.dataZoom) && opt.dataZoom.length > 0) ? opt.dataZoom.map(dz => (dz && dz.yAxisIndex !== undefined && dz.xAxisIndex === undefined) ? dz : { ...dz, xAxisIndex: new Array(0) }) : new Array({ type: "inside", xAxisIndex: new Array(0) }),
         series: baseSeries.concat(extra)
-      }, { replaceMerge: new Array("series", "xAxis", "yAxis", "grid") });
+      }, { replaceMerge: new Array("series") });
     } else {
       chart.setOption({
         grid: new Array({ left: 45, right: 92, top: 32, bottom: 22 }),
@@ -5040,7 +5040,7 @@ window.__chInjecterIndicateurs = function() {
     yAxis: yAxes,
     dataZoom: allXIdx.map((axI, k) => ({ id: k === 0 ? "zoomX_inside" : ("zoomX_inside_" + k), type: "inside", xAxisIndex: allXIdx, filterMode: "none", zoomOnMouseWheel: true, moveOnMouseMove: true })).concat(new Array({ id: "zoomY_inside", type: "inside", yAxisIndex: isMulti ? new Array(0) : new Array(0, 1), filterMode: "none", zoomOnMouseWheel: "shift", moveOnMouseMove: "shift" }, { id: "zoomX_slider", type: "slider", xAxisIndex: allXIdx, filterMode: "none" })),
     series: baseSeries.concat(extra)
-  }, { replaceMerge: new Array("series", "xAxis", "yAxis", "grid") });
+  }, { replaceMerge: new Array("series") });
 };
 
 document.addEventListener("click", (e) => {
@@ -9264,17 +9264,8 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
         const s = typeof dz0.start === "number" ? dz0.start.toFixed(1) : "?";
         const e = typeof dz0.end === "number" ? dz0.end.toFixed(1) : "?";
 
-        let customCount = 0;
-        const newSeries = (opt.series || []).map((sr, sIdx) => {
-          if (sr && sr.type === "custom") {
-            customCount++;
-            return { ...sr, xAxisIndex: 0, yAxisIndex: (typeof sr.yAxisIndex === "number" ? sr.yAxisIndex : 1) };
-          }
-          return sr;
-        });
-        if (customCount > 0) {
-          ch.setOption({ series: newSeries }, { lazyUpdate: false });
-        }
+        const customCount = (opt.series || []).filter(sr => sr && sr.type === "custom").length;
+        ch.resize();
         showZoomDiag("🔍 Zoom X: " + s + "%→" + e + "% | Grilles: " + opt.grid.length + " | Custom: " + customCount, false);
       } catch (err) {
         showZoomDiag("⚠️ ERR ZOOM: " + err.message, true);
