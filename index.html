@@ -9245,12 +9245,13 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       return v === "" || v === "NONE" || v === "MAIN" || v === "CURSEUR";
     };
 
-    dom.addEventListener("mousedown", function(e) {
+    document.addEventListener("mousedown", function(e) {
       if (e.button !== 0 || !isMainHandActive()) return;
+      if (e.target && e.target.closest && (e.target.closest("#chHudTools") || e.target.closest("#chIndPanel") || e.target.closest("button,select,input"))) return;
       const opt = ch.getOption();
       if (!opt || !Array.isArray(opt.grid) || opt.grid.length <= 1 || !Array.isArray(opt.dataZoom) || !opt.dataZoom.length) return;
       const rect = dom.getBoundingClientRect();
-      if (e.clientX < rect.left + 40 || e.clientX > rect.right - 85) return;
+      if (e.clientX < rect.left + 40 || e.clientX > rect.right - 85 || e.clientY < rect.top + 24 || e.clientY > rect.bottom - 28) return;
       const dz0 = opt.dataZoom.at(0) || {};
       panStartS = typeof dz0.start === "number" ? dz0.start : 0;
       panStartE = typeof dz0.end === "number" ? dz0.end : 100;
@@ -9311,8 +9312,8 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
           let xMin = null, xMax = null;
           if (x0.type === "category" && Array.isArray(x0.data) && x0.data.length > 1) {
             const lastI = x0.data.length - 1;
-            xMin = Math.floor((s / 100) * lastI);
-            xMax = Math.ceil((e / 100) * lastI);
+            xMin = +((s / 100) * lastI).toFixed(3);
+            xMax = +((e / 100) * lastI).toFixed(3);
           } else if (typeof x0.min === "number" && typeof x0.max === "number") {
             const fullSpan = 54000 - 32400;
             xMin = Math.round(32400 + (s / 100) * fullSpan);
