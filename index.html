@@ -9152,5 +9152,35 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     animation: none !important;
   }
 </style>
+<script id="ch-live-sticker-sync">
+(function() {
+  function syncLiveSticker() {
+    const badge = document.getElementById("badgeLive");
+    const selH = document.getElementById("selHorizon");
+    if (!badge || !selH) return;
+    if (selH.value === "LIVE") {
+      const now = new Date();
+      const dd = String(now.getDate()).padStart(2, "0");
+      const mm = String(now.getMonth() + 1).padStart(2, "0");
+      const yyyy = now.getFullYear();
+      const dateStr = (typeof globalData !== "undefined" && globalData && globalData.date_seance_fr)
+        ? globalData.date_seance_fr
+        : (dd + "/" + mm + "/" + yyyy);
+      badge.setAttribute("data-show-replay", "1");
+      badge.setAttribute("data-replay-state", "PLAY");
+      badge.innerHTML = '<span class="live-dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#10B981;"></span> LIVE · ' + dateStr;
+    } else if (!window.__chReplayActive) {
+      if (badge.innerHTML.includes("LIVE · ")) {
+        badge.removeAttribute("data-show-replay");
+      }
+    }
+  }
+  window.addEventListener("load", function() {
+    syncLiveSticker();
+    setInterval(syncLiveSticker, 1500);
+    document.getElementById("selHorizon")?.addEventListener("change", syncLiveSticker);
+  });
+})();
+</script>
 </body>
 </html>
