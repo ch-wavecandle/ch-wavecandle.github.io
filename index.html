@@ -8117,6 +8117,26 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     const rAff = document.createElement("div"); rAff.className = "ch-pop-row";
     if(btnTheme) rAff.appendChild(btnTheme);
     if(lblEtiq) rAff.appendChild(lblEtiq);
+    const lblBoiteOutils = document.createElement("label");
+    lblBoiteOutils.style.cssText = "display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:#E2E8F0;font-size:12px;font-weight:600;padding:4px 8px;border:1px solid #334155;border-radius:6px;background:#0F172A;";
+    const chkBoiteOutils = document.createElement("input");
+    chkBoiteOutils.type = "checkbox";
+    chkBoiteOutils.id = "chkBoiteOutils";
+    chkBoiteOutils.checked = localStorage.getItem("ch_hud_visible") !== "0";
+    chkBoiteOutils.onchange = () => {
+      const hud = document.getElementById("chHudTools") || document.querySelector(".ch-hud-tools");
+      if (hud) {
+        hud.style.display = chkBoiteOutils.checked ? "flex" : "none";
+        if (chkBoiteOutils.checked && (!hud.style.left || hud.style.left === "auto")) {
+          hud.style.left = "52px";
+          hud.style.top = "38px";
+        }
+      }
+      localStorage.setItem("ch_hud_visible", chkBoiteOutils.checked ? "1" : "0");
+    };
+    lblBoiteOutils.appendChild(chkBoiteOutils);
+    lblBoiteOutils.appendChild(document.createTextNode("🧰 Boîte Outils"));
+    rAff.appendChild(lblBoiteOutils);
     panelAutres.appendChild(rAff);
     autresWrap.appendChild(btnAutres); autresWrap.appendChild(panelAutres);
 
@@ -8354,16 +8374,45 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
         localStorage.setItem("ch_hud_orient", isV ? "V" : "H");
       };
 
+      const lblTitleHud = document.createElement("span");
+      lblTitleHud.textContent = "🧰 Outils";
+      lblTitleHud.style.cssText = "color:#E2E8F0;font-weight:700;font-size:12px;letter-spacing:0.3px;margin-right:auto;padding-left:4px;user-select:none;";
+
+      const btnCloseHud = document.createElement("button");
+      btnCloseHud.type = "button";
+      btnCloseHud.title = "Fermer la boîte Outils (rouvrir via Autres → Boîte Outils)";
+      btnCloseHud.textContent = "✕";
+      btnCloseHud.style.cssText = "background:rgba(239,68,68,0.16);color:#FCA5A5;border:1px solid rgba(239,68,68,0.45);border-radius:6px;width:26px;height:26px;font-weight:800;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;margin-left:4px;";
+      btnCloseHud.onclick = (e) => {
+        e.stopPropagation();
+        hudTools.style.display = "none";
+        localStorage.setItem("ch_hud_visible", "0");
+        const chk = document.getElementById("chkBoiteOutils");
+        if (chk) chk.checked = false;
+      };
+
+      ctrlBar.style.display = "flex";
+      ctrlBar.style.alignItems = "center";
+      ctrlBar.style.width = "100%";
       ctrlBar.appendChild(handle);
+      ctrlBar.appendChild(lblTitleHud);
       ctrlBar.appendChild(btnOrient);
+      ctrlBar.appendChild(btnCloseHud);
       hudTools.insertBefore(ctrlBar, hudTools.firstChild);
 
-      // Restaurer position enregistree
+      // Position de depart en haut a gauche du graphique (52px, 38px) ou position sauvegardee
+      hudTools.style.left = "52px";
+      hudTools.style.top = "38px";
+      hudTools.style.right = "auto";
+      hudTools.style.bottom = "auto";
       try {
         const pos = JSON.parse(localStorage.getItem("ch_hud_pos") || "null");
         if(pos && typeof pos.x === "number" && typeof pos.y === "number"){
           hudTools.style.left = Math.max(4, pos.x) + "px";
           hudTools.style.top = Math.max(4, pos.y) + "px";
+        }
+        if(localStorage.getItem("ch_hud_visible") === "0"){
+          hudTools.style.display = "none";
         }
       } catch(e){}
 
