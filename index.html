@@ -2876,7 +2876,7 @@ async function rafraichirFluxLive(forcer = false) {
     const sig = `${dernierFichier.name}_${dernierFichier.lastModified}_${dernierFichier.size}`;
     if (!forcer && sig === dernierTailleLive) {
       const opAct = globalData ? globalData.derniere_op_globale : null;
-      if(document.getElementById('lblHorlogeMarche')) document.getElementById('lblHorlogeMarche').innerText = heureMarcheDs || (opAct ? opAct.heure : "--:--:--");
+      if(document.getElementById('lblHorlogeMarche')) document.getElementById('lblHorlogeMarche').innerText = (typeof heureMarcheVerrouillee !== 'undefined' && heureMarcheVerrouillee && heureMarcheVerrouillee !== '08:30:00') ? heureMarcheVerrouillee : ((heureMarcheDs && heureMarcheDs !== '08:30:00') ? heureMarcheDs : (opAct ? opAct.heure : '15:00:00'));
       const txtOp = opAct ? ` | Dernière op. : ${opAct.ticker} (${opAct.sens} ${opAct.qte.toLocaleString('fr-FR')} @ ${opAct.prix.toFixed(2)} à ${opAct.heure})` : "";
       document.getElementById('statusText').style.color = "#00E5FF";
       document.getElementById('statusText').innerText = `LIVE [${new Date().toTimeString().slice(0,8)}] — ${dernierFichier.name}${txtOp}`;
@@ -2904,7 +2904,7 @@ async function rafraichirFluxLive(forcer = false) {
     dessinerGraphique(data);
 
     const op = data.derniere_op_globale;
-    if(document.getElementById('lblHorlogeMarche')) document.getElementById('lblHorlogeMarche').innerText = heureMarcheDs || (op ? op.heure : "--:--:--");
+    if(document.getElementById('lblHorlogeMarche')) document.getElementById('lblHorlogeMarche').innerText = (typeof heureMarcheVerrouillee !== 'undefined' && heureMarcheVerrouillee && heureMarcheVerrouillee !== '08:30:00') ? heureMarcheVerrouillee : ((heureMarcheDs && heureMarcheDs !== '08:30:00') ? heureMarcheDs : (op ? op.heure : '15:00:00'));
     const infoOp = op ? ` | Dernière op. : ${op.ticker} (${op.sens} ${op.qte.toLocaleString('fr-FR')} @ ${op.prix.toFixed(2)} à ${op.heure})` : "";
     document.getElementById('statusText').style.color = "#00FF66";
     document.getElementById('statusText').innerText = `LIVE [${new Date().toTimeString().slice(0,8)}] [${dernierFichier.name} | ${parsed.ops.length} ops] — ${data.ticker}${infoOp}`;
@@ -8394,11 +8394,36 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       ctrlBar.style.display = "flex";
       ctrlBar.style.alignItems = "center";
       ctrlBar.style.width = "100%";
+      const btnMinHud = document.createElement("button");
+      btnMinHud.id = "chHudMinBtn";
+      btnMinHud.type = "button";
+      btnMinHud.title = "Masquer / Réduire la boîte Outils";
+      btnMinHud.textContent = "\u2014";
+      btnMinHud.style.cssText = "background:rgba(148,163,184,0.18);color:#E2E8F0;border:1px solid rgba(148,163,184,0.45);border-radius:6px;width:26px;height:26px;font-weight:800;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;margin-left:4px;padding:0;";
+
+      const setHudCollapsed = (collapsed) => {
+        Array.from(hudTools.children).forEach(chEl => {
+          if (chEl !== ctrlBar) chEl.style.display = collapsed ? "none" : "";
+        });
+        btnMinHud.textContent = collapsed ? "\u25A1" : "\u2014";
+        btnMinHud.title = collapsed ? "Démasquer la boîte Outils" : "Masquer / Réduire la boîte Outils";
+        hudTools.style.padding = collapsed ? "4px 8px" : "";
+        localStorage.setItem("ch_hud_collapsed", collapsed ? "1" : "0");
+      };
+
+      btnMinHud.onclick = (e) => {
+        e.stopPropagation();
+        const isCol = localStorage.getItem("ch_hud_collapsed") === "1";
+        setHudCollapsed(!isCol);
+      };
+
       ctrlBar.appendChild(handle);
       ctrlBar.appendChild(lblTitleHud);
       ctrlBar.appendChild(btnOrient);
+      ctrlBar.appendChild(btnMinHud);
       ctrlBar.appendChild(btnCloseHud);
       hudTools.insertBefore(ctrlBar, hudTools.firstChild);
+      if (localStorage.getItem("ch_hud_collapsed") === "1") setHudCollapsed(true);
 
       // Position de depart en haut a gauche du graphique (52px, 38px) ou position sauvegardee
       hudTools.style.left = "52px";
