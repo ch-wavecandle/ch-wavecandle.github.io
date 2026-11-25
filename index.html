@@ -9264,16 +9264,18 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
         const s = typeof dz0.start === "number" ? dz0.start.toFixed(1) : "?";
         const e = typeof dz0.end === "number" ? dz0.end.toFixed(1) : "?";
 
-        const customPatches = (opt.series || []).filter(sr => sr && sr.type === "custom" && sr.id).map(sr => ({
-          id: sr.id,
-          xAxisIndex: 0,
-          yAxisIndex: sr.yAxisIndex || 0,
-          data: sr.data
-        }));
-        if (customPatches.length > 0) {
-          ch.setOption({ series: customPatches }, { lazyUpdate: false });
+        let customCount = 0;
+        const newSeries = (opt.series || []).map((sr, sIdx) => {
+          if (sr && sr.type === "custom") {
+            customCount++;
+            return { ...sr, xAxisIndex: 0, yAxisIndex: (typeof sr.yAxisIndex === "number" ? sr.yAxisIndex : 1) };
+          }
+          return sr;
+        });
+        if (customCount > 0) {
+          ch.setOption({ series: newSeries }, { lazyUpdate: false });
         }
-        showZoomDiag("🔍 Zoom X: " + s + "%→" + e + "% | Grilles: " + opt.grid.length + " | Custom: " + customPatches.length, false);
+        showZoomDiag("🔍 Zoom X: " + s + "%→" + e + "% | Grilles: " + opt.grid.length + " | Custom: " + customCount, false);
       } catch (err) {
         showZoomDiag("⚠️ ERR ZOOM: " + err.message, true);
       }
