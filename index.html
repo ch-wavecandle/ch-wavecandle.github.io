@@ -5038,7 +5038,7 @@ window.__chInjecterIndicateurs = function() {
     grid: grids,
     xAxis: xAxes,
     yAxis: yAxes,
-    dataZoom: (Array.isArray(opt.dataZoom) && opt.dataZoom.length > 0) ? opt.dataZoom.map(dz => (dz && dz.yAxisIndex !== undefined && dz.xAxisIndex === undefined) ? dz : { ...dz, xAxisIndex: allXIdx }) : new Array({ type: "inside", xAxisIndex: allXIdx }),
+    dataZoom: new Array({ id: "zoomX_inside", type: "inside", xAxisIndex: allXIdx, filterMode: "none", zoomOnMouseWheel: true, moveOnMouseMove: true }, { id: "zoomY_inside", type: "inside", yAxisIndex: isMulti ? new Array(0) : new Array(0, 1), filterMode: "none", zoomOnMouseWheel: "shift", moveOnMouseMove: "shift" }, { id: "zoomX_slider", type: "slider", xAxisIndex: allXIdx, filterMode: "none" }),
     series: baseSeries.concat(extra)
   }, { replaceMerge: new Array("series", "xAxis", "yAxis", "grid") });
 };
@@ -7395,9 +7395,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
         const futLabels = generateFutureCategoryLabels(lastLbl, extra, granVal);
         const extData = x0.data.concat(futLabels);
 
-        const dzPatch = Array.isArray(opt.dataZoom)
-          ? opt.dataZoom.map(() => ({ start: 0, end: 100, startValue: null, endValue: null }))
-          : undefined;
+        const hasUserZoom = Array.isArray(opt.dataZoom) && opt.dataZoom.some(d => d && ((typeof d.start === "number" && d.start > 0.5) || (typeof d.end === "number" && d.end < 99.5))); const dzPatch = (!hasUserZoom && Array.isArray(opt.dataZoom)) ? opt.dataZoom.map(() => ({ start: 0, end: 100, startValue: null, endValue: null })) : undefined;
 
         chart.setOption({
           xAxis: [{ data: extData, max: extData.length - 1 }],
