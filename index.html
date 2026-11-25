@@ -2159,7 +2159,7 @@ function dessinerChandeliersMulti(data) {
     backgroundColor: '#0A0A0A',
     animation: false,
     title: { show: false, id: 'titreCamembert', text: `${data.date_deb_fr} → ${data.date_fin_fr}`, left: pieAuto.pos[0], top: pieAuto.topTitle, textAlign: 'center', textStyle: { color: '#FFD700', fontSize: 11, fontFamily: 'Consolas', fontWeight: 'bold' } },
-    grid: { left: 45, right: 92, top: 35, bottom: 62 },
+    grid: { left: 45, right: 92, top: 35, bottom: 24 },
     tooltip: {
       trigger: 'item', z: 999, backgroundColor: 'rgba(18,18,18,0.96)', borderColor: '#444', textStyle: { color: '#FFF', fontFamily: 'Consolas', fontSize: 12 },
       formatter: p => {
@@ -2588,7 +2588,7 @@ function dessinerGraphique(data) {
   chart.setOption({
     backgroundColor: '#0A0A0A', animation: false,
     title: { show: false, id: 'titreCamembert', text: `Séance ${data.date_fr} (09:00 → 15:00)`, left: pieAutoV.pos[0], top: pieAutoV.topTitle, textAlign: 'center', textStyle: { color: '#FFD700', fontSize: 11, fontFamily: 'Consolas', fontWeight: 'bold' } },
-    grid: { left: 45, right: 92, top: 35, bottom: 55 },
+    grid: { left: 45, right: 92, top: 35, bottom: 24 },
     tooltip: {
       trigger: 'item', z: 999, backgroundColor: 'rgba(18,18,18,0.96)', borderColor: '#444', textStyle: { color: '#FFF', fontFamily: 'Consolas', fontSize: 12 },
       formatter: p => {
@@ -4802,7 +4802,7 @@ window.__chInjecterIndicateurs = function() {
   const splitCol = isClair ? "#E2E8F0" : "#1E293B";
 
   if (cfg.osc === "NONE") {
-    chart.setOption({ grid: new Array({ left: 45, right: 92, top: 35, bottom: 62 }), series: baseSeries.concat(extra) }, { replaceMerge: new Array("series") });
+    chart.setOption({ grid: new Array({ left: 45, right: 92, top: 35, bottom: 24 }), series: baseSeries.concat(extra) }, { replaceMerge: new Array("series") });
     return;
   }
 
@@ -8792,7 +8792,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     gap: 7px !important;
     position: absolute !important;
     right: 54px !important;
-    bottom: 52px !important;
+    bottom: 30px !important;
     z-index: 45 !important;
     padding: 5px 12px !important;
     border-radius: 6px !important;
