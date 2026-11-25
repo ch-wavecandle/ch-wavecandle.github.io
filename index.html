@@ -4608,7 +4608,7 @@ window.__CH_CHAT_CORE = {
 </style>
 
 <div id="chIndPopover" style="max-height:82vh; overflow-y:auto; width:360px;">
-  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid #334155; padding-bottom:6px;">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid #334155; padding-bottom:6px; position:sticky; top:0; background:#0F172A; z-index:10;">
     <span style="font-weight:800; font-size:13px; color:#E2E8F0;">📐 Indicateurs & Order Flow BVMT</span>
     <button type="button" id="btnCloseInd" style="background:none; border:none; color:#94A3B8; font-size:15px; cursor:pointer;">✕</button>
   </div>
@@ -4919,7 +4919,7 @@ window.__chInjecterIndicateurs = function() {
   const subH = +(availH / nOsc).toFixed(1);
 
   const grids = new Array({ left: 45, right: 92, top: 32, height: mainH + "%" });
-  const xAxes = new Array({ ...xBase, gridIndex: 0 });
+  const xAxes = new Array({ ...xBase, gridIndex: 0, axisLabel: { show: false } });
   const yAxes = new Array({ ...yBase, gridIndex: 0 });
   const allXIdx = new Array(0);
   const trArr = closes.map((c, i) => c === null ? 0 : Math.max((highs.at(i) - lows.at(i)), i > 0 && closes.at(i-1) !== null ? Math.abs(highs.at(i) - closes.at(i-1)) : 0, i > 0 && closes.at(i-1) !== null ? Math.abs(lows.at(i) - closes.at(i-1)) : 0));
@@ -4928,11 +4928,11 @@ window.__chInjecterIndicateurs = function() {
     const topPct = +(mainH + 4.5 + idx * (subH + gapPct)).toFixed(1);
     allXIdx.push(gIdx);
     grids.push({ left: 45, right: 92, top: topPct + "%", height: subH + "%" });
-    xAxes.push({ ...xBase, gridIndex: gIdx, axisLabel: { show: false } });
-    let yOsc = { gridIndex: gIdx, position: "right", axisLabel: { color: axisCol, fontSize: 10 }, splitLine: { lineStyle: { color: splitCol } } };
+    const isLastSub = (idx === nOsc - 1); xAxes.push({ ...xBase, gridIndex: gIdx, axisLabel: isLastSub ? (xBase.axisLabel || { show: true }) : { show: false } });
+    let yOsc = { gridIndex: gIdx, position: "right", name: oscName, nameLocation: "end", nameGap: 2, nameTextStyle: { color: axisCol, fontSize: 9, fontWeight: "bold" }, axisLabel: { color: axisCol, fontSize: 9.5 }, splitLine: { lineStyle: { color: splitCol } } };
 
     if (oscName === "DELTA") {
-      extra.push({ id: "ind_osc_delta", name: "Delta Net", type: "bar", xAxisIndex: gIdx, yAxisIndex: gIdx, itemStyle: { color: (p) => ((Array.isArray(p.value) ? p.value.at(1) : p.value) >= 0) ? "#10B981" : "#EF4444" }, data: pair(deltaArr) });
+      extra.push({ id: "ind_osc_delta", name: "Delta Net", type: "bar", barMaxWidth: 14, xAxisIndex: gIdx, yAxisIndex: gIdx, itemStyle: { color: (p) => ((Array.isArray(p.value) ? p.value.at(1) : p.value) >= 0) ? "#10B981" : "#EF4444" }, data: pair(deltaArr) });
     } else if (oscName === "CVD") {
       extra.push({ id: "ind_osc_cvd", name: "CVD", type: "line", xAxisIndex: gIdx, yAxisIndex: gIdx, showSymbol: false, lineStyle: { width: 1.8, color: "#10B981" }, areaStyle: { color: "rgba(16,185,129,0.16)" }, data: pair(cvdArr) });
     } else if (oscName === "AGGR") {
@@ -4940,11 +4940,11 @@ window.__chInjecterIndicateurs = function() {
       extra.push({ id: "ind_osc_aggr", name: "Agressivité %", type: "line", xAxisIndex: gIdx, yAxisIndex: gIdx, showSymbol: false, lineStyle: { width: 1.7, color: "#38BDF8" }, markLine: { silent: true, symbol: "none", data: new Array({ yAxis: 50, lineStyle: { color: "#64748B", type: "dashed" } }) }, data: pair(aggrArr) });
     } else if (oscName === "NEUT") {
       yOsc = { ...yOsc, min: 0, max: 100, interval: 50 };
-      extra.push({ id: "ind_osc_neut", name: "Neutralité %", type: "bar", xAxisIndex: gIdx, yAxisIndex: gIdx, itemStyle: { color: "rgba(148,163,184,0.7)" }, data: pair(neutArr) });
+      extra.push({ id: "ind_osc_neut", name: "Neutralité %", type: "bar", barMaxWidth: 14, xAxisIndex: gIdx, yAxisIndex: gIdx, itemStyle: { color: "rgba(148,163,184,0.7)" }, data: pair(neutArr) });
     } else if (oscName === "IMPACT") {
       extra.push({ id: "ind_osc_impact", name: "Impact Prix", type: "line", xAxisIndex: gIdx, yAxisIndex: gIdx, showSymbol: false, lineStyle: { width: 1.6, color: "#F59E0B" }, data: pair(impactArr) });
     } else if (oscName === "VOL") {
-      extra.push({ id: "ind_osc_vol", name: "Volume", type: "bar", xAxisIndex: gIdx, yAxisIndex: gIdx, itemStyle: { color: "rgba(56,189,248,0.65)" }, data: pair(vols) });
+      extra.push({ id: "ind_osc_vol", name: "Volume", type: "bar", barMaxWidth: 14, xAxisIndex: gIdx, yAxisIndex: gIdx, itemStyle: { color: "rgba(56,189,248,0.65)" }, data: pair(vols) });
     } else if (oscName === "OBV") {
       let obv = 0; const obvArr = closes.map((c, i) => { if (i > 0 && c !== null && closes.at(i-1) !== null) { if (c > closes.at(i-1)) obv += vols.at(i); else if (c < closes.at(i-1)) obv -= vols.at(i); } return obv; });
       extra.push({ id: "ind_osc_obv", name: "OBV", type: "line", xAxisIndex: gIdx, yAxisIndex: gIdx, showSymbol: false, lineStyle: { width: 1.7, color: "#06B6D4" }, data: pair(obvArr) });
@@ -4964,7 +4964,7 @@ window.__chInjecterIndicateurs = function() {
     }
     else if (oscName === "MACD") {
       const mObj = CH_MathInd.macd(closes, 12, 26, 9);
-      extra.push({ id: "ind_osc_macd_h", name: "MACD Hist", type: "bar", xAxisIndex: gIdx, yAxisIndex: gIdx, itemStyle: { color: (p) => ((Array.isArray(p.value) ? p.value.at(1) : p.value) >= 0) ? "rgba(16,185,129,0.65)" : "rgba(239,68,68,0.65)" }, data: pair(mObj.hist) });
+      extra.push({ id: "ind_osc_macd_h", name: "MACD Hist", type: "bar", barMaxWidth: 14, xAxisIndex: gIdx, yAxisIndex: gIdx, itemStyle: { color: (p) => ((Array.isArray(p.value) ? p.value.at(1) : p.value) >= 0) ? "rgba(16,185,129,0.65)" : "rgba(239,68,68,0.65)" }, data: pair(mObj.hist) });
       extra.push({ id: "ind_osc_macd_l", name: "MACD", type: "line", xAxisIndex: gIdx, yAxisIndex: gIdx, showSymbol: false, lineStyle: { width: 1.5, color: "#38BDF8" }, data: pair(mObj.line) });
       extra.push({ id: "ind_osc_macd_s", name: "Signal", type: "line", xAxisIndex: gIdx, yAxisIndex: gIdx, showSymbol: false, lineStyle: { width: 1.5, color: "#F59E0B" }, data: pair(mObj.signal) });
     } else if (oscName === "STOCH") {
@@ -5881,7 +5881,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       Array.from(s.options).some(o => /vagues|bougie|chandelier/i.test((o.textContent||"") + " " + (o.value||"")))
     );
   }
-  function isCandleOrCh3D(sel){
+  function isCandleOrCh3D(sel){ return true;
     if(!sel) return true;
     const opt = sel.options.item(sel.selectedIndex);
     const txt = ((opt ? opt.textContent : "") + " " + (sel.value || "")).toLowerCase();
@@ -8535,6 +8535,14 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     min-height: 0 !important;
     padding-bottom: 10px !important;
     margin-bottom: 0 !important;
+  }
+  #chIndPopover {
+    top: 48px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    max-height: calc(100vh - 88px) !important;
+    z-index: 9500 !important;
+    box-shadow: 0 12px 32px rgba(2, 6, 23, 0.55) !important;
   }
 </style>
 <script id="ch-master-ui-orchestrator">
