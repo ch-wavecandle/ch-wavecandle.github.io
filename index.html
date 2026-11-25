@@ -8332,12 +8332,20 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     flex-direction: column !important;
     overflow: hidden !important;
   }
-  [_echarts_instance_], #mainChart, #chartContainer {
+  #chart-container, [_echarts_instance_], #mainChart, #chartContainer {
+    padding-bottom: 26px !important;
     flex: 1 1 auto !important;
     height: 100% !important;
     min-height: 0 !important;
     margin-bottom: 0 !important;
     padding-bottom: 0 !important;
+  }
+  #chart-container {
+    flex: 1 1 auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding-bottom: 26px !important;
+    margin-bottom: 0 !important;
   }
 </style>
 <script id="ch-master-ui-orchestrator">
