@@ -5876,7 +5876,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
 (function(){
   let showLabels = true;
 
-  function getModeSelect(){
+  function getModeSelect(){ if(document.getElementById("selModeRendu")) return document.getElementById("selModeRendu");
     return Array.from(document.querySelectorAll("select")).find(s =>
       Array.from(s.options).some(o => /vagues|bougie|chandelier/i.test((o.textContent||"") + " " + (o.value||"")))
     );
@@ -6157,7 +6157,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     return "DELICE HOLDING";
   }
 
-  function getModeSelect(){
+  function getModeSelect(){ if(document.getElementById("selModeRendu")) return document.getElementById("selModeRendu");
     return Array.from(document.querySelectorAll("select")).find(s =>
       Array.from(s.options).some(o => /vagues|bougie|chandelier/i.test((o.textContent||"") + " " + (o.value||"")))
     );
