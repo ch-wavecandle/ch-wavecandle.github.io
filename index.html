@@ -4835,7 +4835,7 @@ window.__chInjecterIndicateurs = function() {
     extra.push({ id: "ind_vwap_l", name: "VWAP -1σ", type: "line", xAxisIndex: 0, yAxisIndex: 0, showSymbol: false, lineStyle: { width: 1, type: "dotted", color: "rgba(16,185,129,0.65)" }, data: pair(vwapLo), z: 39 });
   }
   if (cfg.bb) {
-    const bb = CH_MathInd.bb(closes, cfg.bbP, cfg.bbK);
+    const bb = typeof CH_MathInd.bollinger === "function" ? CH_MathInd.bollinger(closes, cfg.bbP, cfg.bbK) : (() => { const m = CH_MathInd.sma(closes, cfg.bbP); const up = [], lo = []; closes.forEach((_, i) => { if (i < cfg.bbP - 1 || m.at(i) === null) { up.push(null); lo.push(null); return; } let s2 = 0, n = 0; for (let j = i - cfg.bbP + 1; j <= i; j++) { if (closes.at(j) !== null) { s2 += Math.pow(closes.at(j) - m.at(i), 2); n++; } } const sd = n > 0 ? Math.sqrt(s2 / n) : 0; up.push(+(m.at(i) + cfg.bbK * sd).toFixed(3)); lo.push(+(m.at(i) - cfg.bbK * sd).toFixed(3)); }); return { up, lo }; })();
     extra.push({ id: "ind_bb_up", name: "BB Sup", type: "line", xAxisIndex: 0, yAxisIndex: 0, showSymbol: false, lineStyle: { width: 1.2, color: "rgba(168,85,247,0.8)" }, data: pair(bb.up), z: 38 });
     extra.push({ id: "ind_bb_lo", name: "BB Inf", type: "line", xAxisIndex: 0, yAxisIndex: 0, showSymbol: false, lineStyle: { width: 1.2, color: "rgba(168,85,247,0.8)" }, data: pair(bb.lo), z: 38 });
   }
