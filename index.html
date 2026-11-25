@@ -4944,9 +4944,9 @@ window.__chInjecterIndicateurs = function() {
   }
 
   const nOsc = cfg.oscs.length;
-  const mainH = nOsc === 1 ? 64 : (nOsc === 2 ? 50 : (nOsc === 3 ? 41 : 34));
-  const gapPct = 2.2;
-  const availH = 92 - mainH - (nOsc * gapPct);
+  const mainH = nOsc === 1 ? 60 : (nOsc === 2 ? 46 : (nOsc === 3 ? 37 : 31));
+  const gapPct = 3.2;
+  const availH = 85 - mainH - (nOsc * gapPct);
   const subH = +(availH / nOsc).toFixed(1);
 
   const grids = new Array({ left: 45, right: 92, top: 32, height: mainH + "%" });
@@ -4956,11 +4956,11 @@ window.__chInjecterIndicateurs = function() {
   const trArr = closes.map((c, i) => c === null ? 0 : Math.max((highs.at(i) - lows.at(i)), i > 0 && closes.at(i-1) !== null ? Math.abs(highs.at(i) - closes.at(i-1)) : 0, i > 0 && closes.at(i-1) !== null ? Math.abs(lows.at(i) - closes.at(i-1)) : 0));
   cfg.oscs.forEach((oscName, idx) => {
     const gIdx = idx + 1; const yIdx = yOscOffset + idx;
-    const topPct = +(mainH + 4.5 + idx * (subH + gapPct)).toFixed(1);
+    const topPct = +(mainH + 5.5 + idx * (subH + gapPct)).toFixed(1);
     allXIdx.push(gIdx);
     grids.push({ left: 45, right: 92, top: topPct + "%", height: subH + "%" });
     const isLastSub = (idx === nOsc - 1); xAxes.push({ ...xBase, gridIndex: gIdx, axisLabel: isLastSub ? (xBase.axisLabel || { show: true }) : { show: false } });
-    let yOsc = { gridIndex: gIdx, position: "right", name: oscName, nameLocation: "end", nameGap: 2, nameTextStyle: { color: axisCol, fontSize: 9, fontWeight: "bold" }, axisLabel: { color: axisCol, fontSize: 9.5 }, splitLine: { lineStyle: { color: splitCol } } };
+    let yOsc = { gridIndex: gIdx, position: "right", name: oscName, nameLocation: "end", nameGap: 2, nameTextStyle: { color: axisCol, fontSize: 9, fontWeight: "bold" }, axisLabel: { color: axisCol, fontSize: 9, hideOverlap: true, showMinLabel: false }, splitLine: { lineStyle: { color: splitCol } } };
 
     if (oscName === "DELTA") {
       extra.push({ id: "ind_osc_delta", name: "Delta Net", type: "bar", barMaxWidth: 14, xAxisIndex: gIdx, yAxisIndex: yIdx, itemStyle: { color: (p) => ((Array.isArray(p.value) ? p.value.at(1) : p.value) >= 0) ? "#10B981" : "#EF4444" }, data: pair(deltaArr) });
@@ -5038,7 +5038,7 @@ window.__chInjecterIndicateurs = function() {
     grid: grids,
     xAxis: xAxes,
     yAxis: yAxes,
-    dataZoom: new Array({ id: "zoomX_inside", type: "inside", xAxisIndex: allXIdx, filterMode: "none", zoomOnMouseWheel: true, moveOnMouseMove: false }, { id: "zoomX_slider", type: "slider", xAxisIndex: allXIdx, filterMode: "none", bottom: 24, height: 14, showDetail: false }),
+    dataZoom: new Array({ id: "zoomX_inside", type: "inside", xAxisIndex: allXIdx, filterMode: "none", zoomOnMouseWheel: true, moveOnMouseMove: false }, { id: "zoomX_slider", type: "slider", xAxisIndex: allXIdx, filterMode: "none", bottom: 22, height: 12, showDetail: false }),
     series: extra
   });
 };
@@ -9323,7 +9323,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
           if (xMin !== null && xMax !== null && xMax > xMin) {
             ch.setOption({ xAxis: [{ min: xMin, max: xMax }] });
           }
-          showZPill("🔍 Zoom X: " + s.toFixed(1) + "%→" + e.toFixed(1) + "% [" + xMin + ".." + xMax + "]", false);
+          /* Zoom OK */
         }
       } catch (err) {
         showZPill("⚠️ SYNC X0 ERR: " + err.message, true);
