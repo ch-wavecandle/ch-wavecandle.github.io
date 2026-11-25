@@ -4818,7 +4818,7 @@ window.__chInjecterIndicateurs = function() {
     });
   } else { return; }
 
-  const pair = (arr) => xVals.map((x, i) => new Array(x, arr.at(i)));
+  const pair = (arr) => isMulti ? arr.slice() : xVals.map((x, i) => new Array(x, arr.at(i)));
   const extra = new Array();
 
   if (cfg.ma1) {
@@ -4895,13 +4895,20 @@ window.__chInjecterIndicateurs = function() {
   const yBase = Array.isArray(opt.yAxis) ? opt.yAxis.at(0) : opt.yAxis;
 
   if (cfg.oscs.length === 0) {
-    chart.setOption({
-      grid: new Array({ left: 45, right: 92, top: 32, bottom: 22 }),
-      xAxis: new Array({ ...xBase, gridIndex: 0 }),
-      yAxis: new Array({ ...yBase, gridIndex: 0 }),
-      dataZoom: new Array({ id: "zoomX_inside", xAxisIndex: new Array(0) }, { id: "zoomY_inside", yAxisIndex: new Array(0) }, { id: "zoomX_slider", xAxisIndex: new Array(0) }),
-      series: baseSeries.concat(extra)
-    }, { replaceMerge: new Array("series", "xAxis", "yAxis", "grid") });
+    if (Array.isArray(opt.grid) && opt.grid.length > 1) {
+      chart.setOption({
+        grid: new Array({ left: 45, right: 92, top: 32, bottom: 22 }),
+        xAxis: new Array({ ...xBase, gridIndex: 0 }),
+        yAxis: new Array({ ...yBase, gridIndex: 0 }),
+        dataZoom: new Array({ id: "zoomX_inside", xAxisIndex: new Array(0) }, { id: "zoomY_inside", yAxisIndex: new Array(0) }, { id: "zoomX_slider", xAxisIndex: new Array(0) }),
+        series: baseSeries.concat(extra)
+      }, { replaceMerge: new Array("series", "xAxis", "yAxis", "grid") });
+    } else {
+      chart.setOption({
+        grid: new Array({ left: 45, right: 92, top: 32, bottom: 22 }),
+        series: baseSeries.concat(extra)
+      }, { replaceMerge: new Array("series") });
+    }
     return;
   }
 
