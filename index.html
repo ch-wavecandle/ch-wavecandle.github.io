@@ -4990,7 +4990,7 @@ window.__chInjecterIndicateurs = function() {
       });
       extra.push({ id: "ind_osc_cci", name: "CCI(20)", type: "line", xAxisIndex: gIdx, yAxisIndex: gIdx, showSymbol: false, lineStyle: { width: 1.6, color: "#C084FC" }, markLine: { silent: true, symbol: "none", data: new Array({ yAxis: 100, lineStyle: { color: "#EF4444" } }, { yAxis: -100, lineStyle: { color: "#10B981" } }) }, data: pair(cci) });
     } else if (oscName === "ATR") {
-      extra.push({ id: "ind_osc_atr", name: "ATR(14)", type: "line", xAxisIndex: gIdx, yAxisIndex: gIdx, showSymbol: false, lineStyle: { width: 1.7, color: "#F43F5E" }, data: pair(CH_MathInd.ema(trArr, 14).map(v => +v.toFixed(4))) });
+      extra.push({ id: "ind_osc_atr", name: "ATR(14)", type: "line", xAxisIndex: gIdx, yAxisIndex: gIdx, showSymbol: false, lineStyle: { width: 1.7, color: "#F43F5E" }, data: pair(CH_MathInd.ema(trArr, 14).map(v => (v !== null && v !== undefined && !isNaN(v)) ? +v.toFixed(4) : null)) });
     }
     yAxes.push(yOsc);
   });
