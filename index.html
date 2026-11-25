@@ -9178,5 +9178,54 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
   });
 })();
 </script>
+<script id="ch-unified-multi-zoom">
+(function() {
+  function attachUnifiedZoom() {
+    const dom = document.querySelector("[_echarts_instance_]");
+    if (!dom || dom.__chUnifiedZoom) return;
+    dom.__chUnifiedZoom = true;
+
+    dom.addEventListener("wheel", function(e) {
+      try {
+        const ch = window.echarts && window.echarts.getInstanceByDom(dom);
+        if (!ch) return;
+        const opt = ch.getOption();
+        if (!opt || !Array.isArray(opt.grid) || opt.grid.length <= 1) return;
+        if (!Array.isArray(opt.dataZoom) || opt.dataZoom.length === 0) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        const dz0 = opt.dataZoom.at(0) || {};
+        const curS = typeof dz0.start === "number" ? dz0.start : 0;
+        const curE = typeof dz0.end === "number" ? dz0.end : 100;
+        const span = Math.max(1, curE - curS);
+
+        const rect = dom.getBoundingClientRect();
+        const relX = Math.max(0, Math.min(1, (e.clientX - rect.left - 45) / Math.max(1, rect.width - 137)));
+        const anchor = curS + relX * span;
+
+        const factor = e.deltaY < 0 ? 0.80 : 1.25;
+        const newSpan = Math.max(1.5, Math.min(100, span * factor));
+        let nextS = anchor - relX * newSpan;
+        let nextE = nextS + newSpan;
+        if (nextS < 0) { nextE = Math.min(100, nextE - nextS); nextS = 0; }
+        if (nextE > 100) { nextS = Math.max(0, nextS - (nextE - 100)); nextE = 100; }
+
+        opt.dataZoom.forEach((dz, idx) => {
+          if (dz && dz.yAxisIndex !== undefined && dz.xAxisIndex === undefined) return;
+          ch.dispatchAction({ type: "dataZoom", dataZoomIndex: idx, start: nextS, end: nextE });
+        });
+      } catch (err) {
+        const st = document.getElementById("statusText");
+        if (st) { st.style.color = "#FF3B3B"; st.innerText = "ERREUR ZOOM MULTI : " + err.message; }
+      }
+    }, { passive: false, capture: true });
+  }
+
+  window.addEventListener("load", attachUnifiedZoom);
+  setInterval(attachUnifiedZoom, 1500);
+})();
+</script>
 </body>
 </html>
