@@ -4944,9 +4944,9 @@ window.__chInjecterIndicateurs = function() {
   }
 
   const nOsc = cfg.oscs.length;
-  const mainH = nOsc === 1 ? 60 : (nOsc === 2 ? 46 : (nOsc === 3 ? 37 : 31));
-  const gapPct = 3.2;
-  const availH = 85 - mainH - (nOsc * gapPct);
+  const mainH = nOsc === 1 ? 65 : (nOsc === 2 ? 51 : (nOsc === 3 ? 42 : 35));
+  const gapPct = 2.5;
+  const availH = 91 - mainH - (nOsc * gapPct);
   const subH = +(availH / nOsc).toFixed(1);
 
   const grids = new Array({ left: 45, right: 92, top: 32, height: mainH + "%" });
@@ -4956,7 +4956,7 @@ window.__chInjecterIndicateurs = function() {
   const trArr = closes.map((c, i) => c === null ? 0 : Math.max((highs.at(i) - lows.at(i)), i > 0 && closes.at(i-1) !== null ? Math.abs(highs.at(i) - closes.at(i-1)) : 0, i > 0 && closes.at(i-1) !== null ? Math.abs(lows.at(i) - closes.at(i-1)) : 0));
   cfg.oscs.forEach((oscName, idx) => {
     const gIdx = idx + 1; const yIdx = yOscOffset + idx;
-    const topPct = +(mainH + 5.5 + idx * (subH + gapPct)).toFixed(1);
+    const topPct = +(mainH + 4.8 + idx * (subH + gapPct)).toFixed(1);
     allXIdx.push(gIdx);
     grids.push({ left: 45, right: 92, top: topPct + "%", height: subH + "%" });
     const isLastSub = (idx === nOsc - 1); xAxes.push({ ...xBase, gridIndex: gIdx, axisLabel: isLastSub ? (xBase.axisLabel || { show: true }) : { show: false } });
