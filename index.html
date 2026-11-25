@@ -4923,14 +4923,14 @@ window.__chInjecterIndicateurs = function() {
   const axisCol = isClair ? "#475569" : "#94A3B8";
   const splitCol = isClair ? "#E2E8F0" : "#1E293B";
   const xBase = Array.isArray(opt.xAxis) ? opt.xAxis.at(0) : opt.xAxis;
-  const yBase = Array.isArray(opt.yAxis) ? opt.yAxis.at(0) : opt.yAxis;
+  const baseYAxes = (Array.isArray(opt.yAxis) ? opt.yAxis : new Array(opt.yAxis)).filter(y => (y.gridIndex || 0) === 0).map(y => ({ ...y, gridIndex: 0 })); const yBase = baseYAxes.at(0); const yOscOffset = baseYAxes.length;
 
   if (cfg.oscs.length === 0) {
     if (Array.isArray(opt.grid) && opt.grid.length > 1) {
       chart.setOption({
         grid: new Array({ left: 45, right: 92, top: 32, bottom: 22 }),
         xAxis: new Array({ ...xBase, gridIndex: 0 }),
-        yAxis: new Array({ ...yBase, gridIndex: 0 }),
+        yAxis: baseYAxes,
         dataZoom: new Array({ id: "zoomX_inside", xAxisIndex: new Array(0) }, { id: "zoomY_inside", yAxisIndex: new Array(0) }, { id: "zoomX_slider", xAxisIndex: new Array(0) }),
         series: baseSeries.concat(extra)
       }, { replaceMerge: new Array("series", "xAxis", "yAxis", "grid") });
@@ -4951,11 +4951,11 @@ window.__chInjecterIndicateurs = function() {
 
   const grids = new Array({ left: 45, right: 92, top: 32, height: mainH + "%" });
   const xAxes = new Array({ ...xBase, gridIndex: 0, axisLabel: { show: false } });
-  const yAxes = new Array({ ...yBase, gridIndex: 0 });
+  const yAxes = baseYAxes.slice();
   const allXIdx = new Array(0);
   const trArr = closes.map((c, i) => c === null ? 0 : Math.max((highs.at(i) - lows.at(i)), i > 0 && closes.at(i-1) !== null ? Math.abs(highs.at(i) - closes.at(i-1)) : 0, i > 0 && closes.at(i-1) !== null ? Math.abs(lows.at(i) - closes.at(i-1)) : 0));
   cfg.oscs.forEach((oscName, idx) => {
-    const gIdx = idx + 1;
+    const gIdx = idx + 1; const yIdx = yOscOffset + idx;
     const topPct = +(mainH + 4.5 + idx * (subH + gapPct)).toFixed(1);
     allXIdx.push(gIdx);
     grids.push({ left: 45, right: 92, top: topPct + "%", height: subH + "%" });
@@ -4963,25 +4963,25 @@ window.__chInjecterIndicateurs = function() {
     let yOsc = { gridIndex: gIdx, position: "right", name: oscName, nameLocation: "end", nameGap: 2, nameTextStyle: { color: axisCol, fontSize: 9, fontWeight: "bold" }, axisLabel: { color: axisCol, fontSize: 9.5 }, splitLine: { lineStyle: { color: splitCol } } };
 
     if (oscName === "DELTA") {
-      extra.push({ id: "ind_osc_delta", name: "Delta Net", type: "bar", barMaxWidth: 14, xAxisIndex: gIdx, yAxisIndex: gIdx, itemStyle: { color: (p) => ((Array.isArray(p.value) ? p.value.at(1) : p.value) >= 0) ? "#10B981" : "#EF4444" }, data: pair(deltaArr) });
+      extra.push({ id: "ind_osc_delta", name: "Delta Net", type: "bar", barMaxWidth: 14, xAxisIndex: gIdx, yAxisIndex: yIdx, itemStyle: { color: (p) => ((Array.isArray(p.value) ? p.value.at(1) : p.value) >= 0) ? "#10B981" : "#EF4444" }, data: pair(deltaArr) });
     } else if (oscName === "CVD") {
-      extra.push({ id: "ind_osc_cvd", name: "CVD", type: "line", xAxisIndex: gIdx, yAxisIndex: gIdx, showSymbol: false, lineStyle: { width: 1.8, color: "#10B981" }, areaStyle: { color: "rgba(16,185,129,0.16)" }, data: pair(cvdArr) });
+      extra.push({ id: "ind_osc_cvd", name: "CVD", type: "line", xAxisIndex: gIdx, yAxisIndex: yIdx, showSymbol: false, lineStyle: { width: 1.8, color: "#10B981" }, areaStyle: { color: "rgba(16,185,129,0.16)" }, data: pair(cvdArr) });
     } else if (oscName === "AGGR") {
       yOsc = { ...yOsc, min: 0, max: 100, interval: 50 };
-      extra.push({ id: "ind_osc_aggr", name: "Agressivité %", type: "line", xAxisIndex: gIdx, yAxisIndex: gIdx, showSymbol: false, lineStyle: { width: 1.7, color: "#38BDF8" }, markLine: { silent: true, symbol: "none", data: new Array({ yAxis: 50, lineStyle: { color: "#64748B", type: "dashed" } }) }, data: pair(aggrArr) });
+      extra.push({ id: "ind_osc_aggr", name: "Agressivité %", type: "line", xAxisIndex: gIdx, yAxisIndex: yIdx, showSymbol: false, lineStyle: { width: 1.7, color: "#38BDF8" }, markLine: { silent: true, symbol: "none", data: new Array({ yAxis: 50, lineStyle: { color: "#64748B", type: "dashed" } }) }, data: pair(aggrArr) });
     } else if (oscName === "NEUT") {
       yOsc = { ...yOsc, min: 0, max: 100, interval: 50 };
-      extra.push({ id: "ind_osc_neut", name: "Neutralité %", type: "bar", barMaxWidth: 14, xAxisIndex: gIdx, yAxisIndex: gIdx, itemStyle: { color: "rgba(148,163,184,0.7)" }, data: pair(neutArr) });
+      extra.push({ id: "ind_osc_neut", name: "Neutralité %", type: "bar", barMaxWidth: 14, xAxisIndex: gIdx, yAxisIndex: yIdx, itemStyle: { color: "rgba(148,163,184,0.7)" }, data: pair(neutArr) });
     } else if (oscName === "IMPACT") {
-      extra.push({ id: "ind_osc_impact", name: "Impact Prix", type: "line", xAxisIndex: gIdx, yAxisIndex: gIdx, showSymbol: false, lineStyle: { width: 1.6, color: "#F59E0B" }, data: pair(impactArr) });
+      extra.push({ id: "ind_osc_impact", name: "Impact Prix", type: "line", xAxisIndex: gIdx, yAxisIndex: yIdx, showSymbol: false, lineStyle: { width: 1.6, color: "#F59E0B" }, data: pair(impactArr) });
     } else if (oscName === "VOL") {
-      extra.push({ id: "ind_osc_vol", name: "Volume", type: "bar", barMaxWidth: 14, xAxisIndex: gIdx, yAxisIndex: gIdx, itemStyle: { color: "rgba(56,189,248,0.65)" }, data: pair(vols) });
+      extra.push({ id: "ind_osc_vol", name: "Volume", type: "bar", barMaxWidth: 14, xAxisIndex: gIdx, yAxisIndex: yIdx, itemStyle: { color: "rgba(56,189,248,0.65)" }, data: pair(vols) });
     } else if (oscName === "OBV") {
       let obv = 0; const obvArr = closes.map((c, i) => { if (i > 0 && c !== null && closes.at(i-1) !== null) { if (c > closes.at(i-1)) obv += vols.at(i); else if (c < closes.at(i-1)) obv -= vols.at(i); } return obv; });
-      extra.push({ id: "ind_osc_obv", name: "OBV", type: "line", xAxisIndex: gIdx, yAxisIndex: gIdx, showSymbol: false, lineStyle: { width: 1.7, color: "#06B6D4" }, data: pair(obvArr) });
+      extra.push({ id: "ind_osc_obv", name: "OBV", type: "line", xAxisIndex: gIdx, yAxisIndex: yIdx, showSymbol: false, lineStyle: { width: 1.7, color: "#06B6D4" }, data: pair(obvArr) });
     } else if (oscName === "RSI") {
       yOsc = { ...yOsc, min: 0, max: 100, interval: 30 };
-      extra.push({ id: "ind_osc_rsi", name: "RSI(" + cfg.rsiP + ")", type: "line", xAxisIndex: gIdx, yAxisIndex: gIdx, showSymbol: false, lineStyle: { width: 1.8, color: "#38BDF8" }, markLine: { silent: true, symbol: "none", lineStyle: { type: "dashed", width: 1 }, data: new Array({ yAxis: 70, lineStyle: { color: "#EF4444" } }, { yAxis: 30, lineStyle: { color: "#10B981" } }) }, data: pair(CH_MathInd.rsi(closes, cfg.rsiP)) });
+      extra.push({ id: "ind_osc_rsi", name: "RSI(" + cfg.rsiP + ")", type: "line", xAxisIndex: gIdx, yAxisIndex: yIdx, showSymbol: false, lineStyle: { width: 1.8, color: "#38BDF8" }, markLine: { silent: true, symbol: "none", lineStyle: { type: "dashed", width: 1 }, data: new Array({ yAxis: 70, lineStyle: { color: "#EF4444" } }, { yAxis: 30, lineStyle: { color: "#10B981" } }) }, data: pair(CH_MathInd.rsi(closes, cfg.rsiP)) });
     } else if (oscName === "MFI") {
       yOsc = { ...yOsc, min: 0, max: 100, interval: 40 };
       const tp = closes.map((c, i) => c === null ? null : ((highs.at(i) + lows.at(i) + c) / 3));
@@ -4991,13 +4991,13 @@ window.__chInjecterIndicateurs = function() {
         for (let j = i - 13; j <= i; j++) { const mf = (tp.at(j) || 0) * vols.at(j); if (tp.at(j) >= (tp.at(j-1) || 0)) pos += mf; else neg += mf; }
         return neg === 0 ? 100 : +(100 - (100 / (1 + pos / neg))).toFixed(1);
       });
-      extra.push({ id: "ind_osc_mfi", name: "MFI(14)", type: "line", xAxisIndex: gIdx, yAxisIndex: gIdx, showSymbol: false, lineStyle: { width: 1.8, color: "#10B981" }, markLine: { silent: true, symbol: "none", data: new Array({ yAxis: 80, lineStyle: { color: "#EF4444" } }, { yAxis: 20, lineStyle: { color: "#10B981" } }) }, data: pair(mfiArr) });
+      extra.push({ id: "ind_osc_mfi", name: "MFI(14)", type: "line", xAxisIndex: gIdx, yAxisIndex: yIdx, showSymbol: false, lineStyle: { width: 1.8, color: "#10B981" }, markLine: { silent: true, symbol: "none", data: new Array({ yAxis: 80, lineStyle: { color: "#EF4444" } }, { yAxis: 20, lineStyle: { color: "#10B981" } }) }, data: pair(mfiArr) });
     }
     else if (oscName === "MACD") {
       const mObj = CH_MathInd.macd(closes, 12, 26, 9);
-      extra.push({ id: "ind_osc_macd_h", name: "MACD Hist", type: "bar", barMaxWidth: 14, xAxisIndex: gIdx, yAxisIndex: gIdx, itemStyle: { color: (p) => ((Array.isArray(p.value) ? p.value.at(1) : p.value) >= 0) ? "rgba(16,185,129,0.65)" : "rgba(239,68,68,0.65)" }, data: pair(mObj.hist) });
-      extra.push({ id: "ind_osc_macd_l", name: "MACD", type: "line", xAxisIndex: gIdx, yAxisIndex: gIdx, showSymbol: false, lineStyle: { width: 1.5, color: "#38BDF8" }, data: pair(mObj.line) });
-      extra.push({ id: "ind_osc_macd_s", name: "Signal", type: "line", xAxisIndex: gIdx, yAxisIndex: gIdx, showSymbol: false, lineStyle: { width: 1.5, color: "#F59E0B" }, data: pair(mObj.signal) });
+      extra.push({ id: "ind_osc_macd_h", name: "MACD Hist", type: "bar", barMaxWidth: 14, xAxisIndex: gIdx, yAxisIndex: yIdx, itemStyle: { color: (p) => ((Array.isArray(p.value) ? p.value.at(1) : p.value) >= 0) ? "rgba(16,185,129,0.65)" : "rgba(239,68,68,0.65)" }, data: pair(mObj.hist) });
+      extra.push({ id: "ind_osc_macd_l", name: "MACD", type: "line", xAxisIndex: gIdx, yAxisIndex: yIdx, showSymbol: false, lineStyle: { width: 1.5, color: "#38BDF8" }, data: pair(mObj.line) });
+      extra.push({ id: "ind_osc_macd_s", name: "Signal", type: "line", xAxisIndex: gIdx, yAxisIndex: yIdx, showSymbol: false, lineStyle: { width: 1.5, color: "#F59E0B" }, data: pair(mObj.signal) });
     } else if (oscName === "STOCH") {
       yOsc = { ...yOsc, min: 0, max: 100, interval: 40 };
       const kRaw = closes.map((c, i) => {
@@ -5007,17 +5007,17 @@ window.__chInjecterIndicateurs = function() {
         return mx === mn ? 50 : +(((c - mn) / (mx - mn)) * 100).toFixed(1);
       });
       const kSm = CH_MathInd.sma(kRaw, 3), dSm = CH_MathInd.sma(kSm, 3);
-      extra.push({ id: "ind_osc_st_k", name: "Stoch %K", type: "line", xAxisIndex: gIdx, yAxisIndex: gIdx, showSymbol: false, lineStyle: { width: 1.5, color: "#38BDF8" }, data: pair(kSm) });
-      extra.push({ id: "ind_osc_st_d", name: "Stoch %D", type: "line", xAxisIndex: gIdx, yAxisIndex: gIdx, showSymbol: false, lineStyle: { width: 1.5, color: "#F59E0B" }, data: pair(dSm) });
+      extra.push({ id: "ind_osc_st_k", name: "Stoch %K", type: "line", xAxisIndex: gIdx, yAxisIndex: yIdx, showSymbol: false, lineStyle: { width: 1.5, color: "#38BDF8" }, data: pair(kSm) });
+      extra.push({ id: "ind_osc_st_d", name: "Stoch %D", type: "line", xAxisIndex: gIdx, yAxisIndex: yIdx, showSymbol: false, lineStyle: { width: 1.5, color: "#F59E0B" }, data: pair(dSm) });
     } else if (oscName === "ADX") {
       const pDm = closes.map((_, i) => i === 0 ? 0 : Math.max(0, highs.at(i) - highs.at(i-1)));
       const mDm = closes.map((_, i) => i === 0 ? 0 : Math.max(0, lows.at(i-1) - lows.at(i)));
       const atr14 = CH_MathInd.ema(trArr, 14), pDi = CH_MathInd.ema(pDm, 14).map((v, i) => atr14.at(i) > 0 ? +((v / atr14.at(i)) * 100).toFixed(1) : 0), mDi = CH_MathInd.ema(mDm, 14).map((v, i) => atr14.at(i) > 0 ? +((v / atr14.at(i)) * 100).toFixed(1) : 0);
       const dx = pDi.map((p, i) => (p + mDi.at(i)) > 0 ? +((Math.abs(p - mDi.at(i)) / (p + mDi.at(i))) * 100).toFixed(1) : 0);
       const adx = CH_MathInd.ema(dx, 14);
-      extra.push({ id: "ind_osc_adx", name: "ADX(14)", type: "line", xAxisIndex: gIdx, yAxisIndex: gIdx, showSymbol: false, lineStyle: { width: 1.8, color: "#FBBF24" }, data: pair(adx) });
-      extra.push({ id: "ind_osc_pdi", name: "+DI", type: "line", xAxisIndex: gIdx, yAxisIndex: gIdx, showSymbol: false, lineStyle: { width: 1.2, color: "#10B981" }, data: pair(pDi) });
-      extra.push({ id: "ind_osc_mdi", name: "-DI", type: "line", xAxisIndex: gIdx, yAxisIndex: gIdx, showSymbol: false, lineStyle: { width: 1.2, color: "#EF4444" }, data: pair(mDi) });
+      extra.push({ id: "ind_osc_adx", name: "ADX(14)", type: "line", xAxisIndex: gIdx, yAxisIndex: yIdx, showSymbol: false, lineStyle: { width: 1.8, color: "#FBBF24" }, data: pair(adx) });
+      extra.push({ id: "ind_osc_pdi", name: "+DI", type: "line", xAxisIndex: gIdx, yAxisIndex: yIdx, showSymbol: false, lineStyle: { width: 1.2, color: "#10B981" }, data: pair(pDi) });
+      extra.push({ id: "ind_osc_mdi", name: "-DI", type: "line", xAxisIndex: gIdx, yAxisIndex: yIdx, showSymbol: false, lineStyle: { width: 1.2, color: "#EF4444" }, data: pair(mDi) });
     } else if (oscName === "CCI") {
       const tp = closes.map((c, i) => c === null ? null : ((highs.at(i) + lows.at(i) + c) / 3));
       const smaTp = CH_MathInd.sma(tp, 20);
@@ -5026,9 +5026,9 @@ window.__chInjecterIndicateurs = function() {
         let md = 0; for (let j = i - 19; j <= i; j++) md += Math.abs((tp.at(j) || t) - smaTp.at(i));
         md /= 20; return md === 0 ? 0 : +((t - smaTp.at(i)) / (0.015 * md)).toFixed(1);
       });
-      extra.push({ id: "ind_osc_cci", name: "CCI(20)", type: "line", xAxisIndex: gIdx, yAxisIndex: gIdx, showSymbol: false, lineStyle: { width: 1.6, color: "#C084FC" }, markLine: { silent: true, symbol: "none", data: new Array({ yAxis: 100, lineStyle: { color: "#EF4444" } }, { yAxis: -100, lineStyle: { color: "#10B981" } }) }, data: pair(cci) });
+      extra.push({ id: "ind_osc_cci", name: "CCI(20)", type: "line", xAxisIndex: gIdx, yAxisIndex: yIdx, showSymbol: false, lineStyle: { width: 1.6, color: "#C084FC" }, markLine: { silent: true, symbol: "none", data: new Array({ yAxis: 100, lineStyle: { color: "#EF4444" } }, { yAxis: -100, lineStyle: { color: "#10B981" } }) }, data: pair(cci) });
     } else if (oscName === "ATR") {
-      extra.push({ id: "ind_osc_atr", name: "ATR(14)", type: "line", xAxisIndex: gIdx, yAxisIndex: gIdx, showSymbol: false, lineStyle: { width: 1.7, color: "#F43F5E" }, data: pair(CH_MathInd.ema(trArr, 14).map(v => (v !== null && v !== undefined && !isNaN(v)) ? +v.toFixed(4) : null)) });
+      extra.push({ id: "ind_osc_atr", name: "ATR(14)", type: "line", xAxisIndex: gIdx, yAxisIndex: yIdx, showSymbol: false, lineStyle: { width: 1.7, color: "#F43F5E" }, data: pair(CH_MathInd.ema(trArr, 14).map(v => (v !== null && v !== undefined && !isNaN(v)) ? +v.toFixed(4) : null)) });
     }
     yAxes.push(yOsc);
   });
@@ -5038,7 +5038,7 @@ window.__chInjecterIndicateurs = function() {
     grid: grids,
     xAxis: xAxes,
     yAxis: yAxes,
-    dataZoom: new Array({ id: "zoomX_inside", xAxisIndex: allXIdx }, { id: "zoomY_inside", yAxisIndex: new Array(0) }, { id: "zoomX_slider", xAxisIndex: allXIdx }),
+    dataZoom: new Array({ id: "zoomX_inside", type: "inside", xAxisIndex: allXIdx, filterMode: "none" }, { id: "zoomY_inside", type: "inside", yAxisIndex: new Array(0, 1), filterMode: "none" }, { id: "zoomX_slider", type: "slider", xAxisIndex: allXIdx, filterMode: "none" }),
     series: baseSeries.concat(extra)
   }, { replaceMerge: new Array("series", "xAxis", "yAxis", "grid") });
 };
