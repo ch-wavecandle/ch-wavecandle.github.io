@@ -4931,7 +4931,7 @@ window.__chInjecterIndicateurs = function() {
         grid: new Array({ left: 45, right: 92, top: 32, bottom: 22 }),
         xAxis: new Array({ ...xBase, gridIndex: 0 }),
         yAxis: baseYAxes,
-        dataZoom: new Array({ id: "zoomX_inside", xAxisIndex: new Array(0) }, { id: "zoomY_inside", yAxisIndex: new Array(0) }, { id: "zoomX_slider", xAxisIndex: new Array(0) }),
+        dataZoom: (Array.isArray(opt.dataZoom) && opt.dataZoom.length > 0) ? opt.dataZoom.map(dz => (dz && dz.yAxisIndex !== undefined && dz.xAxisIndex === undefined) ? dz : { ...dz, xAxisIndex: new Array(0) }) : new Array({ type: "inside", xAxisIndex: new Array(0) }),
         series: baseSeries.concat(extra)
       }, { replaceMerge: new Array("series", "xAxis", "yAxis", "grid") });
     } else {
@@ -5038,7 +5038,7 @@ window.__chInjecterIndicateurs = function() {
     grid: grids,
     xAxis: xAxes,
     yAxis: yAxes,
-    dataZoom: new Array({ id: "zoomX_inside", type: "inside", xAxisIndex: allXIdx, filterMode: "none" }, { id: "zoomY_inside", type: "inside", yAxisIndex: new Array(0, 1), filterMode: "none" }, { id: "zoomX_slider", type: "slider", xAxisIndex: allXIdx, filterMode: "none" }),
+    dataZoom: (Array.isArray(opt.dataZoom) && opt.dataZoom.length > 0) ? opt.dataZoom.map(dz => (dz && dz.yAxisIndex !== undefined && dz.xAxisIndex === undefined) ? dz : { ...dz, xAxisIndex: allXIdx }) : new Array({ type: "inside", xAxisIndex: allXIdx }),
     series: baseSeries.concat(extra)
   }, { replaceMerge: new Array("series", "xAxis", "yAxis", "grid") });
 };
