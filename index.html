@@ -2871,12 +2871,12 @@ async function rafraichirFluxLive(forcer = false) {
     let dFr = new Date().toLocaleDateString('fr-FR'), dIso = new Date().toISOString().slice(0, 10);
     const mD = dernierFichier.name.match(/(\d{2})(\d{2})(\d{4})/);
     if (mD) { dFr = `${mD[1]}/${mD[2]}/${mD[3]}`; dIso = `${mD[3]}-${mD[2]}-${mD[1]}`; }
-    document.getElementById('txtBadgeLive').innerText = `LIVE ${dFr}`;
+    if(document.getElementById('txtBadgeLive')) document.getElementById('txtBadgeLive').innerText = `LIVE ${dFr}`;
 
     const sig = `${dernierFichier.name}_${dernierFichier.lastModified}_${dernierFichier.size}`;
     if (!forcer && sig === dernierTailleLive) {
       const opAct = globalData ? globalData.derniere_op_globale : null;
-      document.getElementById('lblHorlogeMarche').innerText = heureMarcheDs || (opAct ? opAct.heure : "--:--:--");
+      if(document.getElementById('lblHorlogeMarche')) document.getElementById('lblHorlogeMarche').innerText = heureMarcheDs || (opAct ? opAct.heure : "--:--:--");
       const txtOp = opAct ? ` | Dernière op. : ${opAct.ticker} (${opAct.sens} ${opAct.qte.toLocaleString('fr-FR')} @ ${opAct.prix.toFixed(2)} à ${opAct.heure})` : "";
       document.getElementById('statusText').style.color = "#00E5FF";
       document.getElementById('statusText').innerText = `LIVE [${new Date().toTimeString().slice(0,8)}] — ${dernierFichier.name}${txtOp}`;
@@ -2904,7 +2904,7 @@ async function rafraichirFluxLive(forcer = false) {
     dessinerGraphique(data);
 
     const op = data.derniere_op_globale;
-    document.getElementById('lblHorlogeMarche').innerText = heureMarcheDs || (op ? op.heure : "--:--:--");
+    if(document.getElementById('lblHorlogeMarche')) document.getElementById('lblHorlogeMarche').innerText = heureMarcheDs || (op ? op.heure : "--:--:--");
     const infoOp = op ? ` | Dernière op. : ${op.ticker} (${op.sens} ${op.qte.toLocaleString('fr-FR')} @ ${op.prix.toFixed(2)} à ${op.heure})` : "";
     document.getElementById('statusText').style.color = "#00FF66";
     document.getElementById('statusText').innerText = `LIVE [${new Date().toTimeString().slice(0,8)}] [${dernierFichier.name} | ${parsed.ops.length} ops] — ${data.ticker}${infoOp}`;
@@ -3217,7 +3217,7 @@ document.getElementById('btnSimulerLive').onclick = async () => {
 
   document.getElementById('btnSimulerLive').innerHTML = '&#9209; Stop Simul.';
   document.getElementById('badgeLive').style.display = 'inline-flex';
-  document.getElementById('txtBadgeLive').innerText = 'REPLAY ' + dateSimul.date_fr;
+  if(document.getElementById('txtBadgeLive')) document.getElementById('txtBadgeLive').innerText = 'REPLAY ' + dateSimul.date_fr;
 
   window.chReplayEnPause = false; window.chReplayStopForce = false; const jouerTick = () => { if(window.chReplayStopForce){ timerSimulLive = null; return; } if(window.chReplayEnPause){ timerSimulLive = setTimeout(jouerTick, 150); return; }
     if (liveEnPause) return;
@@ -3239,7 +3239,7 @@ document.getElementById('btnSimulerLive').onclick = async () => {
     dessinerGraphique(data);
 
     const op = data.derniere_op_globale;
-    if(op && op.heure){ window.chHeureTickReplay = op.heure; const bLiveTick = document.getElementById('badgeLive'); const lblTick = document.getElementById('txtBadgeLive'); if(bLiveTick && bLiveTick.dataset.showReplay === '1' && lblTick){ const dtBase = (lblTick.textContent || '').replace(/\s+à\s+\d{2}:\d{2}:\d{2}$/, ''); lblTick.textContent = dtBase + ' à ' + op.heure; } } document.getElementById('lblHorlogeMarche').innerText = op ? op.heure : '--:--:--';
+    if(op && op.heure){ window.chHeureTickReplay = op.heure; const bLiveTick = document.getElementById('badgeLive'); const lblTick = document.getElementById('txtBadgeLive'); if(bLiveTick && bLiveTick.dataset.showReplay === '1' && lblTick){ const dtBase = (lblTick.textContent || '').replace(/\s+à\s+\d{2}:\d{2}:\d{2}$/, ''); lblTick.textContent = dtBase + ' à ' + op.heure; } } if(document.getElementById('lblHorlogeMarche')) document.getElementById('lblHorlogeMarche').innerText = op ? op.heure : '--:--:--';
     const infoOp = op ? ` | Dernière op. : ${op.ticker} (${op.sens} ${op.qte.toLocaleString('fr-FR')} @ ${op.prix.toFixed(2)} à ${op.heure})` : '';
     document.getElementById('statusText').style.color = '#FFD700';
     document.getElementById('statusText').innerText = `REPLAY SÉANCE [${idxSimul}/${opsSimul.length} ops] — ${data.ticker}${infoOp}`;
@@ -9125,7 +9125,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     gap: 7px !important;
     position: absolute !important;
     right: 54px !important;
-    bottom: 26px !important;
+    bottom: 34px !important;
     z-index: 45 !important;
     padding: 5px 12px !important;
     border-radius: 6px !important;
@@ -9163,12 +9163,10 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       const dd = String(now.getDate()).padStart(2, "0");
       const mm = String(now.getMonth() + 1).padStart(2, "0");
       const yyyy = now.getFullYear();
-      const dateStr = (typeof globalData !== "undefined" && globalData && globalData.date_seance_fr)
-        ? globalData.date_seance_fr
-        : (dd + "/" + mm + "/" + yyyy);
+      const dRaw = (typeof globalData !== "undefined" && globalData) ? (globalData.date_seance_fr || globalData.date_seance || globalData.date_fin_fr || "") : ""; const dateStr = dRaw ? dRaw : (dd + "/" + mm + "/" + yyyy);
       badge.setAttribute("data-show-replay", "1");
       badge.setAttribute("data-replay-state", "PLAY");
-      badge.innerHTML = '<span class="live-dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#10B981;"></span> LIVE · ' + dateStr;
+      badge.innerHTML = '<span class="live-dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#10B981;"></span> <span id="txtBadgeLive">LIVE · ' + dateStr + '</span>';
     } else if (!window.__chReplayActive) {
       if (badge.innerHTML.includes("LIVE · ")) {
         badge.removeAttribute("data-show-replay");
