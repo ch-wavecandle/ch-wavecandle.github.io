@@ -5038,7 +5038,7 @@ window.__chInjecterIndicateurs = function() {
     grid: grids,
     xAxis: xAxes,
     yAxis: yAxes,
-    dataZoom: new Array({ id: "zoomX_inside", type: "inside", xAxisIndex: allXIdx, filterMode: "none", zoomOnMouseWheel: true, moveOnMouseMove: true }, { id: "zoomX_slider", type: "slider", xAxisIndex: allXIdx, filterMode: "none" }),
+    dataZoom: new Array({ id: "zoomX_inside", type: "inside", xAxisIndex: allXIdx, filterMode: "none", zoomOnMouseWheel: true, moveOnMouseMove: false }, { id: "zoomX_slider", type: "slider", xAxisIndex: allXIdx, filterMode: "none" }),
     series: extra
   });
 };
@@ -9237,45 +9237,65 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       }
     }, { passive: false, capture: true });
 
-    let panDragging = false, panStartX = 0, panStartS = 0, panStartE = 100;
+    let panDragging = false, panStartX = 0, panStartS = 0, panStartE = 100, panRaf = 0, panLastX = 0;
+    const isMainHandActive = () => {
+      const s1 = document.getElementById("selOutilDessin")?.value || "";
+      const s2 = document.getElementById("selOutil")?.value || "";
+      const v = (s1 || s2).toUpperCase();
+      return v === "" || v === "NONE" || v === "MAIN" || v === "CURSEUR";
+    };
+
     dom.addEventListener("mousedown", function(e) {
-      if (e.button !== 0) return;
-      const toolSel = document.getElementById("selOutilDessin") || document.getElementById("selOutil");
-      if (toolSel && toolSel.value && toolSel.value !== "NONE" && toolSel.value !== "MAIN") return;
+      if (e.button !== 0 || !isMainHandActive()) return;
       const opt = ch.getOption();
       if (!opt || !Array.isArray(opt.grid) || opt.grid.length <= 1 || !Array.isArray(opt.dataZoom) || !opt.dataZoom.length) return;
+      const rect = dom.getBoundingClientRect();
+      if (e.clientX < rect.left + 40 || e.clientX > rect.right - 85) return;
       const dz0 = opt.dataZoom.at(0) || {};
       panStartS = typeof dz0.start === "number" ? dz0.start : 0;
       panStartE = typeof dz0.end === "number" ? dz0.end : 100;
       if (panStartE - panStartS >= 99.5) return;
       panDragging = true;
       panStartX = e.clientX;
+      panLastX = e.clientX;
+      e.preventDefault();
+      e.stopPropagation();
       dom.style.cursor = "grabbing";
     }, true);
 
     window.addEventListener("mousemove", function(e) {
       if (!panDragging) return;
-      const opt = ch.getOption();
-      if (!opt || !Array.isArray(opt.dataZoom)) return;
-      const rect = dom.getBoundingClientRect();
-      const plotW = Math.max(100, rect.width - 137);
-      const span = panStartE - panStartS;
-      const deltaPct = -((e.clientX - panStartX) / plotW) * span;
-      let nextS = panStartS + deltaPct;
-      let nextE = panStartE + deltaPct;
-      if (nextS < 0) { nextE -= nextS; nextS = 0; }
-      if (nextE > 100) { nextS -= (nextE - 100); nextE = 100; }
-      const batch = [];
-      opt.dataZoom.forEach((dz, idx) => {
-        if (dz && dz.yAxisIndex !== undefined && dz.xAxisIndex === undefined) return;
-        batch.push({ dataZoomIndex: idx, start: nextS, end: nextE });
+      e.preventDefault();
+      e.stopPropagation();
+      panLastX = e.clientX;
+      if (panRaf) return;
+      panRaf = requestAnimationFrame(() => {
+        panRaf = 0;
+        if (!panDragging) return;
+        const opt = ch.getOption();
+        if (!opt || !Array.isArray(opt.dataZoom)) return;
+        const rect = dom.getBoundingClientRect();
+        const plotW = Math.max(100, rect.width - 137);
+        const span = panStartE - panStartS;
+        const deltaPct = -((panLastX - panStartX) / plotW) * span;
+        let nextS = panStartS + deltaPct;
+        let nextE = panStartE + deltaPct;
+        if (nextS < 0) { nextE -= nextS; nextS = 0; }
+        if (nextE > 100) { nextS -= (nextE - 100); nextE = 100; }
+        const batch = [];
+        opt.dataZoom.forEach((dz, idx) => {
+          if (dz && dz.yAxisIndex !== undefined && dz.xAxisIndex === undefined) return;
+          batch.push({ dataZoomIndex: idx, start: nextS, end: nextE });
+        });
+        if (batch.length) ch.dispatchAction({ type: "dataZoom", batch: batch });
       });
-      if (batch.length) ch.dispatchAction({ type: "dataZoom", batch: batch });
     }, true);
 
-    window.addEventListener("mouseup", function() {
+    window.addEventListener("mouseup", function(e) {
       if (!panDragging) return;
       panDragging = false;
+      if (panRaf) { cancelAnimationFrame(panRaf); panRaf = 0; }
+      e.stopPropagation();
       dom.style.cursor = "";
     }, true);
 
