@@ -4950,7 +4950,7 @@ window.__chInjecterIndicateurs = function() {
   const subH = +(availH / nOsc).toFixed(1);
 
   const grids = new Array({ left: 45, right: 92, top: 32, height: mainH + "%" });
-  const xAxes = new Array({ ...xBase, gridIndex: 0, axisLabel: { show: false } });
+  const x0Clean = { ...xBase, gridIndex: 0, axisLabel: { show: false } }; delete x0Clean.min; delete x0Clean.max; const xAxes = new Array(x0Clean);
   const yAxes = baseYAxes.slice();
   const allXIdx = new Array(0);
   const trArr = closes.map((c, i) => c === null ? 0 : Math.max((highs.at(i) - lows.at(i)), i > 0 && closes.at(i-1) !== null ? Math.abs(highs.at(i) - closes.at(i-1)) : 0, i > 0 && closes.at(i-1) !== null ? Math.abs(lows.at(i) - closes.at(i-1)) : 0));
@@ -4959,7 +4959,7 @@ window.__chInjecterIndicateurs = function() {
     const topPct = +(mainH + 4.5 + idx * (subH + gapPct)).toFixed(1);
     allXIdx.push(gIdx);
     grids.push({ left: 45, right: 92, top: topPct + "%", height: subH + "%" });
-    const isLastSub = (idx === nOsc - 1); xAxes.push({ ...xBase, gridIndex: gIdx, axisLabel: isLastSub ? (xBase.axisLabel || { show: true }) : { show: false } });
+    const isLastSub = (idx === nOsc - 1); const xSubClean = { ...xBase, gridIndex: gIdx, axisLabel: isLastSub ? (xBase.axisLabel || { show: true }) : { show: false } }; delete xSubClean.min; delete xSubClean.max; xAxes.push(xSubClean);
     let yOsc = { gridIndex: gIdx, position: "right", name: oscName, nameLocation: "end", nameGap: 2, nameTextStyle: { color: axisCol, fontSize: 9, fontWeight: "bold" }, axisLabel: { color: axisCol, fontSize: 9.5 }, splitLine: { lineStyle: { color: splitCol } } };
 
     if (oscName === "DELTA") {
@@ -9212,10 +9212,12 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
         if (nextS < 0) { nextE = Math.min(100, nextE - nextS); nextS = 0; }
         if (nextE > 100) { nextS = Math.max(0, nextS - (nextE - 100)); nextE = 100; }
 
+        const batchList = [];
         opt.dataZoom.forEach((dz, idx) => {
           if (dz && dz.yAxisIndex !== undefined && dz.xAxisIndex === undefined) return;
-          ch.dispatchAction({ type: "dataZoom", dataZoomIndex: idx, start: nextS, end: nextE });
+          batchList.push({ dataZoomIndex: idx, start: nextS, end: nextE });
         });
+        if (batchList.length > 0) ch.dispatchAction({ type: "dataZoom", batch: batchList });
       } catch (err) {
         const st = document.getElementById("statusText");
         if (st) { st.style.color = "#FF3B3B"; st.innerText = "ERREUR ZOOM MULTI : " + err.message; }
