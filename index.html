@@ -9178,5 +9178,98 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
   });
 })();
 </script>
+<script id="ch-exact-xaxis0-zoom">
+(function() {
+  function showZPill(txt, err) {
+    let d = document.getElementById("chZoomDiagPill");
+    if (!d) {
+      const bar = document.getElementById("statusText")?.parentElement;
+      if (bar) {
+        d = document.createElement("span");
+        d.id = "chZoomDiagPill";
+        d.style.cssText = "padding:2px 8px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:8px;white-space:nowrap;";
+        bar.insertBefore(d, bar.lastElementChild);
+      }
+    }
+    if (d) {
+      d.style.background = err ? "#450A0A" : "#0C4A6E";
+      d.style.color = err ? "#FCA5A5" : "#7DD3FC";
+      d.style.border = err ? "1px solid #EF4444" : "1px solid #0284C7";
+      d.textContent = txt;
+    }
+  }
+
+  function initExactZoom() {
+    const dom = document.querySelector("[_echarts_instance_]");
+    const ch = dom && window.echarts && window.echarts.getInstanceByDom(dom);
+    if (!ch || ch.__chExactX0Zoom) return;
+    ch.__chExactX0Zoom = true;
+
+    dom.addEventListener("wheel", function(e) {
+      try {
+        const opt = ch.getOption();
+        if (!opt || !Array.isArray(opt.grid) || opt.grid.length <= 1 || !Array.isArray(opt.dataZoom) || !opt.dataZoom.length) return;
+        e.preventDefault();
+        e.stopPropagation();
+
+        const dz0 = opt.dataZoom.at(0) || {};
+        const curS = typeof dz0.start === "number" ? dz0.start : 0;
+        const curE = typeof dz0.end === "number" ? dz0.end : 100;
+        const span = Math.max(1, curE - curS);
+        const rect = dom.getBoundingClientRect();
+        const relX = Math.max(0, Math.min(1, (e.clientX - rect.left - 45) / Math.max(1, rect.width - 137)));
+        const anchor = curS + relX * span;
+        const factor = e.deltaY < 0 ? 0.80 : 1.25;
+        const newSpan = Math.max(2, Math.min(100, span * factor));
+        let nextS = anchor - relX * newSpan;
+        let nextE = nextS + newSpan;
+        if (nextS < 0) { nextE = Math.min(100, nextE - nextS); nextS = 0; }
+        if (nextE > 100) { nextS = Math.max(0, nextS - (nextE - 100)); nextE = 100; }
+
+        const batch = [];
+        opt.dataZoom.forEach((dz, idx) => {
+          if (dz && dz.yAxisIndex !== undefined && dz.xAxisIndex === undefined) return;
+          batch.push({ dataZoomIndex: idx, start: nextS, end: nextE });
+        });
+        if (batch.length) ch.dispatchAction({ type: "dataZoom", batch: batch });
+      } catch (err) {
+        showZPill("⚠️ WHEEL ERR: " + err.message, true);
+      }
+    }, { passive: false, capture: true });
+
+    ch.on("datazoom", function() {
+      try {
+        const opt = ch.getOption();
+        if (!opt || !Array.isArray(opt.grid) || opt.grid.length <= 1) return;
+        const dz0 = (opt.dataZoom && opt.dataZoom.at(0)) || {};
+        const s = typeof dz0.start === "number" ? dz0.start : 0;
+        const e = typeof dz0.end === "number" ? dz0.end : 100;
+        const x0 = Array.isArray(opt.xAxis) ? opt.xAxis.at(0) : opt.xAxis;
+        if (x0) {
+          let xMin = null, xMax = null;
+          if (x0.type === "category" && Array.isArray(x0.data) && x0.data.length > 1) {
+            const lastI = x0.data.length - 1;
+            xMin = Math.floor((s / 100) * lastI);
+            xMax = Math.ceil((e / 100) * lastI);
+          } else if (typeof x0.min === "number" && typeof x0.max === "number") {
+            const fullSpan = 54000 - 32400;
+            xMin = Math.round(32400 + (s / 100) * fullSpan);
+            xMax = Math.round(32400 + (e / 100) * fullSpan);
+          }
+          if (xMin !== null && xMax !== null && xMax > xMin) {
+            ch.setOption({ xAxis: [{ min: xMin, max: xMax }] });
+          }
+          showZPill("🔍 Zoom X: " + s.toFixed(1) + "%→" + e.toFixed(1) + "% [" + xMin + ".." + xMax + "]", false);
+        }
+      } catch (err) {
+        showZPill("⚠️ SYNC X0 ERR: " + err.message, true);
+      }
+    });
+  }
+
+  window.addEventListener("load", initExactZoom);
+  setInterval(initExactZoom, 1500);
+})();
+</script>
 </body>
 </html>
