@@ -9229,5 +9229,59 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
   setInterval(attachUnifiedZoom, 1500);
 })();
 </script>
+<script id="ch-zoom-custom-sync-diag">
+(function() {
+  function showZoomDiag(msg, isErr) {
+    let d = document.getElementById("chZoomDiagPill");
+    if (!d) {
+      const bar = document.getElementById("statusText")?.parentElement;
+      if (bar) {
+        d = document.createElement("span");
+        d.id = "chZoomDiagPill";
+        d.style.cssText = "padding:2px 8px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:8px;white-space:nowrap;";
+        bar.insertBefore(d, bar.lastElementChild);
+      }
+    }
+    if (d) {
+      d.style.background = isErr ? "#450A0A" : "#0C4A6E";
+      d.style.color = isErr ? "#FCA5A5" : "#7DD3FC";
+      d.style.border = isErr ? "1px solid #EF4444" : "1px solid #0284C7";
+      d.textContent = msg;
+    }
+  }
+
+  function bindCustomZoomSync() {
+    const dom = document.querySelector("[_echarts_instance_]");
+    const ch = dom && window.echarts && window.echarts.getInstanceByDom(dom);
+    if (!ch || ch.__chCustomZoomBound) return;
+    ch.__chCustomZoomBound = true;
+
+    ch.on("datazoom", function() {
+      try {
+        const opt = ch.getOption();
+        if (!opt || !Array.isArray(opt.grid) || opt.grid.length <= 1) return;
+        const dz0 = (opt.dataZoom && opt.dataZoom.at(0)) || {};
+        const s = typeof dz0.start === "number" ? dz0.start.toFixed(1) : "?";
+        const e = typeof dz0.end === "number" ? dz0.end.toFixed(1) : "?";
+
+        const customPatches = (opt.series || []).filter(sr => sr && sr.type === "custom" && sr.id).map(sr => ({
+          id: sr.id,
+          xAxisIndex: 0,
+          yAxisIndex: sr.yAxisIndex || 0
+        }));
+        if (customPatches.length > 0) {
+          ch.setOption({ series: customPatches }, { lazyUpdate: false });
+        }
+        showZoomDiag("🔍 Zoom X: " + s + "%→" + e + "% | Grilles: " + opt.grid.length + " | Custom: " + customPatches.length, false);
+      } catch (err) {
+        showZoomDiag("⚠️ ERR ZOOM: " + err.message, true);
+      }
+    });
+  }
+
+  window.addEventListener("load", bindCustomZoomSync);
+  setInterval(bindCustomZoomSync, 1500);
+})();
+</script>
 </body>
 </html>
