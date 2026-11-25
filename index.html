@@ -8205,7 +8205,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     panelAutres.appendChild(tAff);
     const rAff = document.createElement("div"); rAff.className = "ch-pop-row";
     if(btnTheme) rAff.appendChild(btnTheme);
-    if(lblEtiq) rAff.appendChild(lblEtiq);
+    if(lblEtiq){ rAff.appendChild(lblEtiq); const cbE = lblEtiq.querySelector("input[type='checkbox']"); if(cbE){ cbE.checked = true; window.__CH_HIDE_CANDLE_LABELS = false; window.__CH_SHOW_CANDLE_LABELS = true; } }
     const lblBoiteOutils = document.createElement("label");
     lblBoiteOutils.style.cssText = "display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:#E2E8F0;font-size:12px;font-weight:600;padding:4px 8px;border:1px solid #334155;border-radius:6px;background:#0F172A;";
     const chkBoiteOutils = document.createElement("input");
