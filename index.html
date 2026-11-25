@@ -1107,7 +1107,7 @@ body.theme-clair #ch-hud-tools .ch-hud-ctrl-bar {
 body.theme-clair #ch-hud-tools .ch-hud-title-lbl {
   color: #0F172A !important;
 }
-#ch-hud-tools > select,
+#ch-hud-tools:not(.vertical) > select, #ch-hud-tools:not(.vertical) > button { width: auto !important; white-space: nowrap !important; } #ch-hud-tools > select,
 #ch-hud-tools > button,
 #ch-hud-tools > .ch-hud-item {
   height: 30px !important;
@@ -2498,7 +2498,7 @@ function dessinerChandeliersIntraday(data, pasMinutes) {
   }
 }
 
-function dessinerGraphique(data) {
+function dessinerGraphique(data) { if (document.getElementById("selHorizon")?.value === "MULTI" && !window.__chForceSingleDraw) return;
   const vagues = data.vagues;
   if (!vagues || !vagues.length) { chart.clear(); return; }
   const modeActuel = document.getElementById('selModeRendu') ? document.getElementById('selModeRendu').value : 'VAGUES';
@@ -2973,7 +2973,7 @@ async function rafraichirFluxLive(forcer = false) {
     }
     dernierTailleLive = sig;
 
-    const parsed = parserLignesCsv(await dernierFichier.text());
+    const rawLiveCsv = await dernierFichier.text(); if (document.getElementById("selHorizon")?.value !== "LIVE") return; const parsed = parserLignesCsv(rawLiveCsv);
     let ticker = document.getElementById('selTicker').value || "";
     if (document.getElementById('chkAutoDernier').checked && parsed.ops.length > 0) {
       const opRec = trouverDerniereOpChrono(parsed.ops);
