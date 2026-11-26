@@ -1198,7 +1198,20 @@ window.__CH_GET_INIT_X_ZOOM = function(bougies){
   }
   return { start: Math.max(0, Math.min(98, s)), end: Math.min(100, Math.max(s + 2, e)) };
 };
-</script>
+
+window.__CH_GET_INIT_Y_ZOOM = function(axisMin, axisMax){
+  const a = window.__CH_SAVED_PERIOD_ZOOM;
+  if(!a || !a.hasY || typeof axisMin !== "number" || typeof axisMax !== "number" || !(axisMax > axisMin)){
+    return { start: 0, end: 100 };
+  }
+  const span = axisMax - axisMin;
+  let ys = ((a.priceMin - axisMin) / span) * 100;
+  let ye = ((a.priceMax - axisMin) / span) * 100;
+  ys = Math.max(0, Math.min(95, ys));
+  ye = Math.min(100, Math.max(ys + 5, ye));
+  if(ys <= 0.5 && ye >= 99.5) return { start: 0, end: 100 };
+  return { start: ys, end: ye };
+};</script>
 </head>
 <body>
 <style>
@@ -2344,9 +2357,9 @@ function dessinerChandeliersMulti(data) { if (document.getElementById('selHorizo
     },
     dataZoom: [
       Object.assign({ id: 'zoomX_inside', type: 'inside', xAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: true, moveOnMouseMove: true }, window.__CH_GET_INIT_X_ZOOM(bougies)),
-      { id: 'zoomY_inside', type: 'inside', yAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: 'shift', moveOnMouseMove: true },
+      Object.assign({ id: 'zoomY_inside', type: 'inside', yAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: 'shift', moveOnMouseMove: true }, window.__CH_GET_INIT_Y_ZOOM(yMin, yMax)),
       Object.assign({ id: 'zoomX_slider', type: 'slider', xAxisIndex: 0, height: 18, bottom: 8, borderColor: '#333', fillerColor: 'rgba(0,229,255,0.15)' }, window.__CH_GET_INIT_X_ZOOM(bougies)),
-      { id: 'zoomY_slider_' + (document.getElementById('selExpandAxes')?.value || 'AUTO'), type: 'slider', orient: 'vertical', yAxisIndex: 0, top: 42, height: Math.max(260, (document.getElementById('chart-container')?.clientHeight || 520) - 92), right: 4, width: 16, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false }
+      Object.assign({ id: 'zoomY_slider_' + (document.getElementById('selExpandAxes')?.value || 'AUTO'), type: 'slider', orient: 'vertical', yAxisIndex: 0, top: 42, height: Math.max(260, (document.getElementById('chart-container')?.clientHeight || 520) - 92), right: 4, width: 16, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false }, window.__CH_GET_INIT_Y_ZOOM(yMin, yMax))
     ],
     xAxis: {
       type: 'category', data: bougies.map(b => b.label),
@@ -2782,7 +2795,7 @@ function dessinerGraphique(data) { if (document.getElementById("selHorizon")?.va
       { id: 'zoomX_inside', type: 'inside', xAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: true, moveOnMouseMove: true, start: zoomXStart, end: zoomXEnd },
       { id: 'zoomY_inside', type: 'inside', yAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: 'shift', moveOnMouseMove: true, start: zoomYStart, end: zoomYEnd },
       { id: 'zoomX_slider', type: 'slider', xAxisIndex: 0, height: 18, bottom: 8, borderColor: '#333', fillerColor: 'rgba(0,229,255,0.15)', start: zoomXStart, end: zoomXEnd },
-      { id: 'zoomY_slider_' + (document.getElementById('selExpandAxes')?.value || 'AUTO'), type: 'slider', orient: 'vertical', yAxisIndex: 0, top: 42, height: Math.max(260, (document.getElementById('chart-container')?.clientHeight || 520) - 92), right: 4, width: 16, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false }
+      Object.assign({ id: 'zoomY_slider_' + (document.getElementById('selExpandAxes')?.value || 'AUTO'), type: 'slider', orient: 'vertical', yAxisIndex: 0, top: 42, height: Math.max(260, (document.getElementById('chart-container')?.clientHeight || 520) - 92), right: 4, width: 16, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false }, window.__CH_GET_INIT_Y_ZOOM(yMin, yMax))
     ],
     xAxis: { type: 'value', min: 32400, max: 54000, interval: 3600, axisLine: { lineStyle: { color: '#333' } }, splitLine: { lineStyle: { color: '#1E1E1E' } }, axisLabel: { color: '#999', formatter: val => heureDepuisSec(val).slice(0,5) } },
     yAxis: { type: 'value', position: 'right', min: +(prixMin - margeY * 0.3).toFixed(2), max: +(prixMax + margeY).toFixed(2), axisLine: { lineStyle: { color: '#333' } }, splitLine: { lineStyle: { color: '#1E1E1E' } }, axisLabel: { color: '#999', formatter: val => val.toFixed(2) } },
@@ -10133,61 +10146,54 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
 <script id="ch-preserve-period-zoom">
 (function(){
   window.__CH_SAVED_PERIOD_ZOOM = null;
-  let pendingRestore = false;
 
   function recordUserZoom(){
-    if(pendingRestore || typeof chart === "undefined" || !chart || typeof globalData === "undefined" || !globalData) return;
+    if(typeof chart === "undefined" || !chart || typeof globalData === "undefined" || !globalData) return;
     const opt = chart.getOption();
     const dzList = (opt && Array.isArray(opt.dataZoom)) ? opt.dataZoom : [];
     const dzX = dzList.find(d => d && (d.id === "zoomX_slider" || d.id === "zoomX_inside" || d.xAxisIndex === 0));
-    if(!dzX) return;
-    const s = typeof dzX.start === "number" ? dzX.start : 0;
-    const e = typeof dzX.end === "number" ? dzX.end : 100;
-    if(s <= 0.5 && e >= 99.5){
+    const dzY = dzList.find(d => d && ((d.id && d.id.startsWith("zoomY_slider")) || d.id === "zoomY_inside" || d.yAxisIndex === 0));
+
+    const sx = dzX && typeof dzX.start === "number" ? dzX.start : 0;
+    const ex = dzX && typeof dzX.end === "number" ? dzX.end : 100;
+    const sy = dzY && typeof dzY.start === "number" ? dzY.start : 0;
+    const ey = dzY && typeof dzY.end === "number" ? dzY.end : 100;
+
+    const hasX = (sx > 0.5 || ex < 99.5);
+    const hasY = (sy > 0.5 || ey < 99.5);
+    if(!hasX && !hasY){
       window.__CH_SAVED_PERIOD_ZOOM = null;
       return;
     }
+
     const bougies = Array.isArray(globalData.bougies) ? globalData.bougies : [];
     let dStart = "", dEnd = "";
     if(bougies.length > 1){
-      const i1 = Math.max(0, Math.min(bougies.length - 1, Math.floor((s / 100) * (bougies.length - 1))));
-      const i2 = Math.max(i1, Math.min(bougies.length - 1, Math.ceil((e / 100) * (bougies.length - 1))));
+      const i1 = Math.max(0, Math.min(bougies.length - 1, Math.floor((sx / 100) * (bougies.length - 1))));
+      const i2 = Math.max(i1, Math.min(bougies.length - 1, Math.ceil((ex / 100) * (bougies.length - 1))));
       dStart = bougies.at(i1)?.date_deb_iso || bougies.at(i1)?.cle || "";
       dEnd = bougies.at(i2)?.date_fin_iso || bougies.at(i2)?.cle || "";
     }
-    window.__CH_SAVED_PERIOD_ZOOM = { dateStart: dStart, dateEnd: dEnd, pctStart: s, pctEnd: e, ts: Date.now() };
-  }
 
-  window.__CH_APPLY_SAVED_ZOOM = applySavedZoomNow; function applySavedZoomNow(){
-    const anchor = window.__CH_SAVED_PERIOD_ZOOM;
-    if(!anchor || typeof chart === "undefined" || !chart || typeof globalData === "undefined" || !globalData) return;
-    const bougies = Array.isArray(globalData.bougies) ? globalData.bougies : [];
-    if(bougies.length < 3) return;
-    let targetS = anchor.pctStart;
-    let targetE = anchor.pctEnd;
-    if(anchor.dateStart && anchor.dateEnd){
-      const d1 = anchor.dateStart.slice(0, 10);
-      const d2 = anchor.dateEnd.slice(0, 10);
-      let idx1 = bougies.findIndex(b => (b.date_deb_iso || b.cle || "").slice(0, 10) >= d1);
-      let idx2 = -1;
-      for(let k = bougies.length - 1; k >= 0; k--){
-        if((bougies.at(k).date_fin_iso || bougies.at(k).cle || "").slice(0, 10) <= d2){ idx2 = k; break; }
-      }
-      if(idx1 >= 0 && idx2 > idx1){
-        targetS = (idx1 / (bougies.length - 1)) * 100;
-        targetE = (idx2 / (bougies.length - 1)) * 100;
-      }
+    let priceMin = 0, priceMax = 0;
+    const ya = opt && Array.isArray(opt.yAxis) ? opt.yAxis.at(0) : null;
+    if(ya && typeof ya.min === "number" && typeof ya.max === "number" && ya.max > ya.min){
+      const span = ya.max - ya.min;
+      priceMin = ya.min + (sy / 100) * span;
+      priceMax = ya.min + (ey / 100) * span;
     }
-    targetS = Math.max(0, Math.min(97, targetS));
-    targetE = Math.min(100, Math.max(targetS + 2, targetE));
-    pendingRestore = true;
-    try {
-      new Array("zoomX_inside", "zoomX_slider").forEach(zId => {
-        try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: targetS, end: targetE }); } catch(e){}
-      });
-    } finally {
-      setTimeout(() => { pendingRestore = false; }, 150);
-    }
+
+    window.__CH_SAVED_PERIOD_ZOOM = {
+      dateStart: dStart,
+      dateEnd: dEnd,
+      pctStart: sx,
+      pctEnd: ex,
+      hasY: hasY && priceMax > priceMin,
+      priceMin: priceMin,
+      priceMax: priceMax,
+      yPctStart: sy,
+      yPctEnd: ey
+    };
   }
 
   function hookContinuousZoom(){
@@ -10197,28 +10203,15 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     }
   }
 
-  document.addEventListener("click", (e) => {
-    const btn = e.target && e.target.closest ? e.target.closest("#ch-period-bar button") : null;
-    if(btn && window.__CH_SAVED_PERIOD_ZOOM){
-      
-    }
-  }, true);
-
-  new Array("selGranularite", "selGranulariteIntra").forEach(id => {
-    const el = document.getElementById(id);
-    if(el && !el.dataset.contZoomHook){
-      el.dataset.contZoomHook = "1";
-      el.addEventListener("change", () => {
-        if(window.__CH_SAVED_PERIOD_ZOOM){
-          
-        }
-      });
-    }
-  });
+  const selTk = document.getElementById("selTicker");
+  if(selTk && !selTk.dataset.resetZoomHook){
+    selTk.dataset.resetZoomHook = "1";
+    selTk.addEventListener("change", () => { window.__CH_SAVED_PERIOD_ZOOM = null; });
+  }
 
   hookContinuousZoom();
   setInterval(hookContinuousZoom, 600);
 })();
-</script></script>
+</script></script></script>
 </body>
 </html>
