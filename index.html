@@ -2312,7 +2312,7 @@ function dessinerChandeliersMulti(data) { if (document.getElementById('selHorizo
       { id: 'zoomX_inside', type: 'inside', xAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: true, moveOnMouseMove: true },
       { id: 'zoomY_inside', type: 'inside', yAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: 'shift', moveOnMouseMove: 'shift' },
       { id: 'zoomX_slider', type: 'slider', xAxisIndex: 0, height: 18, bottom: 8, borderColor: '#333', fillerColor: 'rgba(0,229,255,0.15)' },
-      { id: 'zoomY_slider', type: 'slider', orient: 'vertical', yAxisIndex: 0, top: 32, bottom: 26, right: 4, width: 16, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false }
+      { id: 'zoomY_slider', type: 'slider', orient: 'vertical', yAxisIndex: 0, top: 36, bottom: 36, right: 4, width: 16, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false }
     ],
     xAxis: {
       type: 'category', data: bougies.map(b => b.label),
@@ -2748,7 +2748,7 @@ function dessinerGraphique(data) { if (document.getElementById("selHorizon")?.va
       { id: 'zoomX_inside', type: 'inside', xAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: true, moveOnMouseMove: true, start: zoomXStart, end: zoomXEnd },
       { id: 'zoomY_inside', type: 'inside', yAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: 'shift', moveOnMouseMove: 'shift', start: zoomYStart, end: zoomYEnd },
       { id: 'zoomX_slider', type: 'slider', xAxisIndex: 0, height: 18, bottom: 8, borderColor: '#333', fillerColor: 'rgba(0,229,255,0.15)', start: zoomXStart, end: zoomXEnd },
-      { id: 'zoomY_slider', type: 'slider', orient: 'vertical', yAxisIndex: 0, top: 32, bottom: 26, right: 4, width: 16, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false, start: zoomYStart, end: zoomYEnd }
+      { id: 'zoomY_slider', type: 'slider', orient: 'vertical', yAxisIndex: 0, top: 36, bottom: 36, right: 4, width: 16, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false, start: zoomYStart, end: zoomYEnd }
     ],
     xAxis: { type: 'value', min: 32400, max: 54000, interval: 3600, axisLine: { lineStyle: { color: '#333' } }, splitLine: { lineStyle: { color: '#1E1E1E' } }, axisLabel: { color: '#999', formatter: val => heureDepuisSec(val).slice(0,5) } },
     yAxis: { type: 'value', position: 'right', min: +(prixMin - margeY * 0.3).toFixed(2), max: +(prixMax + margeY).toFixed(2), axisLine: { lineStyle: { color: '#333' } }, splitLine: { lineStyle: { color: '#1E1E1E' } }, axisLabel: { color: '#999', formatter: val => val.toFixed(2) } },
@@ -7553,7 +7553,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
         const dzYReset = Array.isArray(opt.dataZoom) ? opt.dataZoom.map(d => (d && (d.id === "zoomY_inside" || d.id === "zoomY_slider" || d.yAxisIndex === 0)) ? { start: 0, end: 100 } : {}) : undefined; chart.setOption({ yAxis: yPatch, ...(dzYReset ? { dataZoom: dzYReset } : {}) });
       }
 
-      ["zoomY_inside", "zoomY_slider"].forEach(zId => { try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: 0, end: 100 }); } catch(e){} }); if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
+      setTimeout(() => { ["zoomY_inside", "zoomY_slider"].forEach(zId => { try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: 0, end: 100 }); } catch(e){} }); }, 50); if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
     } catch(e){} finally {
       setTimeout(() => { applyingAxis = false; }, 80);
     }
@@ -7710,7 +7710,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       selOutil.addEventListener("change", () => {
         if(selOutil.value !== "AUCUN"){
           selectedDrawIdx = -1;
-          ["zoomY_inside", "zoomY_slider"].forEach(zId => { try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: 0, end: 100 }); } catch(e){} }); if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
+          setTimeout(() => { ["zoomY_inside", "zoomY_slider"].forEach(zId => { try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: 0, end: 100 }); } catch(e){} }); }, 50); if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
         }
       });
     }
@@ -7724,7 +7724,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       if(!hit){
         if(selectedDrawIdx !== -1){
           selectedDrawIdx = -1;
-          ["zoomY_inside", "zoomY_slider"].forEach(zId => { try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: 0, end: 100 }); } catch(e){} }); if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
+          setTimeout(() => { ["zoomY_inside", "zoomY_slider"].forEach(zId => { try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: 0, end: 100 }); } catch(e){} }); }, 50); if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
         }
         return;
       }
@@ -7739,7 +7739,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
         if(hit.pointKey === "ctrl1" || hit.pointKey === "ctrl2") d.ctrlEdited = true;
         dragTarget = { idx: hit.idx, pointKey: hit.pointKey };
       }
-      ["zoomY_inside", "zoomY_slider"].forEach(zId => { try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: 0, end: 100 }); } catch(e){} }); if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
+      setTimeout(() => { ["zoomY_inside", "zoomY_slider"].forEach(zId => { try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: 0, end: 100 }); } catch(e){} }); }, 50); if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
     });
 
     zr.on("mousemove", (params) => {
@@ -7777,13 +7777,13 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
         const dy = pt.at(1) - dragTarget.startDataY;
         d.points = dragTarget.origPoints.map(op => [op.at(0) + dx, op.at(1) + dy]);
       }
-      ["zoomY_inside", "zoomY_slider"].forEach(zId => { try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: 0, end: 100 }); } catch(e){} }); if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
+      setTimeout(() => { ["zoomY_inside", "zoomY_slider"].forEach(zId => { try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: 0, end: 100 }); } catch(e){} }); }, 50); if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
     });
 
     zr.on("mouseup", () => {
       if(dragTarget){
         dragTarget = null;
-        ["zoomY_inside", "zoomY_slider"].forEach(zId => { try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: 0, end: 100 }); } catch(e){} }); if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
+        setTimeout(() => { ["zoomY_inside", "zoomY_slider"].forEach(zId => { try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: 0, end: 100 }); } catch(e){} }); }, 50); if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
       }
     });
   }
@@ -9548,7 +9548,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       window.dessinerChandeliersMulti = function(){
         const res = origMulti.apply(this, arguments);
         syncDessinsTimestamps(true);
-        ["zoomY_inside", "zoomY_slider"].forEach(zId => { try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: 0, end: 100 }); } catch(e){} }); if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
+        setTimeout(() => { ["zoomY_inside", "zoomY_slider"].forEach(zId => { try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: 0, end: 100 }); } catch(e){} }); }, 50); if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
         return res;
       };
       window.dessinerChandeliersMulti.__chTimeAnchored = true;
@@ -9559,7 +9559,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       window.dessinerGraphique = function(){
         const res = origSingle.apply(this, arguments);
         syncDessinsTimestamps(true);
-        ["zoomY_inside", "zoomY_slider"].forEach(zId => { try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: 0, end: 100 }); } catch(e){} }); if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
+        setTimeout(() => { ["zoomY_inside", "zoomY_slider"].forEach(zId => { try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: 0, end: 100 }); } catch(e){} }); }, 50); if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
         return res;
       };
       window.dessinerGraphique.__chTimeAnchored = true;
