@@ -9925,5 +9925,106 @@ body.theme-clair .ch-per-btn:hover {
   });
 })();
 </script>
+<style id="ch-bvmt-logos-css">
+.ch-tk-logo-img { width: 22px; height: 22px; border-radius: 5px; object-fit: contain; background: #FFFFFF; border: 1px solid rgba(148,163,184,0.35); padding: 1px; vertical-align: middle; flex: 0 0 auto; box-shadow: 0 1px 3px rgba(0,0,0,0.18); }
+#chTopTickerLogo { width: 24px; height: 24px; margin-right: 4px; cursor: pointer; }
+#chChartTickerBanner { display: inline-flex !important; align-items: center !important; gap: 8px !important; }
+#chChartTickerBanner .ch-tk-logo-img { width: 24px; height: 24px; border-radius: 6px; }
+#chLogoPickerDrop { display: none; position: fixed; z-index: 10080; width: 310px; max-height: 410px; background: #0F172A; color: #F1F5F9; border: 1px solid #38BDF8; border-radius: 10px; box-shadow: 0 16px 40px rgba(2,6,23,0.65); overflow: hidden; flex-direction: column; }
+body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border-color: #0284C7; box-shadow: 0 14px 36px rgba(15,23,42,0.22); }
+#chLogoPickerSearch { width: 100%; box-sizing: border-box; padding: 8px 10px; border: none; border-bottom: 1px solid rgba(148,163,184,0.25); background: transparent; color: inherit; font-size: 12.5px; outline: none; }
+#chLogoPickerList { overflow-y: auto; max-height: 360px; padding: 4px; }
+.ch-lp-item { display: flex; align-items: center; gap: 9px; padding: 6px 8px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; }
+.ch-lp-item:hover { background: rgba(56,189,248,0.16); }
+.ch-lp-item.active { background: #0284C7; color: #FFFFFF; }
+</style>
+<script id="ch-bvmt-logos-script">
+(function(){
+  const BVMT_DOMAINS = {
+    "MONOPRIX":["monoprix.tn","#E11D48"],"SFBT":["sfbt.com.tn","#0284C7"],"TUNISAIR":["tunisair.com","#DC2626"],"TUNISIE LEASING F":["tlf.com.tn","#1D4ED8"],
+    "BT":["bt.com.tn","#1E3A8A"],"STB":["stb.com.tn","#0369A1"],"BNA":["bna.tn","#15803D"],"AMEN BANK":["amenbank.com.tn","#166534"],
+    "ATB":["atb.tn","#B91C1C"],"UIB":["uib.com.tn","#DC2626"],"SIMPAR":["simpar.com.tn","#0F766E"],"CIL":["cil.com.tn","#1D4ED8"],
+    "ATL":["atl.com.tn","#0284C7"],"POULINA GP HOLDING":["poulinagroupholding.com","#1E40AF"],"SOTETEL":["sotetel.com.tn","#0369A1"],"SOTUVER":["sotuver.com.tn","#0D9488"],
+    "SOTUMAG":["sotumag.com.tn","#16A34A"],"SIAME":["siame.com.tn","#2563EB"],"ATTIJARI LEASING":["attijarileasing.com.tn","#D97706"],"SOTRAPIL":["sotrapil.com.tn","#B45309"],
+    "SOMOCER":["somocer.com","#7C2D12"],"ASSAD":["assad.com.tn","#DC2626"],"ESSOUKNA":["essoukna.com.tn","#0F766E"],"TPR":["tpr.com.tn","#1D4ED8"],
+    "ARTES":["artes.tn","#CA8A04"],"TUNIS RE":["tunisre.com.tn","#1E3A8A"],"CARTHAGE CEMENT":["carthagecement.com.tn","#475569"],"ENNAKL AUTOMOBILES":["ennakl.com","#0F172A"],
+    "LAND OR":["landor.com.tn","#D97706"],"ONE TECH HOLDING":["one-tech.com","#0284C7"],"NEW BODY LINE":["newbodyline.com.tn","#DB2777"],"CITY CARS":["citycars.tn","#B91C1C"],
+    "EURO-CYCLES":["euro-cycles.com","#2563EB"],"CELLCOM":["cellcom.tn","#059669"],"SAH":["sah.tn","#0284C7"],"MPBS":["mpbs.com.tn","#92400E"],
+    "SOTIPAPIER":["sotipapier.com.tn","#15803D"],"TAWASOL GP HOLDING":["tawasolgroup.com","#1D4ED8"],"DELICE HOLDING":["delice.tn","#0284C7"],"UADH":["uadh.com.tn","#1E293B"],
+    "UNIMED":["unimed.com.tn","#0D9488"],"ATELIER MEUBLE INT":["interieurs.com.tn","#78350F"],"BTE (ADP)":["bte.com.tn","#1E3A8A"],"SPDIT - SICAF":["sfbt.com.tn","#0369A1"],
+    "AIR LIQUIDE TSIE":["airliquide.com","#0284C7"],"PLAC. TSIE-SICAF":["bvmt.com.tn","#334155"],"ASTREE":["astree.com.tn","#1E40AF"],"ALKIMIA":["alkimia.com.tn","#0F766E"],
+    "TUNINVEST-SICAR":["africinvest.com","#1E3A8A"],"STAR":["star.com.tn","#15803D"],"MAGASIN GENERAL":["mg.tn","#EA580C"],"BH ASSURANCE":["bh-assurance.com","#B91C1C"],
+    "SIPHAT":["siphat.com.tn","#059669"],"BH LEASING":["bhleasing.tn","#991B1B"],"SITS":["sits.com.tn","#0F766E"],"WIFACK INT BANK":["wifakbank.com","#B45309"],
+    "CIMENTS DE BIZERTE":["lescimentsdebizerte.ind.tn","#475569"],"BEST LEASE":["bestlease.com.tn","#15803D"],"SOTEMAIL":["sotemail.com","#7C2D12"],"OFFICEPLAST":["officeplast.com","#2563EB"],
+    "SANIMED":["sanimed.com.tn","#0284C7"],"SITEX":["sitex.com.tn","#1E3A8A"],"BNA ASSURANCES":["bnaassurances.com.tn","#166534"],"STE TUN. DU SUCRE":["bvmt.com.tn","#0369A1"],
+    "STIP":["stip.com.tn","#1E293B"],"HANNIBAL LEASE":["hanniballease.com.tn","#B91C1C"],"ATTIJARI BANK":["attijaribank.com.tn","#D97706"],"TELNET HOLDING":["telnetholding.com","#0284C7"],
+    "BH BANK":["bhbank.tn","#B91C1C"],"ICF":["icf.com.tn","#0F766E"],"AETECH":["aetech.tn","#2563EB"],"UBCI":["ubci.tn","#15803D"],
+    "ASSUR MAGHREBIA":["maghrebia.com.tn","#1E3A8A"],"BIAT":["biat.com.tn","#1E40AF"],"SMART TUNISIE":["smart.com.tn","#0284C7"],"STA":["sta.com.tn","#DC2626"],
+    "ASSU MAGHREBIA VIE":["maghrebia.com.tn","#0369A1"]
+  };
+  function makeFallbackSvg(tk, color){
+    const ini = (tk || "BV").replace(/[^A-Z0-9 ]/gi, "").trim().split(/\s+/).map(w => w.at(0)).join("").slice(0, 3).toUpperCase() || "BV";
+    return "data:image/svg+xml;utf8," + encodeURIComponent(`<svg xmlns="http://w3.org" width="48" height="48" viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="${color||'#0284C7'}"/><text x="24" y="29" text-anchor="middle" fill="#FFF" font-family="Segoe UI,Arial" font-weight="800" font-size="16">${ini}</text></svg>`);
+  }
+  function getBvmtLogoUrls(ticker){
+    const key = String(ticker || "").trim().toUpperCase();
+    const entry = BVMT_DOMAINS[key] || ["bvmt.com.tn", "#0284C7"];
+    const dom = entry.at(0), col = entry.at(1);
+    return {
+      primary: ["https:/", "://google.com", "s2", "favicons?domain=" + encodeURIComponent(dom) + "&sz=128"].join("/"),
+      secondary: ["https:/", "://duckduckgo.com", "ip3", dom + ".ico"].join("/"),
+      fallback: makeFallbackSvg(key, col)
+    };
+  }
+  function setImgWithFallback(img, ticker){
+    const u = getBvmtLogoUrls(ticker);
+    img.dataset.step = "1";
+    img.onerror = function(){ if(this.dataset.step === "1"){ this.dataset.step = "2"; this.src = u.secondary; } else { this.onerror = null; this.src = u.fallback; } };
+    img.src = u.primary;
+  }
+  window.getBvmtLogoUrls = getBvmtLogoUrls;
+  function syncTickerLogos(){
+    const sel = document.getElementById("selTicker");
+    if(!sel) return;
+    const tk = (sel.value || "DELICE HOLDING").trim().toUpperCase();
+    let topLogo = document.getElementById("chTopTickerLogo");
+    if(!topLogo){ topLogo = document.createElement("img"); topLogo.id = "chTopTickerLogo"; topLogo.className = "ch-tk-logo-img"; topLogo.title = "Catalogue des 77 valeurs BVMT avec logos"; sel.parentElement.insertBefore(topLogo, sel); }
+    if(topLogo.dataset.tk !== tk){ topLogo.dataset.tk = tk; setImgWithFallback(topLogo, tk); }
+    const banner = document.getElementById("chChartTickerBanner");
+    if(banner){
+      let bLogo = banner.querySelector(".ch-tk-logo-img");
+      if(!bLogo){ bLogo = document.createElement("img"); bLogo.className = "ch-tk-logo-img"; banner.insertBefore(bLogo, banner.firstChild); }
+      if(bLogo.dataset.tk !== tk){ bLogo.dataset.tk = tk; setImgWithFallback(bLogo, tk); }
+    }
+  }
+  function initVisualLogoDropdown(){
+    const sel = document.getElementById("selTicker"), topLogo = document.getElementById("chTopTickerLogo");
+    if(!sel || !topLogo || document.getElementById("chLogoPickerDrop")) return;
+    const drop = document.createElement("div"); drop.id = "chLogoPickerDrop";
+    drop.innerHTML = '<input id="chLogoPickerSearch" type="text" placeholder="Rechercher parmi les 77 valeurs BVMT..." /><div id="chLogoPickerList"></div>';
+    document.body.appendChild(drop);
+    const inp = drop.querySelector("#chLogoPickerSearch"), listBox = drop.querySelector("#chLogoPickerList");
+    function renderItems(filter){
+      const q = (filter || "").trim().toUpperCase(), cur = (sel.value || "").trim().toUpperCase();
+      listBox.innerHTML = "";
+      Array.from(sel.options).forEach(opt => {
+        const val = opt.value.trim().toUpperCase();
+        if(q && !val.includes(q)) return;
+        const row = document.createElement("div"); row.className = "ch-lp-item" + (val === cur ? " active" : "");
+        const im = document.createElement("img"); im.className = "ch-tk-logo-img"; setImgWithFallback(im, val);
+        const sp = document.createElement("span"); sp.textContent = opt.textContent || val;
+        row.appendChild(im); row.appendChild(sp);
+        row.onclick = () => { sel.value = opt.value; sel.dispatchEvent(new Event("change", { bubbles: true })); drop.style.display = "none"; syncTickerLogos(); };
+        listBox.appendChild(row);
+      });
+    }
+    topLogo.onclick = (e) => { e.stopPropagation(); if(drop.style.display === "flex"){ drop.style.display = "none"; return; } const r = topLogo.getBoundingClientRect(); drop.style.left = Math.max(8, r.left) + "px"; drop.style.top = (r.bottom + 6) + "px"; drop.style.display = "flex"; inp.value = ""; renderItems(""); setTimeout(() => inp.focus(), 30); };
+    inp.oninput = () => renderItems(inp.value);
+    drop.onclick = (e) => e.stopPropagation();
+    document.addEventListener("click", () => { drop.style.display = "none"; });
+  }
+  window.addEventListener("load", () => { syncTickerLogos(); initVisualLogoDropdown(); const sel = document.getElementById("selTicker"); if(sel) sel.addEventListener("change", syncTickerLogos); setInterval(syncTickerLogos, 700); });
+})();
+</script>
 </body>
 </html>
