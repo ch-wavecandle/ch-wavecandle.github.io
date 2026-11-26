@@ -2312,7 +2312,7 @@ function dessinerChandeliersMulti(data) { if (document.getElementById('selHorizo
       { id: 'zoomX_inside', type: 'inside', xAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: true, moveOnMouseMove: true },
       { id: 'zoomY_inside', type: 'inside', yAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: 'shift', moveOnMouseMove: 'shift' },
       { id: 'zoomX_slider', type: 'slider', xAxisIndex: 0, height: 18, bottom: 8, borderColor: '#333', fillerColor: 'rgba(0,229,255,0.15)' },
-      { id: 'zoomY_slider', type: 'slider', orient: 'vertical', yAxisIndex: 0, top: 36, bottom: 36, right: 4, width: 16, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false }
+      { id: 'zoomY_slider', type: 'slider', orient: 'vertical', yAxisIndex: 0, top: 36, height: '80%', right: 4, width: 16, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false }
     ],
     xAxis: {
       type: 'category', data: bougies.map(b => b.label),
@@ -2748,7 +2748,7 @@ function dessinerGraphique(data) { if (document.getElementById("selHorizon")?.va
       { id: 'zoomX_inside', type: 'inside', xAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: true, moveOnMouseMove: true, start: zoomXStart, end: zoomXEnd },
       { id: 'zoomY_inside', type: 'inside', yAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: 'shift', moveOnMouseMove: 'shift', start: zoomYStart, end: zoomYEnd },
       { id: 'zoomX_slider', type: 'slider', xAxisIndex: 0, height: 18, bottom: 8, borderColor: '#333', fillerColor: 'rgba(0,229,255,0.15)', start: zoomXStart, end: zoomXEnd },
-      { id: 'zoomY_slider', type: 'slider', orient: 'vertical', yAxisIndex: 0, top: 36, bottom: 36, right: 4, width: 16, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false, start: zoomYStart, end: zoomYEnd }
+      { id: 'zoomY_slider', type: 'slider', orient: 'vertical', yAxisIndex: 0, top: 36, height: '80%', right: 4, width: 16, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false, start: zoomYStart, end: zoomYEnd }
     ],
     xAxis: { type: 'value', min: 32400, max: 54000, interval: 3600, axisLine: { lineStyle: { color: '#333' } }, splitLine: { lineStyle: { color: '#1E1E1E' } }, axisLabel: { color: '#999', formatter: val => heureDepuisSec(val).slice(0,5) } },
     yAxis: { type: 'value', position: 'right', min: +(prixMin - margeY * 0.3).toFixed(2), max: +(prixMax + margeY).toFixed(2), axisLine: { lineStyle: { color: '#333' } }, splitLine: { lineStyle: { color: '#1E1E1E' } }, axisLabel: { color: '#999', formatter: val => val.toFixed(2) } },
@@ -10096,5 +10096,81 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
   installYAxisDetector();
   setInterval(installYAxisDetector, 800);
 })();</script>
+<script id="ch-preserve-period-zoom">
+(function(){
+  let savedZoomAnchor = null;
+
+  function captureCurrentTimeWindow(){
+    if(typeof chart === "undefined" || !chart || typeof globalData === "undefined" || !globalData) return;
+    const opt = chart.getOption();
+    const dzList = (opt && Array.isArray(opt.dataZoom)) ? opt.dataZoom : [];
+    const dzX = dzList.find(d => d && (d.id === "zoomX_slider" || d.id === "zoomX_inside" || d.xAxisIndex === 0));
+    if(!dzX) return;
+    const s = typeof dzX.start === "number" ? dzX.start : 0;
+    const e = typeof dzX.end === "number" ? dzX.end : 100;
+    if(s <= 0.5 && e >= 99.5){ savedZoomAnchor = null; return; }
+    const bougies = Array.isArray(globalData.bougies) ? globalData.bougies : [];
+    if(bougies.length > 1){
+      const i1 = Math.max(0, Math.min(bougies.length - 1, Math.floor((s / 100) * (bougies.length - 1))));
+      const i2 = Math.max(i1, Math.min(bougies.length - 1, Math.ceil((e / 100) * (bougies.length - 1))));
+      savedZoomAnchor = {
+        dateStart: bougies.at(i1)?.date_deb_iso || bougies.at(i1)?.cle || "",
+        dateEnd: bougies.at(i2)?.date_fin_iso || bougies.at(i2)?.cle || "",
+        pctStart: s,
+        pctEnd: e
+      };
+    } else {
+      savedZoomAnchor = { dateStart: "", dateEnd: "", pctStart: s, pctEnd: e };
+    }
+  }
+
+  function restoreTimeWindowIfNeeded(){
+    if(!savedZoomAnchor || typeof chart === "undefined" || !chart || typeof globalData === "undefined" || !globalData) return;
+    const anchor = savedZoomAnchor;
+    savedZoomAnchor = null;
+    const bougies = Array.isArray(globalData.bougies) ? globalData.bougies : [];
+    let targetS = anchor.pctStart;
+    let targetE = anchor.pctEnd;
+    if(bougies.length > 2 && anchor.dateStart && anchor.dateEnd){
+      const d1 = anchor.dateStart.slice(0, 10);
+      const d2 = anchor.dateEnd.slice(0, 10);
+      let idx1 = bougies.findIndex(b => (b.date_deb_iso || b.cle || "").slice(0, 10) >= d1);
+      let idx2 = -1;
+      for(let k = bougies.length - 1; k >= 0; k--){
+        if((bougies.at(k).date_fin_iso || bougies.at(k).cle || "").slice(0, 10) <= d2){ idx2 = k; break; }
+      }
+      if(idx1 >= 0 && idx2 > idx1){
+        targetS = (idx1 / (bougies.length - 1)) * 100;
+        targetE = (idx2 / (bougies.length - 1)) * 100;
+      }
+    }
+    targetS = Math.max(0, Math.min(97, targetS));
+    targetE = Math.min(100, Math.max(targetS + 2, targetE));
+    ["zoomX_inside", "zoomX_slider"].forEach(zId => {
+      try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: targetS, end: targetE }); } catch(e){}
+    });
+  }
+
+  document.addEventListener("click", (e) => {
+    const btn = e.target && e.target.closest ? e.target.closest("#ch-period-bar button") : null;
+    if(btn) captureCurrentTimeWindow();
+  }, true);
+
+  ["selGranularite", "selGranulariteIntra"].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.addEventListener("mousedown", captureCurrentTimeWindow, true);
+  });
+
+  setInterval(() => {
+    if(savedZoomAnchor && typeof globalData !== "undefined" && globalData && Array.isArray(globalData.bougies) && globalData.bougies.length > 0){
+      const opt = (typeof chart !== "undefined" && chart) ? chart.getOption() : null;
+      const dzX = opt && Array.isArray(opt.dataZoom) ? opt.dataZoom.find(d => d && (d.id === "zoomX_slider" || d.id === "zoomX_inside")) : null;
+      if(dzX && (typeof dzX.start !== "number" || dzX.start <= 0.5) && (typeof dzX.end !== "number" || dzX.end >= 99.5)){
+        restoreTimeWindowIfNeeded();
+      }
+    }
+  }, 150);
+})();
+</script>
 </body>
 </html>
