@@ -2312,7 +2312,7 @@ function dessinerChandeliersMulti(data) { if (document.getElementById('selHorizo
       { id: 'zoomX_inside', type: 'inside', xAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: true, moveOnMouseMove: true },
       { id: 'zoomY_inside', type: 'inside', yAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: 'shift', moveOnMouseMove: 'shift' },
       { id: 'zoomX_slider', type: 'slider', xAxisIndex: 0, height: 18, bottom: 8, borderColor: '#333', fillerColor: 'rgba(0,229,255,0.15)' },
-      { id: 'zoomY_slider', type: 'slider', yAxisIndex: 0, right: 6, width: 14, borderColor: '#333', fillerColor: 'rgba(255,215,0,0.18)', showDetail: false }
+      { id: 'zoomY_slider', type: 'slider', yAxisIndex: 0, right: 6, width: 16, right: 4, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: '110%', showDetail: false }
     ],
     xAxis: {
       type: 'category', data: bougies.map(b => b.label),
@@ -2748,7 +2748,7 @@ function dessinerGraphique(data) { if (document.getElementById("selHorizon")?.va
       { id: 'zoomX_inside', type: 'inside', xAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: true, moveOnMouseMove: true, start: zoomXStart, end: zoomXEnd },
       { id: 'zoomY_inside', type: 'inside', yAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: 'shift', moveOnMouseMove: 'shift', start: zoomYStart, end: zoomYEnd },
       { id: 'zoomX_slider', type: 'slider', xAxisIndex: 0, height: 18, bottom: 8, borderColor: '#333', fillerColor: 'rgba(0,229,255,0.15)', start: zoomXStart, end: zoomXEnd },
-      { id: 'zoomY_slider', type: 'slider', yAxisIndex: 0, right: 6, width: 14, borderColor: '#333', fillerColor: 'rgba(255,215,0,0.18)', showDetail: false, start: zoomYStart, end: zoomYEnd }
+      { id: 'zoomY_slider', type: 'slider', yAxisIndex: 0, right: 6, width: 16, right: 4, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: '110%', showDetail: false, start: zoomYStart, end: zoomYEnd }
     ],
     xAxis: { type: 'value', min: 32400, max: 54000, interval: 3600, axisLine: { lineStyle: { color: '#333' } }, splitLine: { lineStyle: { color: '#1E1E1E' } }, axisLabel: { color: '#999', formatter: val => heureDepuisSec(val).slice(0,5) } },
     yAxis: { type: 'value', position: 'right', min: +(prixMin - margeY * 0.3).toFixed(2), max: +(prixMax + margeY).toFixed(2), axisLine: { lineStyle: { color: '#333' } }, splitLine: { lineStyle: { color: '#1E1E1E' } }, axisLabel: { color: '#999', formatter: val => val.toFixed(2) } },
@@ -9989,7 +9989,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     box.dataset.yHoverZoomBound = "1";
     const Y_AXIS_ZONE_PX = 92;
     let yDragActive = false, yDragStartY = 0, yDragStartRange = new Array(0, 100);
-    function isOverYAxis(clientX){ const r = box.getBoundingClientRect(); return clientX >= (r.right - Y_AXIS_ZONE_PX) && clientX <= r.right; }
+    function isOverYAxis(clientX){ const r = box.getBoundingClientRect(); return clientX >= (r.right - Y_AXIS_ZONE_PX) && clientX < (r.right - 22); }
     function getYZoomRange(){
       if(typeof chart === "undefined" || !chart) return new Array(0, 100);
       const opt = chart.getOption(), dzList = (opt && opt.dataZoom) || [];
