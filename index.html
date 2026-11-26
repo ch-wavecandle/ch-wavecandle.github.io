@@ -1199,11 +1199,20 @@ window.__CH_GET_INIT_X_ZOOM = function(bougies){
   return { start: Math.max(0, Math.min(98, s)), end: Math.min(100, Math.max(s + 2, e)) };
 };
 
-window.__CH_GET_INIT_Y_ZOOM = function(axisMin, axisMax){
+window.__CH_GET_INIT_Y_ZOOM = function(bougies){
   const a = window.__CH_SAVED_PERIOD_ZOOM;
-  if(!a || !a.hasY || typeof axisMin !== "number" || typeof axisMax !== "number" || !(axisMax > axisMin)){
-    return { start: 0, end: 100 };
+  if(!a || !a.hasY || !Array.isArray(bougies) || bougies.length === 0) return { start: 0, end: 100 };
+  let axisMin = Infinity, axisMax = -Infinity;
+  for(const b of bougies){
+    const lo = Number(b.low ?? b.min ?? b.close ?? b.prix_fin);
+    const hi = Number(b.high ?? b.max ?? b.close ?? b.prix_fin);
+    if(lo > 0 && lo < axisMin) axisMin = lo;
+    if(hi > 0 && hi > axisMax) axisMax = hi;
   }
+  if(!(axisMax > axisMin)) return { start: 0, end: 100 };
+  const pad = Math.max(0.02, (axisMax - axisMin) * 0.08);
+  axisMin = Math.max(0.01, axisMin - pad);
+  axisMax = axisMax + pad;
   const span = axisMax - axisMin;
   let ys = ((a.priceMin - axisMin) / span) * 100;
   let ye = ((a.priceMax - axisMin) / span) * 100;
@@ -2357,9 +2366,9 @@ function dessinerChandeliersMulti(data) { if (document.getElementById('selHorizo
     },
     dataZoom: [
       Object.assign({ id: 'zoomX_inside', type: 'inside', xAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: true, moveOnMouseMove: true }, window.__CH_GET_INIT_X_ZOOM(bougies)),
-      Object.assign({ id: 'zoomY_inside', type: 'inside', yAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: 'shift', moveOnMouseMove: true }, window.__CH_GET_INIT_Y_ZOOM(yMin, yMax)),
+      Object.assign({ id: 'zoomY_inside', type: 'inside', yAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: 'shift', moveOnMouseMove: true }, window.__CH_GET_INIT_Y_ZOOM(typeof bougies !== 'undefined' ? bougies : null)),
       Object.assign({ id: 'zoomX_slider', type: 'slider', xAxisIndex: 0, height: 18, bottom: 8, borderColor: '#333', fillerColor: 'rgba(0,229,255,0.15)' }, window.__CH_GET_INIT_X_ZOOM(bougies)),
-      Object.assign({ id: 'zoomY_slider_' + (document.getElementById('selExpandAxes')?.value || 'AUTO'), type: 'slider', orient: 'vertical', yAxisIndex: 0, top: 42, height: Math.max(260, (document.getElementById('chart-container')?.clientHeight || 520) - 92), right: 4, width: 16, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false }, window.__CH_GET_INIT_Y_ZOOM(yMin, yMax))
+      Object.assign({ id: 'zoomY_slider_' + (document.getElementById('selExpandAxes')?.value || 'AUTO'), type: 'slider', orient: 'vertical', yAxisIndex: 0, top: 42, height: Math.max(260, (document.getElementById('chart-container')?.clientHeight || 520) - 92), right: 4, width: 16, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false }, window.__CH_GET_INIT_Y_ZOOM(typeof bougies !== 'undefined' ? bougies : null))
     ],
     xAxis: {
       type: 'category', data: bougies.map(b => b.label),
@@ -2795,7 +2804,7 @@ function dessinerGraphique(data) { if (document.getElementById("selHorizon")?.va
       { id: 'zoomX_inside', type: 'inside', xAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: true, moveOnMouseMove: true, start: zoomXStart, end: zoomXEnd },
       { id: 'zoomY_inside', type: 'inside', yAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: 'shift', moveOnMouseMove: true, start: zoomYStart, end: zoomYEnd },
       { id: 'zoomX_slider', type: 'slider', xAxisIndex: 0, height: 18, bottom: 8, borderColor: '#333', fillerColor: 'rgba(0,229,255,0.15)', start: zoomXStart, end: zoomXEnd },
-      Object.assign({ id: 'zoomY_slider_' + (document.getElementById('selExpandAxes')?.value || 'AUTO'), type: 'slider', orient: 'vertical', yAxisIndex: 0, top: 42, height: Math.max(260, (document.getElementById('chart-container')?.clientHeight || 520) - 92), right: 4, width: 16, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false }, window.__CH_GET_INIT_Y_ZOOM(yMin, yMax))
+      Object.assign({ id: 'zoomY_slider_' + (document.getElementById('selExpandAxes')?.value || 'AUTO'), type: 'slider', orient: 'vertical', yAxisIndex: 0, top: 42, height: Math.max(260, (document.getElementById('chart-container')?.clientHeight || 520) - 92), right: 4, width: 16, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false }, window.__CH_GET_INIT_Y_ZOOM(typeof bougies !== 'undefined' ? bougies : null))
     ],
     xAxis: { type: 'value', min: 32400, max: 54000, interval: 3600, axisLine: { lineStyle: { color: '#333' } }, splitLine: { lineStyle: { color: '#1E1E1E' } }, axisLabel: { color: '#999', formatter: val => heureDepuisSec(val).slice(0,5) } },
     yAxis: { type: 'value', position: 'right', min: +(prixMin - margeY * 0.3).toFixed(2), max: +(prixMax + margeY).toFixed(2), axisLine: { lineStyle: { color: '#333' } }, splitLine: { lineStyle: { color: '#1E1E1E' } }, axisLabel: { color: '#999', formatter: val => val.toFixed(2) } },
