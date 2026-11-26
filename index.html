@@ -9795,5 +9795,5 @@ body.theme-clair .ch-per-btn:hover {
   min-width: 30px !important;
 }
 #ch-hud-tools:not(.vertical) { width: max-content !important; max-width: none !important; overflow: visible !important; } #ch-hud-tools:not(.vertical) .ch-hud-ctrl-bar { width: auto !important; flex: 0 0 auto !important; }</style>
-</body>
+<script id="ch-hud-width-lock">(function(){ function fixHudBox(){ const h = document.getElementById("ch-hud-tools"); if(!h) return; if(!h.classList.contains("vertical")){ h.style.setProperty("width", "max-content", "important"); h.style.setProperty("min-width", "max-content", "important"); h.style.setProperty("max-width", "none", "important"); h.style.setProperty("display", "inline-flex", "important"); } } window.addEventListener("load", () => { fixHudBox(); setTimeout(fixHudBox, 500); setTimeout(fixHudBox, 1200); setInterval(fixHudBox, 1000); }); })();</script></body>
 </html>
