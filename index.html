@@ -2344,7 +2344,7 @@ function dessinerChandeliersMulti(data) { if (document.getElementById('selHorizo
     },
     dataZoom: [
       Object.assign({ id: 'zoomX_inside', type: 'inside', xAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: true, moveOnMouseMove: true }, window.__CH_GET_INIT_X_ZOOM(bougies)),
-      { id: 'zoomY_inside', type: 'inside', yAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: 'shift', moveOnMouseMove: 'shift' },
+      { id: 'zoomY_inside', type: 'inside', yAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: 'shift', moveOnMouseMove: true },
       Object.assign({ id: 'zoomX_slider', type: 'slider', xAxisIndex: 0, height: 18, bottom: 8, borderColor: '#333', fillerColor: 'rgba(0,229,255,0.15)' }, window.__CH_GET_INIT_X_ZOOM(bougies)),
       { id: 'zoomY_slider_' + (document.getElementById('selExpandAxes')?.value || 'AUTO'), type: 'slider', orient: 'vertical', yAxisIndex: 0, top: 42, height: Math.max(260, (document.getElementById('chart-container')?.clientHeight || 520) - 92), right: 4, width: 16, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false }
     ],
@@ -2780,7 +2780,7 @@ function dessinerGraphique(data) { if (document.getElementById("selHorizon")?.va
     },
     dataZoom: [
       { id: 'zoomX_inside', type: 'inside', xAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: true, moveOnMouseMove: true, start: zoomXStart, end: zoomXEnd },
-      { id: 'zoomY_inside', type: 'inside', yAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: 'shift', moveOnMouseMove: 'shift', start: zoomYStart, end: zoomYEnd },
+      { id: 'zoomY_inside', type: 'inside', yAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: 'shift', moveOnMouseMove: true, start: zoomYStart, end: zoomYEnd },
       { id: 'zoomX_slider', type: 'slider', xAxisIndex: 0, height: 18, bottom: 8, borderColor: '#333', fillerColor: 'rgba(0,229,255,0.15)', start: zoomXStart, end: zoomXEnd },
       { id: 'zoomY_slider_' + (document.getElementById('selExpandAxes')?.value || 'AUTO'), type: 'slider', orient: 'vertical', yAxisIndex: 0, top: 42, height: Math.max(260, (document.getElementById('chart-container')?.clientHeight || 520) - 92), right: 4, width: 16, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false }
     ],
