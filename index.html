@@ -2312,7 +2312,7 @@ function dessinerChandeliersMulti(data) { if (document.getElementById('selHorizo
       { id: 'zoomX_inside', type: 'inside', xAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: true, moveOnMouseMove: true },
       { id: 'zoomY_inside', type: 'inside', yAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: 'shift', moveOnMouseMove: 'shift' },
       { id: 'zoomX_slider', type: 'slider', xAxisIndex: 0, height: 18, bottom: 8, borderColor: '#333', fillerColor: 'rgba(0,229,255,0.15)' },
-      { id: 'zoomY_slider', type: 'slider', yAxisIndex: 0, right: 6, width: 16, right: 4, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false }
+      { id: 'zoomY_slider', type: 'slider', yAxisIndex: 0, top: 32, bottom: 26, right: 4, width: 16, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false }
     ],
     xAxis: {
       type: 'category', data: bougies.map(b => b.label),
@@ -2748,7 +2748,7 @@ function dessinerGraphique(data) { if (document.getElementById("selHorizon")?.va
       { id: 'zoomX_inside', type: 'inside', xAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: true, moveOnMouseMove: true, start: zoomXStart, end: zoomXEnd },
       { id: 'zoomY_inside', type: 'inside', yAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: 'shift', moveOnMouseMove: 'shift', start: zoomYStart, end: zoomYEnd },
       { id: 'zoomX_slider', type: 'slider', xAxisIndex: 0, height: 18, bottom: 8, borderColor: '#333', fillerColor: 'rgba(0,229,255,0.15)', start: zoomXStart, end: zoomXEnd },
-      { id: 'zoomY_slider', type: 'slider', yAxisIndex: 0, right: 6, width: 16, right: 4, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false, start: zoomYStart, end: zoomYEnd }
+      { id: 'zoomY_slider', type: 'slider', yAxisIndex: 0, top: 32, bottom: 26, right: 4, width: 16, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false, start: zoomYStart, end: zoomYEnd }
     ],
     xAxis: { type: 'value', min: 32400, max: 54000, interval: 3600, axisLine: { lineStyle: { color: '#333' } }, splitLine: { lineStyle: { color: '#1E1E1E' } }, axisLabel: { color: '#999', formatter: val => heureDepuisSec(val).slice(0,5) } },
     yAxis: { type: 'value', position: 'right', min: +(prixMin - margeY * 0.3).toFixed(2), max: +(prixMax + margeY).toFixed(2), axisLine: { lineStyle: { color: '#333' } }, splitLine: { lineStyle: { color: '#1E1E1E' } }, axisLabel: { color: '#999', formatter: val => val.toFixed(2) } },
@@ -9884,31 +9884,25 @@ body.theme-clair .ch-per-btn:hover {
 
   async function syncClosedMarketClockFromSynthese(){
     const code = getTargetClosedDateCode();
-    if(!code) return;
-    const fn = "synthese_cloture_reel_" + code + ".csv";
-    const urls = [
-      ["https:/", "://githubusercontent.com", "ch-wavecandle", "ch-wavecandle.github.io", "main", "Historique", "Synthese_cloture", fn].join("/"),
-      "https://huggingface.co" + fn
-    ];
-    for(const u of urls){
+    if(!code || typeof lireFichierViaGradio !== "function") return;
+    const prevDate = new Date(); prevDate.setDate(prevDate.getDate() - 1);
+    while(prevDate.getDay() === 0 || prevDate.getDay() === 6) prevDate.setDate(prevDate.getDate() - 1);
+    const codePrev = String(prevDate.getDate()).padStart(2,"0") + String(prevDate.getMonth()+1).padStart(2,"0") + prevDate.getFullYear();
+    const candidates = code === codePrev ? new Array(code) : new Array(code, codePrev);
+    for(const c of candidates){
       try {
-        const res = await fetch(u, { cache: "no-store" });
-        if(!res.ok) continue;
-        const txt = await res.text();
+        const res = await lireFichierViaGradio("Synthese_cloture/synthese_cloture_reel_" + c + ".csv");
+        const txt = res && res.ok ? res.text : "";
+        if(!txt || txt.length < 20) continue;
         const lines = txt.split(/\r?\n/).filter(l => l.trim().length > 0);
         if(lines.length < 2) continue;
         const headers = lines.at(0).split(";").map(h => h.trim().replace(/^"|"$/g, ""));
         const idxH = headers.findIndex(h => /^heure(_marche|_python)?$/i.test(h));
         let heureSyn = "";
         for(let i = lines.length - 1; i >= 1; i--){
-          const cols = lines.at(i).split(";").map(c => c.trim().replace(/^"|"$/g, ""));
-          if(cols.at(0) === "CONFIG_SYSTEM" && idxH >= 0 && cols.at(idxH)){
-            heureSyn = cols.at(idxH);
-            break;
-          }
-          if(!heureSyn && idxH >= 0 && /^\d{2}:\d{2}(:\d{2})?$/.test(cols.at(idxH) || "")){
-            heureSyn = cols.at(idxH);
-          }
+          const cols = lines.at(i).split(";").map(x => x.trim().replace(/^"|"$/g, ""));
+          if(cols.at(0) === "CONFIG_SYSTEM" && idxH >= 0 && cols.at(idxH)){ heureSyn = cols.at(idxH); break; }
+          if(!heureSyn && idxH >= 0 && /^\d{2}:\d{2}(:\d{2})?$/.test(cols.at(idxH) || "")) heureSyn = cols.at(idxH);
         }
         if(heureSyn){
           const boxH = document.getElementById("boxHorlogeMarche");
@@ -9916,18 +9910,13 @@ body.theme-clair .ch-per-btn:hover {
             boxH.style.display = "inline-flex";
             const txtNode = Array.from(boxH.childNodes).find(n => n.nodeType === 3 && /\d{2}:\d{2}/.test(n.textContent));
             if(txtNode) txtNode.textContent = " " + heureSyn + " ";
-            else {
-              const sp = boxH.querySelector("span, b, strong") || boxH;
-              if(sp !== boxH) sp.textContent = heureSyn;
-              else boxH.textContent = "\uD83D\uDD52 " + heureSyn;
-            }
+            else { const sp = boxH.querySelector("span, b, strong") || boxH; if(sp !== boxH) sp.textContent = heureSyn; else boxH.textContent = "\uD83D\uDD52 " + heureSyn; }
           }
           break;
         }
       } catch(e){}
     }
   }
-
   window.addEventListener("load", () => {
     syncClosedMarketClockFromSynthese();
     setTimeout(syncClosedMarketClockFromSynthese, 1500);
@@ -10003,7 +9992,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
       const opt = chart.getOption(), dzList = (opt && opt.dataZoom) || [];
       dzList.forEach(d => {
         const isY = d.id === "zoomY_inside" || d.id === "zoomY_slider" || (Array.isArray(d.yAxisIndex) && d.yAxisIndex.includes(0)) || d.yAxisIndex === 0;
-        if(isY && d.id) chart.dispatchAction({ type: "dataZoom", dataZoomId: d.id, start: s, end: e });
+        if(isY && d.id){ const ya = opt && Array.isArray(opt.yAxis) ? opt.yAxis.at(0) : null; const minB = (ya && typeof ya.min === "number") ? ya.min : 0.01; const maxB = (ya && typeof ya.max === "number") ? ya.max : 100; const safeS = (maxB > minB && minB < 0.01) ? Math.max(s, ((0.01 - minB) / (maxB - minB)) * 100) : s; chart.dispatchAction({ type: "dataZoom", dataZoomId: d.id, start: safeS, end: Math.max(safeS + 2, e) }); }
       });
     }
     box.addEventListener("mousemove", (e) => {
