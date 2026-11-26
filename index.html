@@ -7582,7 +7582,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
         }
       }
 
-      const yPatch = (minP !== Infinity && maxP !== -Infinity)
+      const savedY = (window.__CH_SAVED_PERIOD_ZOOM && window.__CH_SAVED_PERIOD_ZOOM.hasY && window.__CH_SAVED_PERIOD_ZOOM.priceMax > window.__CH_SAVED_PERIOD_ZOOM.priceMin) ? window.__CH_SAVED_PERIOD_ZOOM : null; const yPatch = savedY ? [{ min: Number(savedY.priceMin.toFixed(3)), max: Number(savedY.priceMax.toFixed(3)), scale: false }] : (minP !== Infinity && maxP !== -Infinity)
         ? [{ min: Number(Math.max(0.01, targetMinY).toFixed(3)), max: Number(targetMaxY.toFixed(3)), scale: false }]
         : [{}];
 
