@@ -2312,7 +2312,7 @@ function dessinerChandeliersMulti(data) { if (document.getElementById('selHorizo
       { id: 'zoomX_inside', type: 'inside', xAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: true, moveOnMouseMove: true },
       { id: 'zoomY_inside', type: 'inside', yAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: 'shift', moveOnMouseMove: 'shift' },
       { id: 'zoomX_slider', type: 'slider', xAxisIndex: 0, height: 18, bottom: 8, borderColor: '#333', fillerColor: 'rgba(0,229,255,0.15)' },
-      { id: 'zoomY_slider', type: 'slider', show: false, yAxisIndex: 0, right: 6, width: 22, right: 2, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.24)', handleSize: 24, minSpan: 20, brushSelect: false, showDetail: false }
+      { id: 'zoomY_slider', type: 'slider', yAxisIndex: 0, right: 6, width: 22, right: 2, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.24)', handleSize: 24, minSpan: 20, brushSelect: false, showDetail: false }
     ],
     xAxis: {
       type: 'category', data: bougies.map(b => b.label),
@@ -2748,7 +2748,7 @@ function dessinerGraphique(data) { if (document.getElementById("selHorizon")?.va
       { id: 'zoomX_inside', type: 'inside', xAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: true, moveOnMouseMove: true, start: zoomXStart, end: zoomXEnd },
       { id: 'zoomY_inside', type: 'inside', yAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: 'shift', moveOnMouseMove: 'shift', start: zoomYStart, end: zoomYEnd },
       { id: 'zoomX_slider', type: 'slider', xAxisIndex: 0, height: 18, bottom: 8, borderColor: '#333', fillerColor: 'rgba(0,229,255,0.15)', start: zoomXStart, end: zoomXEnd },
-      { id: 'zoomY_slider', type: 'slider', show: false, yAxisIndex: 0, right: 6, width: 22, right: 2, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.24)', handleSize: 24, minSpan: 20, brushSelect: false, showDetail: false, start: zoomYStart, end: zoomYEnd }
+      { id: 'zoomY_slider', type: 'slider', yAxisIndex: 0, right: 6, width: 22, right: 2, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.24)', handleSize: 24, minSpan: 20, brushSelect: false, showDetail: false, start: zoomYStart, end: zoomYEnd }
     ],
     xAxis: { type: 'value', min: 32400, max: 54000, interval: 3600, axisLine: { lineStyle: { color: '#333' } }, splitLine: { lineStyle: { color: '#1E1E1E' } }, axisLabel: { color: '#999', formatter: val => heureDepuisSec(val).slice(0,5) } },
     yAxis: { type: 'value', position: 'right', min: +(prixMin - margeY * 0.3).toFixed(2), max: +(prixMax + margeY).toFixed(2), axisLine: { lineStyle: { color: '#333' } }, splitLine: { lineStyle: { color: '#1E1E1E' } }, axisLabel: { color: '#999', formatter: val => val.toFixed(2) } },
@@ -9886,7 +9886,7 @@ body.theme-clair .ch-per-btn:hover {
     const code = getTargetClosedDateCode();
     if(!code) return;
     const fn = "synthese_cloture_reel_" + code + ".csv";
-    const urls = new Array(["https:", "", "raw.githubusercontent.com", "ch-wavecandle", "ch-wavecandle.github.io", "main", "Historique", "Synthese_cloture", fn].join("/"));
+    const urls = new Array(["https:", "", "raw.githubusercontent.com", "chemshaf-beep", "ch-wavecandle-data", "main", "Historique", "Synthese_cloture", fn].join("/"));
     for(const u of urls){
       try {
         const res = await fetch(u, { cache: "no-store" });
@@ -9989,7 +9989,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
 
     function isOverYAxis(clientX){
       const r = box.getBoundingClientRect();
-      return clientX >= (r.right - 95) && clientX <= r.right;
+      return clientX >= (r.right - 95) && clientX < (r.right - 24);
     }
 
     function getCurrentYBounds(){
@@ -10002,7 +10002,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
 
     function setYBounds(newMin, newMax){
       if(typeof chart === "undefined" || !chart) return;
-      if(!(newMax > newMin)) return;
+      newMin = Math.max(0.01, newMin); if(!(newMax > newMin)) newMax = newMin + 0.05;
       chart.setOption({ yAxis: [{ min: +newMin.toFixed(3), max: +newMax.toFixed(3) }] });
     }
 
