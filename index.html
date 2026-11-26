@@ -1171,11 +1171,11 @@ window.__CH_GET_INIT_X_ZOOM = function(bougies){
   if(!a || !Array.isArray(bougies) || bougies.length < 3) return { start: 0, end: 100 };
   let s = a.pctStart, e = a.pctEnd;
   if(a.dateStart && a.dateEnd){
-    const d1 = a.dateStart.slice(0, 10), d2 = a.dateEnd.slice(0, 10);
-    let i1 = bougies.findIndex(b => (b.date_deb_iso || b.cle || "").slice(0, 10) >= d1);
+    const d1 = a.dateStart.slice(0, 16), d2 = a.dateEnd.slice(0, 16);
+    let i1 = bougies.findIndex(b => (b.date_deb_iso || b.cle || "").slice(0, 16) >= d1);
     let i2 = -1;
     for(let k = bougies.length - 1; k >= 0; k--){
-      if((bougies.at(k).date_fin_iso || bougies.at(k).cle || "").slice(0, 10) <= d2){ i2 = k; break; }
+      if((bougies.at(k).date_fin_iso || bougies.at(k).cle || "").slice(0, 16) <= d2){ i2 = k; break; }
     }
     if(i1 >= 0 && i2 >= i1){
       const minCandles = Math.min(bougies.length, 6);
@@ -7598,7 +7598,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
         const futLabels = generateFutureCategoryLabels(lastLbl, extra, granVal);
         const extData = x0.data.concat(futLabels);
 
-        const newYSliderId = "zoomY_slider_" + (currentExpandMode || "AUTO"); const dzPatch = Array.isArray(opt.dataZoom) ? opt.dataZoom.map(d => (d && ((d.id && d.id.startsWith("zoomY_slider")) || d.yAxisIndex === 0 && d.type === "slider")) ? { id: newYSliderId, type: "slider", orient: "vertical", yAxisIndex: 0, top: 42, height: Math.max(260, (document.getElementById("chart-container")?.clientHeight || 520) - 92), right: 4, width: 16, borderColor: "#64748B", fillerColor: "rgba(56,189,248,0.22)", handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false, start: 0, end: 100 } : (d && d.id === "zoomY_inside" ? { start: 0, end: 100 } : {})) : undefined;
+        const newYSliderId = "zoomY_slider_" + (currentExpandMode || "AUTO"); const dzPatch = Array.isArray(opt.dataZoom) ? opt.dataZoom.map(d => (d && ((d.id && d.id.startsWith("zoomY_slider")) || d.yAxisIndex === 0 && d.type === "slider")) ? { id: newYSliderId, type: "slider", orient: "vertical", yAxisIndex: 0, top: 42, height: Math.max(260, (document.getElementById("chart-container")?.clientHeight || 520) - 92), right: 4, width: 16, borderColor: "#64748B", fillerColor: "rgba(56,189,248,0.22)", handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false, ...(window.__CH_GET_INIT_Y_ZOOM(globalData?.bougies)) } : (d && d.id === "zoomY_inside" ? window.__CH_GET_INIT_Y_ZOOM(globalData?.bougies) : {})) : undefined;
 
         chart.setOption({
           xAxis: [{ data: extData, max: extData.length - 1 }],
@@ -7606,7 +7606,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
           ...(dzPatch ? { dataZoom: dzPatch } : {})
         });
       } else {
-        const newYSliderId2 = "zoomY_slider_" + (currentExpandMode || "AUTO"); const dzYReset = Array.isArray(opt.dataZoom) ? opt.dataZoom.map(d => (d && ((d.id && d.id.startsWith("zoomY_slider")) || d.yAxisIndex === 0 && d.type === "slider")) ? { id: newYSliderId2, type: "slider", orient: "vertical", yAxisIndex: 0, top: 42, height: Math.max(260, (document.getElementById("chart-container")?.clientHeight || 520) - 92), right: 4, width: 16, borderColor: "#64748B", fillerColor: "rgba(56,189,248,0.22)", handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false, start: 0, end: 100 } : (d && d.id === "zoomY_inside" ? { start: 0, end: 100 } : {})) : undefined; chart.setOption({ yAxis: yPatch, ...(dzYReset ? { dataZoom: dzYReset } : {}) });
+        const newYSliderId2 = "zoomY_slider_" + (currentExpandMode || "AUTO"); const dzYReset = Array.isArray(opt.dataZoom) ? opt.dataZoom.map(d => (d && ((d.id && d.id.startsWith("zoomY_slider")) || d.yAxisIndex === 0 && d.type === "slider")) ? { id: newYSliderId2, type: "slider", orient: "vertical", yAxisIndex: 0, top: 42, height: Math.max(260, (document.getElementById("chart-container")?.clientHeight || 520) - 92), right: 4, width: 16, borderColor: "#64748B", fillerColor: "rgba(56,189,248,0.22)", handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false, ...(window.__CH_GET_INIT_Y_ZOOM(globalData?.bougies)) } : (d && d.id === "zoomY_inside" ? window.__CH_GET_INIT_Y_ZOOM(globalData?.bougies) : {})) : undefined; chart.setOption({ yAxis: yPatch, ...(dzYReset ? { dataZoom: dzYReset } : {}) });
       }
 
       setTimeout(() => { ["zoomY_inside", "zoomY_slider"].forEach(zId => { try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: 0, end: 100, startValue: null, endValue: null }); } catch(e){} }); }, 50); if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
