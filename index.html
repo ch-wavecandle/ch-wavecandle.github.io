@@ -10237,5 +10237,105 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
   setInterval(hookContinuousZoom, 600);
 })();
 </script></script></script>
+<script id="ch-live-closed-guard">
+(function(){
+  function getTunisMarketState(){
+    const now = new Date();
+    const tn = new Date(now.toLocaleString("en-US", { timeZone: "Africa/Tunis" }));
+    const day = tn.getDay();
+    const mins = tn.getHours() * 60 + tn.getMinutes();
+    const isWeekend = (day === 0 || day === 6);
+    const isNightBeforeOpen = (mins >= 0 && mins < 510); // 00:00 -> 08:30
+    const isAfterClose = (mins >= 900); // >= 15:00
+    const isClosed = isWeekend || isNightBeforeOpen || isAfterClose;
+    let reason = "";
+    if(isWeekend) reason = "Week-end — Réouverture Lundi à 08:30 (début des opérations à 09:00)";
+    else if(isNightBeforeOpen) reason = "Pré-ouverture BVMT à 08:30 • Début des opérations à 09:00 (heure de Tunis)";
+    else if(isAfterClose) reason = "Séance clôturée • Prochaine ouverture BVMT à 08:30 (opérations à 09:00)";
+    return { isClosed, isNightBeforeOpen, isWeekend, reason, tn };
+  }
+
+  function showLiveMarketClosedCard(reason){
+    const container = document.getElementById("chart-container");
+    if(!container) return;
+    if(typeof timerSimulLive !== "undefined" && timerSimulLive){ clearInterval(timerSimulLive); timerSimulLive = null; }
+    if(typeof chart !== "undefined" && chart){
+      try { chart.clear(); } catch(e){}
+    }
+    let overlay = document.getElementById("ch-live-closed-overlay");
+    if(!overlay){
+      overlay = document.createElement("div");
+      overlay.id = "ch-live-closed-overlay";
+      overlay.style.cssText = "position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(248,250,252,0.96);z-index:25;padding:16px;";
+      if(getComputedStyle(container).position === "static") container.style.position = "relative";
+      container.appendChild(overlay);
+    }
+    overlay.style.display = "flex";
+    overlay.innerHTML = `
+      <div style="max-width:460px;width:100%;background:#ffffff;border:1px solid #cbd5e1;border-radius:14px;padding:22px 24px;text-align:center;box-shadow:0 10px 28px rgba(15,23,42,0.08);font-family:Inter,system-ui,sans-serif;">
+        <div style="display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border-radius:999px;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;font-size:12px;font-weight:700;letter-spacing:.4px;margin-bottom:12px;">
+          <span style="width:8px;height:8px;border-radius:50%;background:#dc2626;display:inline-block;"></span>
+          MARCHÉ FERMÉ
+        </div>
+        <div style="font-size:18px;font-weight:800;color:#0f172a;margin-bottom:6px;">Bourse des Valeurs Mobilières de Tunis</div>
+        <div style="font-size:13px;color:#475569;line-height:1.5;margin-bottom:14px;">${reason}</div>
+        <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;font-size:12px;color:#334155;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 12px;">
+          <span>Ouverture : <b>08:30</b></span>
+          <span>•</span>
+          <span>Négociations : <b>09:00 – 14:10</b></span>
+        </div>
+      </div>
+    `;
+    const st = document.getElementById("statusText");
+    if(st) st.innerText = "MARCHÉ FERMÉ — Ouverture BVMT à 08:30 (opérations à 09:00)";
+  }
+
+  function hideLiveMarketClosedCard(){
+    const overlay = document.getElementById("ch-live-closed-overlay");
+    if(overlay) overlay.style.display = "none";
+  }
+
+  function checkLiveGuard(){
+    const selH = document.getElementById("selHorizon");
+    const hVal = selH ? selH.value : "";
+    if(hVal !== "LIVE"){
+      hideLiveMarketClosedCard();
+      return;
+    }
+    const st = getTunisMarketState();
+    if(st.isClosed){
+      showLiveMarketClosedCard(st.reason);
+    } else {
+      hideLiveMarketClosedCard();
+    }
+  }
+
+  const selH = document.getElementById("selHorizon");
+  if(selH && !selH.dataset.liveGuardBound){
+    selH.dataset.liveGuardBound = "1";
+    selH.addEventListener("change", () => {
+      window.__CH_SAVED_PERIOD_ZOOM = null;
+      setTimeout(checkLiveGuard, 20);
+    });
+  }
+
+  if(typeof window.rafraichirFluxLive === "function" && !window.rafraichirFluxLive.__chClosedGuarded){
+    const origLive = window.rafraichirFluxLive;
+    window.rafraichirFluxLive = async function(){
+      const st = getTunisMarketState();
+      if(st.isClosed){
+        showLiveMarketClosedCard(st.reason);
+        return;
+      }
+      hideLiveMarketClosedCard();
+      return origLive.apply(this, arguments);
+    };
+    window.rafraichirFluxLive.__chClosedGuarded = true;
+  }
+
+  window.addEventListener("load", () => setTimeout(checkLiveGuard, 150));
+  setInterval(checkLiveGuard, 2000);
+})();
+</script>
 </body>
 </html>
