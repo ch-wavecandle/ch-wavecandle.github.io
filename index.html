@@ -10185,27 +10185,15 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     }
 
     let priceMin = 0, priceMax = 0;
-    const ya = opt && Array.isArray(opt.yAxis) ? opt.yAxis.at(0) : null;
-    let curAxisMin = (ya && typeof ya.min === "number") ? ya.min : Infinity;
-    let curAxisMax = (ya && typeof ya.max === "number") ? ya.max : -Infinity;
-    if(!(curAxisMax > curAxisMin) && bougies.length > 0){
-      for(const b of bougies){
-        const lo = Number(b.low ?? b.min ?? b.close ?? b.prix_fin);
-        const hi = Number(b.high ?? b.max ?? b.close ?? b.prix_fin);
-        if(lo > 0 && lo < curAxisMin) curAxisMin = lo;
-        if(hi > 0 && hi > curAxisMax) curAxisMax = hi;
+    try {
+      const hPx = chart.getHeight() || 500;
+      const pTop = chart.convertFromPixel({ seriesIndex: 0 }, [120, 42]);
+      const pBot = chart.convertFromPixel({ seriesIndex: 0 }, new Array(120, hPx - 48));
+      if(Array.isArray(pTop) && Array.isArray(pBot) && Number.isFinite(pTop.at(1)) && Number.isFinite(pBot.at(1)) && pTop.at(1) > pBot.at(1)){
+        priceMin = Math.max(0.01, pBot.at(1));
+        priceMax = pTop.at(1);
       }
-      if(curAxisMax > curAxisMin){
-        const pad = Math.max(0.02, (curAxisMax - curAxisMin) * 0.08);
-        curAxisMin = Math.max(0.01, curAxisMin - pad);
-        curAxisMax = curAxisMax + pad;
-      }
-    }
-    if(curAxisMax > curAxisMin){
-      const span = curAxisMax - curAxisMin;
-      priceMin = curAxisMin + (sy / 100) * span;
-      priceMax = curAxisMin + (ey / 100) * span;
-    }
+    } catch(e){}
 
     window.__CH_SAVED_PERIOD_ZOOM = {
       dateStart: dStart,
@@ -10282,7 +10270,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
         <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;font-size:12px;color:#334155;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 12px;">
           <span>Ouverture : <b>08:30</b></span>
           <span>•</span>
-          <span>Négociations : <b>09:00 – 14:10</b></span>
+          <span>Négociations : <b>09:00 – 14:20</b></span>
         </div>
       </div>
     `;
