@@ -1511,8 +1511,8 @@ body.theme-clair #chHudOrientBtn {
   <select id="selGranularite" style="display:none;">
     <option value="JOUR">Bougie : Journée</option>
     <option value="HEURE">Bougie : Heure</option>
-    <option value="15M">Bougie : 15 Minutes</option>
-    <option value="SEMAINE">Bougie : Semaine</option>
+    <option value="5M">Bougie : 05 Minutes</option><option value="10M">Bougie : 10 Minutes</option><option value="15M">Bougie : 15 Minutes</option><option value="30M">Bougie : 30 Minutes</option>
+    <option value="SEMAINE">Bougie : Semaine</option><option value="MOIS">Bougie : Mois</option><option value="TRIMESTRE">Bougie : Trimestre</option><option value="SEMESTRE">Bougie : Semestre</option><option value="ANNEE">Bougie : Année</option>
     <option value="MOIS">Bougie : Mois</option>
   </select>
   <select id="selCadenceLive" style="display:none;">
@@ -2928,7 +2928,7 @@ async function chargerMultiSeances() {
       if (modeBlocM === 'BLOCS_SEULS' && !estBlocM) continue;
       const ph = op.heure.split(':'), hh = parseInt(ph[0]||"9",10), mm = parseInt(ph[1]||"0",10);
       let cle = s.date_iso, label = s.date_fr.slice(0, 5);
-      if (gran === '15M') { const tm = Math.floor(mm/15)*15; cle = `${s.date_iso} ${String(hh).padStart(2,'0')}:${String(tm).padStart(2,'0')}`; label = `${s.date_fr.slice(0,5)} ${String(hh).padStart(2,'0')}:${String(tm).padStart(2,'0')}`; }
+      if (gran === '5M' || gran === '10M' || gran === '15M' || gran === '30M') { const stepM = parseInt(gran, 10) || 15; const tm = Math.floor(mm/stepM)*stepM; cle = `${s.date_iso} ${String(hh).padStart(2,'0')}:${String(tm).padStart(2,'0')}`; label = `${s.date_fr.slice(0,5)} ${String(hh).padStart(2,'0')}:${String(tm).padStart(2,'0')}`; }
       else if (gran === 'HEURE') { cle = `${s.date_iso} ${String(hh).padStart(2,'0')}:00`; label = `${s.date_fr.slice(0,5)} ${String(hh).padStart(2,'0')}h`; }
       else if (gran === 'SEMAINE') { const numSem = Math.floor((dt.getDate()-1)/7)+1; cle = `${s.date_iso.slice(0,7)}-S${numSem}`; label = `S${numSem} ${moisAnnee}`; }
       else if (gran === 'MOIS') { cle = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}`; label = `${String(dt.getMonth()+1).padStart(2,'0')}/${dt.getFullYear()}`; }
