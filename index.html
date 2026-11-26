@@ -10186,10 +10186,25 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
 
     let priceMin = 0, priceMax = 0;
     const ya = opt && Array.isArray(opt.yAxis) ? opt.yAxis.at(0) : null;
-    if(ya && typeof ya.min === "number" && typeof ya.max === "number" && ya.max > ya.min){
-      const span = ya.max - ya.min;
-      priceMin = ya.min + (sy / 100) * span;
-      priceMax = ya.min + (ey / 100) * span;
+    let curAxisMin = (ya && typeof ya.min === "number") ? ya.min : Infinity;
+    let curAxisMax = (ya && typeof ya.max === "number") ? ya.max : -Infinity;
+    if(!(curAxisMax > curAxisMin) && bougies.length > 0){
+      for(const b of bougies){
+        const lo = Number(b.low ?? b.min ?? b.close ?? b.prix_fin);
+        const hi = Number(b.high ?? b.max ?? b.close ?? b.prix_fin);
+        if(lo > 0 && lo < curAxisMin) curAxisMin = lo;
+        if(hi > 0 && hi > curAxisMax) curAxisMax = hi;
+      }
+      if(curAxisMax > curAxisMin){
+        const pad = Math.max(0.02, (curAxisMax - curAxisMin) * 0.08);
+        curAxisMin = Math.max(0.01, curAxisMin - pad);
+        curAxisMax = curAxisMax + pad;
+      }
+    }
+    if(curAxisMax > curAxisMin){
+      const span = curAxisMax - curAxisMin;
+      priceMin = curAxisMin + (sy / 100) * span;
+      priceMax = curAxisMin + (ey / 100) * span;
     }
 
     window.__CH_SAVED_PERIOD_ZOOM = {
