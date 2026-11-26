@@ -1168,7 +1168,7 @@ body.theme-clair #chHudOrientBtn {
 <script id="ch-sync-zoom-and-logos">
 window.__CH_GET_INIT_X_ZOOM = function(bougies){
   const a = window.__CH_SAVED_PERIOD_ZOOM;
-  if(!a || !Array.isArray(bougies) || bougies.length < 3) return { start: 0, end: 100 };
+  if(!a || !Array.isArray(bougies) || bougies.length < 3) return {};
   let s = a.pctStart, e = a.pctEnd;
   if(a.dateStart && a.dateEnd){
     const d1 = a.dateStart.slice(0, 16), d2 = a.dateEnd.slice(0, 16);
@@ -1201,7 +1201,7 @@ window.__CH_GET_INIT_X_ZOOM = function(bougies){
 
 window.__CH_GET_INIT_Y_ZOOM = function(bougies){
   const a = window.__CH_SAVED_PERIOD_ZOOM;
-  if(!a || !a.hasY || !Array.isArray(bougies) || bougies.length === 0) return { start: 0, end: 100 };
+  if(!a || !a.hasY || !Array.isArray(bougies) || bougies.length === 0) return {};
   let axisMin = Infinity, axisMax = -Infinity;
   for(const b of bougies){
     const lo = Number(b.low ?? b.min ?? b.close ?? b.prix_fin);
@@ -1209,7 +1209,7 @@ window.__CH_GET_INIT_Y_ZOOM = function(bougies){
     if(lo > 0 && lo < axisMin) axisMin = lo;
     if(hi > 0 && hi > axisMax) axisMax = hi;
   }
-  if(!(axisMax > axisMin)) return { start: 0, end: 100 };
+  if(!(axisMax > axisMin)) return {};
   const pad = Math.max(0.02, (axisMax - axisMin) * 0.08);
   axisMin = Math.max(0.01, axisMin - pad);
   axisMax = axisMax + pad;
@@ -1218,7 +1218,7 @@ window.__CH_GET_INIT_Y_ZOOM = function(bougies){
   let ye = ((a.priceMax - axisMin) / span) * 100;
   ys = Math.max(0, Math.min(95, ys));
   ye = Math.min(100, Math.max(ys + 5, ye));
-  if(ys <= 0.5 && ye >= 99.5) return { start: 0, end: 100 };
+  if(ys <= 0.5 && ye >= 99.5) return {};
   return { start: ys, end: ye };
 };</script>
 </head>
