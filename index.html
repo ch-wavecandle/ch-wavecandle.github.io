@@ -3152,7 +3152,7 @@ document.getElementById('btnDossierRacine').onclick = async () => {
     try { dirHandleLive = await rootHandle.getDirectoryHandle('Cache_Live'); } catch (e) { dirHandleLive = null; }
     ['btnDossierRacine','btnAutoSetup'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
     if (seancesLocales.length > 0) {
-      const _savedH = localStorage.getItem('ch_pref_horizon') || 'UNIQUE'; document.getElementById('selHorizon').value = _savedH; if (_savedH === 'MULTI') { chargerMultiSeances(); return; } if (_savedH === 'LIVE' && typeof demarrerModeLive === 'function') { demarrerModeLive(); return; }
+      const _savedH = 'LIVE'; document.getElementById('selHorizon').value = _savedH; if (_savedH === 'MULTI') { chargerMultiSeances(); return; } if (_savedH === 'LIVE' && typeof demarrerModeLive === 'function') { demarrerModeLive(); return; }
       chargerDonnees(seancesLocales.at(0).date_iso, "", false);
     }
   } catch (err) {
@@ -3670,7 +3670,7 @@ async function demarrageAutomatiqueHttp() {
 
     ['btnDossierRacine','btnAutoSetup'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
     if (seancesLocales.length > 0) {
-      const _savedH = localStorage.getItem('ch_pref_horizon') || 'UNIQUE'; document.getElementById('selHorizon').value = _savedH; if (_savedH === 'MULTI') { chargerMultiSeances(); return; } if (_savedH === 'LIVE' && typeof demarrerModeLive === 'function') { demarrerModeLive(); return; }
+      const _savedH = 'LIVE'; document.getElementById('selHorizon').value = _savedH; if (_savedH === 'MULTI') { chargerMultiSeances(); return; } if (_savedH === 'LIVE' && typeof demarrerModeLive === 'function') { demarrerModeLive(); return; }
       chargerDonnees(seancesLocales.at(0).date_iso, "", false);
     }
   } catch (e) { document.getElementById('statusText').style.color = '#FF3B3B'; document.getElementById('statusText').innerText = 'ERREUR AUTO : ' + e.message; }
@@ -10174,15 +10174,28 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     const ey = dzY && typeof dzY.end === "number" ? dzY.end : 100;
 
     let priceMin = 0, priceMax = 0;
-    try {
-      const hPx = chart.getHeight() || 500;
-      const pTop = chart.convertFromPixel({ seriesIndex: 0 }, new Array(120, 42));
-      const pBot = chart.convertFromPixel({ seriesIndex: 0 }, new Array(120, hPx - 48));
-      if(Array.isArray(pTop) && Array.isArray(pBot) && Number.isFinite(pTop.at(1)) && Number.isFinite(pBot.at(1)) && pTop.at(1) > pBot.at(1)){
-        priceMin = Math.max(0.01, pBot.at(1));
-        priceMax = pTop.at(1);
+    const ya = opt && Array.isArray(opt.yAxis) ? opt.yAxis.at(0) : null;
+    let curAxisMin = (ya && typeof ya.min === "number") ? ya.min : Infinity;
+    let curAxisMax = (ya && typeof ya.max === "number") ? ya.max : -Infinity;
+    const bList = Array.isArray(globalData.bougies) ? globalData.bougies : [];
+    if(!(curAxisMax > curAxisMin) && bList.length > 0){
+      for(const b of bList){
+        const lo = Number(b.low ?? b.min ?? b.close ?? b.prix_fin);
+        const hi = Number(b.high ?? b.max ?? b.close ?? b.prix_fin);
+        if(lo > 0 && lo < curAxisMin) curAxisMin = lo;
+        if(hi > 0 && hi > curAxisMax) curAxisMax = hi;
       }
-    } catch(e){}
+      if(curAxisMax > curAxisMin){
+        const pad = Math.max(0.02, (curAxisMax - curAxisMin) * 0.08);
+        curAxisMin = Math.max(0.01, curAxisMin - pad);
+        curAxisMax = curAxisMax + pad;
+      }
+    }
+    if(curAxisMax > curAxisMin){
+      const span = curAxisMax - curAxisMin;
+      priceMin = Math.max(0.01, curAxisMin + (sy / 100) * span);
+      priceMax = curAxisMin + (ey / 100) * span;
+    }
 
     const ya = opt && Array.isArray(opt.yAxis) ? opt.yAxis.at(0) : null;
     const hasExplicitY = (ya && typeof ya.min === "number" && typeof ya.max === "number");
