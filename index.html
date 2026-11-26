@@ -9603,7 +9603,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       const origMulti = window.dessinerChandeliersMulti;
       window.dessinerChandeliersMulti = function(){
         const res = origMulti.apply(this, arguments);
-        syncDessinsTimestamps(true); 
+        syncDessinsTimestamps(true); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); 
         setTimeout(() => { ["zoomY_inside", "zoomY_slider"].forEach(zId => { try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: 0, end: 100, startValue: null, endValue: null }); } catch(e){} }); }, 50); if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
         return res;
       };
@@ -9614,7 +9614,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       const origSingle = window.dessinerGraphique;
       window.dessinerGraphique = function(){
         const res = origSingle.apply(this, arguments);
-        syncDessinsTimestamps(true); 
+        syncDessinsTimestamps(true); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); 
         setTimeout(() => { ["zoomY_inside", "zoomY_slider"].forEach(zId => { try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: 0, end: 100, startValue: null, endValue: null }); } catch(e){} }); }, 50); if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
         return res;
       };
@@ -10156,6 +10156,11 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
 (function(){
   window.__CH_SAVED_PERIOD_ZOOM = null;
 
+  function getGridHeightPx(){
+    const h = (typeof chart !== "undefined" && chart) ? chart.getHeight() : 500;
+    return Math.max(180, h - 90);
+  }
+
   function recordUserZoom(){
     if(typeof chart === "undefined" || !chart || typeof globalData === "undefined" || !globalData) return;
     const opt = chart.getOption();
@@ -10168,8 +10173,22 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     const sy = dzY && typeof dzY.start === "number" ? dzY.start : 0;
     const ey = dzY && typeof dzY.end === "number" ? dzY.end : 100;
 
+    let priceMin = 0, priceMax = 0;
+    try {
+      const hPx = chart.getHeight() || 500;
+      const pTop = chart.convertFromPixel({ seriesIndex: 0 }, new Array(120, 42));
+      const pBot = chart.convertFromPixel({ seriesIndex: 0 }, new Array(120, hPx - 48));
+      if(Array.isArray(pTop) && Array.isArray(pBot) && Number.isFinite(pTop.at(1)) && Number.isFinite(pBot.at(1)) && pTop.at(1) > pBot.at(1)){
+        priceMin = Math.max(0.01, pBot.at(1));
+        priceMax = pTop.at(1);
+      }
+    } catch(e){}
+
+    const ya = opt && Array.isArray(opt.yAxis) ? opt.yAxis.at(0) : null;
+    const hasExplicitY = (ya && typeof ya.min === "number" && typeof ya.max === "number");
     const hasX = (sx > 0.5 || ex < 99.5);
-    const hasY = (sy > 0.5 || ey < 99.5);
+    const hasY = (sy > 0.5 || ey < 99.5 || hasExplicitY) && (priceMax > priceMin);
+
     if(!hasX && !hasY){
       window.__CH_SAVED_PERIOD_ZOOM = null;
       return;
@@ -10184,29 +10203,33 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
       dEnd = bougies.at(i2)?.date_fin_iso || bougies.at(i2)?.cle || "";
     }
 
-    let priceMin = 0, priceMax = 0;
-    try {
-      const hPx = chart.getHeight() || 500;
-      const pTop = chart.convertFromPixel({ seriesIndex: 0 }, [120, 42]);
-      const pBot = chart.convertFromPixel({ seriesIndex: 0 }, new Array(120, hPx - 48));
-      if(Array.isArray(pTop) && Array.isArray(pBot) && Number.isFinite(pTop.at(1)) && Number.isFinite(pBot.at(1)) && pTop.at(1) > pBot.at(1)){
-        priceMin = Math.max(0.01, pBot.at(1));
-        priceMax = pTop.at(1);
-      }
-    } catch(e){}
-
+    const gridH = getGridHeightPx();
+    const spanPrice = priceMax - priceMin;
     window.__CH_SAVED_PERIOD_ZOOM = {
       dateStart: dStart,
       dateEnd: dEnd,
       pctStart: sx,
       pctEnd: ex,
-      hasY: hasY && priceMax > priceMin,
+      hasY: hasY,
       priceMin: priceMin,
       priceMax: priceMax,
-      yPctStart: sy,
-      yPctEnd: ey
+      pxPerTnd: hasY && spanPrice > 0 ? (gridH / spanPrice) : 0,
+      centerPrice: hasY ? ((priceMin + priceMax) / 2) : 0
     };
   }
+
+  window.__CH_RESTORE_Y_PX_SCALE = function(){
+    const a = window.__CH_SAVED_PERIOD_ZOOM;
+    if(!a || !a.hasY || !(a.pxPerTnd > 0) || !(a.centerPrice > 0) || typeof chart === "undefined" || !chart) return;
+    const gridH = getGridHeightPx();
+    const targetSpan = gridH / a.pxPerTnd;
+    const halfSpan = targetSpan / 2;
+    const newMin = Math.max(0.01, +(a.centerPrice - halfSpan).toFixed(3));
+    const newMax = +(newMin + targetSpan).toFixed(3);
+    try {
+      chart.setOption({ yAxis: [{ min: newMin, max: newMax, scale: false }] });
+    } catch(e){}
+  };
 
   function hookContinuousZoom(){
     if(typeof chart !== "undefined" && chart && !chart.__chContZoomHooked){
@@ -10224,7 +10247,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
   hookContinuousZoom();
   setInterval(hookContinuousZoom, 600);
 })();
-</script></script></script>
+</script></script></script></script>
 <script id="ch-live-closed-guard">
 (function(){
   function getTunisMarketState(){
