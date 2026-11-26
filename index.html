@@ -9989,7 +9989,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     box.dataset.yHoverZoomBound = "1";
     const Y_AXIS_ZONE_PX = 92;
     let yDragActive = false, yDragStartY = 0, yDragStartRange = new Array(0, 100);
-    function isOverYAxis(clientX){ const r = box.getBoundingClientRect(); return clientX >= (r.right - Y_AXIS_ZONE_PX) && clientX < (r.right - 22); }
+    function isOverYAxis(clientX){ const r = box.getBoundingClientRect(); return clientX >= (r.right - 95) && clientX <= r.right; } function isOverYSliderHandle(clientX){ const r = box.getBoundingClientRect(); return clientX >= (r.right - 22) && clientX <= r.right; }
     function getYZoomRange(){
       if(typeof chart === "undefined" || !chart) return new Array(0, 100);
       const opt = chart.getOption(), dzList = (opt && opt.dataZoom) || [];
@@ -10019,7 +10019,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
       else if(box.style.cursor === "ns-resize") box.style.cursor = "";
     }, true);
     box.addEventListener("mousedown", (e) => {
-      if(e.button !== 0 || !isOverYAxis(e.clientX)) return;
+      if(e.button !== 0 || !isOverYAxis(e.clientX) || isOverYSliderHandle(e.clientX)) return;
       yDragActive = true; yDragStartY = e.clientY; yDragStartRange = getYZoomRange();
       e.stopPropagation(); e.preventDefault();
     }, true);
