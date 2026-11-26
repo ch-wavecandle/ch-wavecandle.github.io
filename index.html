@@ -2312,7 +2312,7 @@ function dessinerChandeliersMulti(data) { if (document.getElementById('selHorizo
       { id: 'zoomX_inside', type: 'inside', xAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: true, moveOnMouseMove: true },
       { id: 'zoomY_inside', type: 'inside', yAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: 'shift', moveOnMouseMove: 'shift' },
       { id: 'zoomX_slider', type: 'slider', xAxisIndex: 0, height: 18, bottom: 8, borderColor: '#333', fillerColor: 'rgba(0,229,255,0.15)' },
-      { id: 'zoomY_slider', type: 'slider', yAxisIndex: 0, top: 32, bottom: 26, right: 4, width: 16, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false }
+      { id: 'zoomY_slider', type: 'slider', orient: 'vertical', yAxisIndex: 0, top: 32, bottom: 26, right: 4, width: 16, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false }
     ],
     xAxis: {
       type: 'category', data: bougies.map(b => b.label),
@@ -2748,7 +2748,7 @@ function dessinerGraphique(data) { if (document.getElementById("selHorizon")?.va
       { id: 'zoomX_inside', type: 'inside', xAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: true, moveOnMouseMove: true, start: zoomXStart, end: zoomXEnd },
       { id: 'zoomY_inside', type: 'inside', yAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: 'shift', moveOnMouseMove: 'shift', start: zoomYStart, end: zoomYEnd },
       { id: 'zoomX_slider', type: 'slider', xAxisIndex: 0, height: 18, bottom: 8, borderColor: '#333', fillerColor: 'rgba(0,229,255,0.15)', start: zoomXStart, end: zoomXEnd },
-      { id: 'zoomY_slider', type: 'slider', yAxisIndex: 0, top: 32, bottom: 26, right: 4, width: 16, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false, start: zoomYStart, end: zoomYEnd }
+      { id: 'zoomY_slider', type: 'slider', orient: 'vertical', yAxisIndex: 0, top: 32, bottom: 26, right: 4, width: 16, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false, start: zoomYStart, end: zoomYEnd }
     ],
     xAxis: { type: 'value', min: 32400, max: 54000, interval: 3600, axisLine: { lineStyle: { color: '#333' } }, splitLine: { lineStyle: { color: '#1E1E1E' } }, axisLabel: { color: '#999', formatter: val => heureDepuisSec(val).slice(0,5) } },
     yAxis: { type: 'value', position: 'right', min: +(prixMin - margeY * 0.3).toFixed(2), max: +(prixMax + margeY).toFixed(2), axisLine: { lineStyle: { color: '#333' } }, splitLine: { lineStyle: { color: '#1E1E1E' } }, axisLabel: { color: '#999', formatter: val => val.toFixed(2) } },
@@ -7542,7 +7542,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
         const futLabels = generateFutureCategoryLabels(lastLbl, extra, granVal);
         const extData = x0.data.concat(futLabels);
 
-        const dzPatch = Array.isArray(opt.dataZoom) ? opt.dataZoom.map(d => (d && (d.id === "zoomY_inside" || d.id === "zoomY_slider" || d.yAxisIndex === 0)) ? { start: 0, end: 100, startValue: null, endValue: null } : {}) : undefined;
+        const dzPatch = Array.isArray(opt.dataZoom) ? opt.dataZoom.map(d => (d && (d.id === "zoomY_inside" || d.id === "zoomY_slider" || d.yAxisIndex === 0)) ? { start: 0, end: 100 } : {}) : undefined;
 
         chart.setOption({
           xAxis: [{ data: extData, max: extData.length - 1 }],
@@ -7550,7 +7550,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
           ...(dzPatch ? { dataZoom: dzPatch } : {})
         });
       } else {
-        const dzYReset = Array.isArray(opt.dataZoom) ? opt.dataZoom.map(d => (d && (d.id === "zoomY_inside" || d.id === "zoomY_slider" || d.yAxisIndex === 0)) ? { start: 0, end: 100, startValue: null, endValue: null } : {}) : undefined; chart.setOption({ yAxis: yPatch, ...(dzYReset ? { dataZoom: dzYReset } : {}) });
+        const dzYReset = Array.isArray(opt.dataZoom) ? opt.dataZoom.map(d => (d && (d.id === "zoomY_inside" || d.id === "zoomY_slider" || d.yAxisIndex === 0)) ? { start: 0, end: 100 } : {}) : undefined; chart.setOption({ yAxis: yPatch, ...(dzYReset ? { dataZoom: dzYReset } : {}) });
       }
 
       ["zoomY_inside", "zoomY_slider"].forEach(zId => { try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: 0, end: 100 }); } catch(e){} }); if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
@@ -10034,75 +10034,67 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
 })();</script>
 <script id="ch-yaxis-guard-detector">
 (function(){
+  function logAxisDiag(msg){
+    try {
+      if(typeof window.logDiagError === "function") window.logDiagError("AXIS_Y_ERR", msg);
+      else if(typeof window.enregistrerErreurDiag === "function") window.enregistrerErreurDiag("AXIS_Y_ERR", msg);
+      else console.warn("[AXIS_Y_ERR]", msg);
+    } catch(e){}
+  }
+
   function installYAxisDetector(){
     if(typeof chart === "undefined" || !chart || chart.__chYGuardInstalled) return;
     chart.__chYGuardInstalled = true;
+    let lock = false;
 
-    let guardLock = false;
-
-    function enforcePositiveYAndSlider(){
-      if(guardLock || typeof chart === "undefined" || !chart) return;
+    function auditYAxis(fromExpandChange){
+      if(lock || typeof chart === "undefined" || !chart) return;
       const opt = chart.getOption();
       if(!opt || !Array.isArray(opt.yAxis) || !opt.yAxis.at(0)) return;
       const y0 = opt.yAxis.at(0);
       const dzList = Array.isArray(opt.dataZoom) ? opt.dataZoom : [];
-      const dzY = dzList.find(d => d && (d.id === "zoomY_slider" || d.id === "zoomY_inside" || d.yAxisIndex === 0));
+      const dzY = dzList.find(d => d && (d.id === "zoomY_slider" || d.id === "zoomY_inside"));
 
-      let needFix = false;
       let nextMin = typeof y0.min === "number" ? y0.min : null;
       let nextMax = typeof y0.max === "number" ? y0.max : null;
 
       if(nextMin !== null && nextMin < 0.01){
+        logAxisDiag("Borne Y négative détectée (" + nextMin + " TND) -> recalibrée à 0.01 TND");
         nextMin = 0.01;
         if(nextMax !== null && nextMax <= nextMin) nextMax = nextMin + 0.05;
-        needFix = true;
+        lock = true;
+        try { chart.setOption({ yAxis: [{ min: +nextMin.toFixed(3), ...(nextMax !== null ? { max: +nextMax.toFixed(3) } : {}) }] }); } finally { lock = false; }
       }
 
-      if(dzY && nextMin !== null && nextMax !== null && nextMax > nextMin){
+      if(dzY){
         const sPct = typeof dzY.start === "number" ? dzY.start : 0;
         const ePct = typeof dzY.end === "number" ? dzY.end : 100;
-        const visibleMin = nextMin + (sPct / 100) * (nextMax - nextMin);
-        if(visibleMin < 0.01){
-          const minSafePct = Math.min(95, Math.max(0, ((0.01 - nextMin) / (nextMax - nextMin)) * 100));
-          guardLock = true;
+        if(fromExpandChange && (sPct > 1 || ePct < 99)){
+          logAxisDiag("Curseur Y désynchronisé (" + sPct.toFixed(0) + "%-" + ePct.toFixed(0) + "%) après changement d'échelle -> recalibré à 0%-100%");
+          lock = true;
           try {
             ["zoomY_inside", "zoomY_slider"].forEach(zId => {
-              chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: minSafePct, end: Math.max(minSafePct + 5, ePct) });
+              chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: 0, end: 100 });
             });
-          } finally { guardLock = false; }
+          } finally { lock = false; }
         }
-      }
-
-      if(needFix){
-        guardLock = true;
-        try {
-          chart.setOption({ yAxis: [{ min: +nextMin.toFixed(3), ...(nextMax !== null ? { max: +nextMax.toFixed(3) } : {}) }] });
-        } finally { guardLock = false; }
       }
     }
 
-    chart.on("datazoom", enforcePositiveYAndSlider);
-    chart.on("finished", enforcePositiveYAndSlider);
+    chart.on("datazoom", () => auditYAxis(false));
+    chart.on("finished", () => auditYAxis(false));
 
     const selExp = document.getElementById("selExpandAxes");
     if(selExp && !selExp.dataset.yGuardHook){
       selExp.dataset.yGuardHook = "1";
       selExp.addEventListener("change", () => {
-        setTimeout(() => {
-          if(typeof chart !== "undefined" && chart){
-            ["zoomY_inside", "zoomY_slider"].forEach(zId => {
-              try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: 0, end: 100 }); } catch(e){}
-            });
-            enforcePositiveYAndSlider();
-          }
-        }, 40);
+        setTimeout(() => auditYAxis(true), 60);
       });
     }
   }
 
   installYAxisDetector();
   setInterval(installYAxisDetector, 800);
-})();
-</script>
+})();</script>
 </body>
 </html>
