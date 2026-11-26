@@ -3001,7 +3001,7 @@ async function chargerMultiSeances() {
       else { b.qte_neu += op.qte; b.montant_neu += op.qte * op.prix; qN += op.qte; vN += op.qte * op.prix; }
     }
   }
-  const bougies = ordre.map(k => { const b = buckets[k]; b.cmp = b.vol_tot > 0 ? b.montant_tot / b.vol_tot : b.close; return b; });
+  const bougies = ordre.map(k => { const b = buckets[k]; b.cmp = b.vol_tot > 0 ? b.montant_tot / b.vol_tot : b.close; return b; }).filter(b => b && b.cle && !String(b.cle).includes('NaN') && Number.isFinite(b.open) && Number.isFinite(b.high) && Number.isFinite(b.low) && Number.isFinite(b.close) && b.open > 0 && b.close > 0);
   const vTot = qA + qV + qN, mTot = vA + vV + vN;
   globalData = { ticker, granularite: gran, date_deb_fr: asc[0].date_fr, date_fin_fr: asc[asc.length - 1].date_fr, bougies, stats: { dernier: bougies.length ? bougies[bougies.length - 1].close : 0, volume: vTot, nb_ticks: bougies.reduce((a, x) => a + x.nb_ticks, 0), cmp: vTot > 0 ? mTot / vTot : 0, qte_ach: qA, cmp_ach: qA > 0 ? vA / qA : 0, qte_ven: qV, cmp_ven: qV > 0 ? vV / qV : 0, qte_neu: qN, cmp_neu: qN > 0 ? vN / qN : 0, ecart_qte: qA - qV, h_deb_derniere: bougies.length ? bougies[0].date_full : '--', h_fin_derniere: bougies.length ? bougies[bougies.length - 1].date_full : '--' } };
   chart.clear();
