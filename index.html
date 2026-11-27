@@ -5165,12 +5165,12 @@ window.__chInjecterIndicateurs = function() {
         yAxis: baseYAxes,
         dataZoom: (Array.isArray(opt.dataZoom) && opt.dataZoom.length > 0) ? opt.dataZoom.map(dz => (dz && dz.yAxisIndex !== undefined && dz.xAxisIndex === undefined) ? dz : { ...dz, xAxisIndex: new Array(0) }) : new Array({ type: "inside", xAxisIndex: new Array(0) }),
         series: extra
-  });
+  }, { replaceMerge: new Array("grid") });
     } else {
       chart.setOption({
         grid: new Array({ left: 45, right: 100, top: 32, bottom: 22 }),
         series: extra
-  });
+  }, { replaceMerge: new Array("grid") });
     }
     return;
   }
@@ -5269,7 +5269,7 @@ window.__chInjecterIndicateurs = function() {
     yAxis: yAxes,
     dataZoom: new Array({ id: "zoomX_inside", type: "inside", xAxisIndex: allXIdx, filterMode: "none", zoomOnMouseWheel: true, moveOnMouseMove: false }, { id: "zoomX_slider", type: "slider", xAxisIndex: allXIdx, filterMode: "none", left: 45, right: 100, bottom: 22, height: 12, showDetail: false }),
     series: extra
-  });
+  }, { replaceMerge: new Array("grid") });
 };
 
 document.addEventListener("click", (e) => {
