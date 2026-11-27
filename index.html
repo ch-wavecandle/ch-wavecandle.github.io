@@ -11451,16 +11451,41 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     }
   }
 
-  // Eviter le double titre central sur PC lorsque le cartouche haut-gauche est affiche
+  // Supprimer le titre central en haut du graphique sur PC (deja affiche dans le cartouche haut-gauche)
   function hideDuplicateCenterTitleOnDesktop(){
-    if(window.innerWidth <= 960 || typeof chart === "undefined" || !chart) return;
-    const wm = document.getElementById("ch-chart-ticker-watermark");
-    if(!wm || wm.style.display === "none") return;
+    if(window.innerWidth <= 960) return;
+    const curTk = getCurrentTickerKey();
+    // 1. Masquer tout element DOM d'en-tete central du graphique portant le nom de la valeur
+    const container = document.getElementById("chart-container");
+    if(container){
+      container.querySelectorAll("div, span").forEach(el => {
+        if(el.id === "ch-chart-ticker-watermark" || el.closest("#ch-chart-ticker-watermark")) return;
+        if(el.closest("#ch-hud-tools") || el.closest("#ch-zoom-telemetry-hud-box")) return;
+        const txt = (el.textContent || "").trim().toUpperCase();
+        if(curTk && txt === curTk && el.getBoundingClientRect().top < 140){
+          el.style.display = "none";
+        }
+      });
+    }
+    // 2. Masquer le titre ECharts (title) et tout element graphic central en haut
+    if(typeof chart === "undefined" || !chart) return;
     try {
       const opt = chart.getOption() || {};
       const titles = Array.isArray(opt.title) ? opt.title : (opt.title ? [opt.title] : []);
-      if(titles.some(t => t && t.show !== false && t.text)){
-        chart.setOption({ title: titles.map(() => ({ show: false })) });
+      if(titles.some(t => t && t.show !== false)){
+        chart.setOption({ title: titles.map(() => ({ show: false, text: "" })) });
+      }
+      const gList = Array.isArray(opt.graphic) ? opt.graphic : [];
+      const gHide = [];
+      for(const g of gList){
+        if(!g || !g.id || g.id === "grpAgressivitePie" || g.id === "pieTxtTop" || g.id === "pieTxtBot") continue;
+        const gTxt = JSON.stringify(g).toUpperCase();
+        if(curTk && gTxt.includes(curTk) && !g.invisible){
+          gHide.push({ id: g.id, invisible: true, $action: "merge" });
+        }
+      }
+      if(gHide.length > 0){
+        chart.setOption({ graphic: gHide });
       }
     } catch(e){}
   }
@@ -11472,6 +11497,102 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     monitorTickerAndSaveZoom();
     hideDuplicateCenterTitleOnDesktop();
   }, 250);
+})();
+</script>
+<script id="ch-autoheal-and-horizon-rendu">
+(function(){
+  const STORAGE_KEY = "ch_rendu_by_horizon_v1";
+
+  function loadRenduMap(){
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}") || {}; }
+    catch(e){ return {}; }
+  }
+  function saveRenduMap(map){
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(map)); } catch(e){}
+  }
+
+  let lastHorizon = "";
+  let emptySeriesStreak = 0;
+
+  // 1. Memoriser et restaurer le mode de rendu (Chandeliers 3D / Vagues / Jap.) par mode de seance (UNIQUE / LIVE / MULTI)
+  function syncRenduPerHorizon(){
+    const selH = document.getElementById("selHorizon");
+    const selR = document.getElementById("selModeRendu");
+    if(!selH || !selR) return;
+
+    if(!selR.dataset.horizonMemBound){
+      selR.dataset.horizonMemBound = "1";
+      selR.addEventListener("change", () => {
+        const h = selH.value || "LIVE";
+        const map = loadRenduMap();
+        map[h] = selR.value;
+        saveRenduMap(map);
+      });
+    }
+
+    const curH = selH.value || "LIVE";
+    if(curH !== lastHorizon){
+      lastHorizon = curH;
+      const map = loadRenduMap();
+      const savedRendu = map[curH];
+      if(savedRendu && Array.from(selR.options).some(o => o.value === savedRendu) && selR.value !== savedRendu){
+        selR.value = savedRendu;
+        selR.dispatchEvent(new Event("change", { bubbles: true }));
+      } else {
+        map[curH] = selR.value;
+        saveRenduMap(map);
+      }
+    }
+  }
+
+  // 2. Auto-reparation instantanee si le graphique perd ses series/axes apres une synchro asynchrone
+  function watchEmptyCanvasAndAutoRedraw(){
+    const closedOv = document.getElementById("ch-live-closed-overlay");
+    if(closedOv && closedOv.style.display !== "none"){ emptySeriesStreak = 0; return; }
+    if(typeof chart === "undefined" || !chart) return;
+    const hasData = (typeof globalData !== "undefined" && globalData && Array.isArray(globalData.bougies) && globalData.bougies.length > 0);
+    if(!hasData){ emptySeriesStreak = 0; return; }
+
+    try {
+      const opt = chart.getOption() || {};
+      const seriesArr = Array.isArray(opt.series) ? opt.series : [];
+      const xAxisArr = Array.isArray(opt.xAxis) ? opt.xAxis : [];
+      const hasMainSeries = seriesArr.some(s => s && s.type !== "pie" && Array.isArray(s.data) && s.data.length > 0);
+
+      if(!hasMainSeries || xAxisArr.length === 0){
+        emptySeriesStreak++;
+        if(emptySeriesStreak >= 2){
+          emptySeriesStreak = 0;
+          const h = document.getElementById("selHorizon")?.value || "LIVE";
+          if(h === "MULTI" && typeof dessinerChandeliersMulti === "function"){
+            dessinerChandeliersMulti(globalData);
+          } else if(typeof dessinerGraphique === "function"){
+            dessinerGraphique(globalData);
+          }
+        }
+      } else {
+        emptySeriesStreak = 0;
+      }
+    } catch(e){}
+  }
+
+  window.addEventListener("load", () => {
+    const selH = document.getElementById("selHorizon");
+    const selR = document.getElementById("selModeRendu");
+    if(selH && selR){
+      lastHorizon = selH.value || "LIVE";
+      const map = loadRenduMap();
+      if(map[lastHorizon] && Array.from(selR.options).some(o => o.value === map[lastHorizon]) && selR.value !== map[lastHorizon]){
+        selR.value = map[lastHorizon];
+        selR.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+    }
+  });
+
+  setInterval(() => {
+    syncRenduPerHorizon();
+    watchEmptyCanvasAndAutoRedraw();
+  }, 350);
 })();
 </script>
 </body>
