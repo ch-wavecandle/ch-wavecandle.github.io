@@ -10773,42 +10773,50 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
 })();
 </script>
 <style id="ch-mobile-pro-ui">
-@media screen and (max-width: 960px) {
-  body {
-    overflow-x: hidden !important;
+@media screen and (max-width: 960px) and (pointer: coarse), screen and (max-width: 768px) {
+  html, body {
+    width: 100% !important;
+    height: 100dvh !important;
+    overflow: hidden !important;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif !important;
   }
 
-  /* Barre superieure mobile compacte et sans chevauchement */
-  #ch-mobile-top-bar {
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 1200 !important;
-    height: 48px !important;
-    padding: 4px 8px !important;
+  /* 1. Barre superieure mobile ultra-nette (36px) */
+  #chMobControls {
+    top: calc(4px + env(safe-area-inset-top)) !important;
+    left: calc(6px + env(safe-area-inset-left)) !important;
+    right: calc(6px + env(safe-area-inset-right)) !important;
+    height: 36px !important;
     display: flex !important;
     align-items: center !important;
-    justify-content: space-between !important;
     gap: 6px !important;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.12) !important;
+    z-index: 100002 !important;
+    pointer-events: auto !important;
+  }
+  #chMobControls button {
+    height: 34px !important;
+    padding: 0 10px !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    border-radius: 8px !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+  #chMobControls select {
+    height: 34px !important;
+    font-size: 12.5px !important;
+    font-weight: 800 !important;
+    border-radius: 8px !important;
+    padding: 0 8px !important;
+    flex: 1 1 auto !important;
+    min-width: 110px !important;
+    max-width: 52vw !important;
   }
 
-  /* Correction de la case a cocher geante dans le tiroir mobile Autres */
-  #ch-menu-hud-item {
-    padding: 10px 12px !important;
-    gap: 10px !important;
-    justify-content: flex-start !important;
-  }
-  #ch-menu-hud-chk {
-    width: 18px !important;
-    height: 18px !important;
-    min-width: 18px !important;
-    max-width: 18px !important;
-    flex: 0 0 18px !important;
-    margin: 0 !important;
-  }
-
-  /* Ruban KPI horizontal tactile sans ecrasement ni chevauchement */
-  .kpi-bar, #kpiBar, [class*="kpi-container"], [class*="stats-bar"] {
+  /* 2. Ruban KPI horizontal fluide sous la barre du haut */
+  .ch-kpi-strip {
+    margin-top: calc(42px + env(safe-area-inset-top)) !important;
+    padding: 4px 8px !important;
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: nowrap !important;
@@ -10816,94 +10824,200 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     overflow-y: hidden !important;
     -webkit-overflow-scrolling: touch !important;
     gap: 6px !important;
-    padding: 5px 8px !important;
-    margin-top: 0 !important;
     scrollbar-width: none !important;
   }
-  .kpi-bar::-webkit-scrollbar, #kpiBar::-webkit-scrollbar {
-    display: none !important;
-  }
-  .kpi-bar > div, #kpiBar > div, .kpi-card {
+  .ch-kpi-strip::-webkit-scrollbar { display: none !important; }
+  .ch-kpi-strip > * {
     flex: 0 0 auto !important;
-    min-width: 112px !important;
-    padding: 5px 9px !important;
-    border-radius: 8px !important;
-  }
-  .kpi-bar > div .kpi-val, #kpiBar > div .kpi-val, .kpi-card strong {
-    font-size: 13px !important;
+    font-size: 11.5px !important;
+    padding: 4px 9px !important;
+    border-radius: 7px !important;
     white-space: nowrap !important;
   }
 
-  /* Barre de periodes (5m..1A) fluide au pouce */
-  #ch-period-bar, .period-bar, [id*="periodBar"] {
-    max-width: calc(100vw - 16px) !important;
+  /* 3. Barre de periodes (5m..1A) calibree loin de Plage + - */
+  #ch-period-bar, .period-bar {
+    max-width: calc(100vw - 148px) !important;
     overflow-x: auto !important;
     white-space: nowrap !important;
     -webkit-overflow-scrolling: touch !important;
-    padding: 3px 6px !important;
     scrollbar-width: none !important;
+    padding: 2px 4px !important;
   }
-  #ch-period-bar::-webkit-scrollbar {
-    display: none !important;
+  #ch-period-bar::-webkit-scrollbar { display: none !important; }
+  #ch-period-bar button, .period-bar button {
+    font-size: 11.5px !important;
+    padding: 4px 8px !important;
+    min-height: 28px !important;
   }
 
-  /* Cartouche Valeur + Logo compact sur mobile */
+  /* 4. Cartouche Valeur + Logo compact et lisible */
   #ch-chart-ticker-watermark {
-    padding: 3px 8px !important;
-    gap: 6px !important;
-    max-width: 62vw !important;
+    padding: 4px 8px !important;
+    gap: 7px !important;
+    border-radius: 8px !important;
+    max-width: 60vw !important;
   }
-  #ch-chart-ticker-watermark div:first-child {
-    font-size: 12.5px !important;
+  #ch-chart-ticker-watermark > div:last-child > div:first-child { font-size: 12.5px !important; }
+  #ch-chart-ticker-watermark > div:last-child > div:last-child { font-size: 9.5px !important; }
+
+  /* 5. Tiroir lateral Menu propre (Camembert + Case a cocher Detecteur) */
+  header button, div:has(> #selTicker) button {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    font-size: 13px !important;
+    min-height: 38px !important;
+    border-radius: 8px !important;
+  }
+  header input[type="checkbox"], div:has(> #selTicker) input[type="checkbox"], #ch-menu-hud-chk {
+    width: 18px !important;
+    height: 18px !important;
+    min-width: 18px !important;
+    max-width: 18px !important;
+    flex: 0 0 18px !important;
+    margin: 0 !important;
+  }
+  #ch-menu-hud-item {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 10px !important;
+    padding: 10px 12px !important;
+    font-size: 13px !important;
+    border-radius: 8px !important;
   }
 
-  /* Boite Outils mobile ergonomique au pouce */
-  #floatingTools, .floating-tools, #toolbox {
-    max-width: min(88vw, 310px) !important;
+  /* 6. Boite Outils (#ch-hud-tools) tactile moderne au pouce */
+  #ch-hud-tools {
+    max-width: min(92vw, 330px) !important;
     border-radius: 14px !important;
-    box-shadow: 0 12px 32px rgba(0,0,0,0.35) !important;
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.38) !important;
+    z-index: 99990 !important;
+    touch-action: manipulation !important;
   }
-  #floatingTools.ch-mob-collapsed, .floating-tools.ch-mob-collapsed, #toolbox.ch-mob-collapsed {
+  #ch-hud-tools select, #ch-hud-tools button {
+    min-height: 38px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    pointer-events: auto !important;
+    touch-action: manipulation !important;
+  }
+  #ch-hud-tools.ch-mob-tools-closed {
     width: auto !important;
     min-width: 0 !important;
     padding: 0 !important;
     top: auto !important;
-    bottom: 44px !important;
+    bottom: calc(36px + env(safe-area-inset-bottom)) !important;
     left: 10px !important;
     right: auto !important;
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
   }
-  #floatingTools.ch-mob-collapsed > *:not(#ch-mob-tools-fab) {
-    display: none !important;
-  }
-
-  /* Barre d'etat du bas epuree sur mobile */
-  .status-bar, #statusBar, footer {
-    font-size: 10.5px !important;
-    padding: 3px 8px !important;
-    overflow-x: auto !important;
-    white-space: nowrap !important;
-  }
+  #ch-hud-tools.ch-mob-tools-closed > *:not(#ch-mob-tools-fab) { display: none !important; }
 }
 </style>
-
 <script id="ch-mobile-pro-touch-engine">
 (function(){
-  function isMobileDevice(){
+  function isMobileViewport(){
     return window.innerWidth <= 960;
   }
 
-  // 1. Pilule tactile flottante "Outils" au pouce sur smartphone
-  function setupMobileToolsFab(){
-    if(!isMobileDevice()) return;
-    const box = document.getElementById("floatingTools") || document.querySelector(".floating-tools, #toolbox");
-    if(!box) return;
+  function unlockHudInteractiveControls(){
+    const hud = document.getElementById("ch-hud-tools");
+    if(!hud || hud.dataset.controlsUnlocked) return;
+    hud.dataset.controlsUnlocked = "1";
 
-    if(!box.dataset.mobInitDone){
-      box.dataset.mobInitDone = "1";
-      box.classList.add("ch-mob-collapsed");
+    hud.addEventListener("touchstart", function(e){
+      const t = e.target;
+      if(t && (t.tagName === "SELECT" || t.tagName === "OPTION" || t.tagName === "BUTTON" || t.tagName === "INPUT" || t.closest("select") || t.closest("button"))){
+        e.stopPropagation();
+      }
+    }, { capture: true, passive: true });
+
+    hud.addEventListener("mousedown", function(e){
+      const t = e.target;
+      if(t && (t.tagName === "SELECT" || t.tagName === "OPTION" || t.tagName === "BUTTON" || t.tagName === "INPUT" || t.closest("select") || t.closest("button"))){
+        e.stopPropagation();
+      }
+    }, { capture: true });
+
+    const selOutil = document.getElementById("selOutilDessin");
+    if(selOutil && !selOutil.dataset.mobAutoCollapse){
+      selOutil.dataset.mobAutoCollapse = "1";
+      selOutil.addEventListener("change", function(){
+        if(!isMobileViewport()) return;
+        const v = String(selOutil.value || "").toUpperCase();
+        const isDraw = v !== "" && v !== "NONE" && v !== "CURSEUR" && v !== "MAIN" && v !== "MAIN_LIBRE" && v !== "PAN";
+        if(isDraw){
+          setMobileToolsOpen(false);
+          updateMobileDrawBanner(selOutil.options[selOutil.selectedIndex]?.text || v);
+        } else {
+          updateMobileDrawBanner("");
+        }
+      });
+    }
+  }
+
+  function updateMobileDrawBanner(toolLabel){
+    let banner = document.getElementById("ch-mob-draw-banner");
+    if(!toolLabel){
+      if(banner) banner.style.display = "none";
+      return;
+    }
+    if(!banner){
+      banner = document.createElement("div");
+      banner.id = "ch-mob-draw-banner";
+      banner.style.cssText = "position:fixed;bottom:calc(36px + env(safe-area-inset-bottom));right:10px;z-index:99991;background:rgba(15,23,42,0.92);color:#38bdf8;border:1px solid #38bdf8;border-radius:999px;padding:7px 12px;font-size:11.5px;font-weight:700;display:flex;align-items:center;gap:8px;box-shadow:0 6px 18px rgba(0,0,0,0.35);";
+      document.body.appendChild(banner);
+    }
+    banner.style.display = "flex";
+    banner.innerHTML = `<span>✏️ ${toolLabel} : touchez & glissez</span><button type="button" id="ch-mob-exit-draw" style="background:#ef4444;color:#fff;border:none;border-radius:999px;padding:2px 8px;font-size:11px;font-weight:700;cursor:pointer;">Fin</button>`;
+    document.getElementById("ch-mob-exit-draw").onclick = () => {
+      const selOutil = document.getElementById("selOutilDessin");
+      if(selOutil){ selOutil.value = "NONE"; selOutil.dispatchEvent(new Event("change")); }
+      banner.style.display = "none";
+    };
+  }
+
+  function setMobileToolsOpen(open){
+    const hud = document.getElementById("ch-hud-tools");
+    const fab = document.getElementById("ch-mob-tools-fab");
+    if(!hud || !fab) return;
+    if(open){
+      hud.classList.remove("ch-mob-tools-closed");
+      hud.style.display = "flex";
+      hud.style.flexDirection = "column";
+      hud.style.top = "auto";
+      hud.style.bottom = "calc(38px + env(safe-area-inset-bottom))";
+      hud.style.left = "10px";
+      fab.innerHTML = "<span>✕ Fermer Outils</span>";
+      fab.style.background = "linear-gradient(135deg,#dc2626,#b91c1c)";
+      fab.style.marginBottom = "8px";
+    } else {
+      hud.classList.add("ch-mob-tools-closed");
+      fab.innerHTML = "<span>🛠 Outils & Tracés</span>";
+      fab.style.background = "linear-gradient(135deg,#0284c7,#0369a1)";
+      fab.style.marginBottom = "0";
+    }
+  }
+
+  function setupMobileToolsFab(){
+    const hud = document.getElementById("ch-hud-tools");
+    if(!hud) return;
+    if(!isMobileViewport()){
+      hud.classList.remove("ch-mob-tools-closed");
+      const fabOld = document.getElementById("ch-mob-tools-fab");
+      if(fabOld) fabOld.style.display = "none";
+      return;
+    }
+
+    if(!hud.dataset.mobFabInit){
+      hud.dataset.mobFabInit = "1";
+      hud.classList.add("ch-mob-tools-closed");
     }
 
     let fab = document.getElementById("ch-mob-tools-fab");
@@ -10911,36 +11025,25 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
       fab = document.createElement("button");
       fab.id = "ch-mob-tools-fab";
       fab.type = "button";
-      fab.style.cssText = "display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:999px;background:linear-gradient(135deg,#0284c7,#0369a1);color:#ffffff;border:1px solid rgba(255,255,255,0.28);font-family:Inter,system-ui,sans-serif;font-size:12.5px;font-weight:700;box-shadow:0 6px 18px rgba(2,132,199,0.45);cursor:pointer;";
+      fab.style.cssText = "display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 14px;border-radius:999px;background:linear-gradient(135deg,#0284c7,#0369a1);color:#ffffff;border:1px solid rgba(255,255,255,0.3);font-family:Inter,system-ui,sans-serif;font-size:12px;font-weight:700;box-shadow:0 6px 18px rgba(2,132,199,0.45);cursor:pointer;pointer-events:auto;";
       fab.innerHTML = "<span>🛠 Outils & Tracés</span>";
       fab.onclick = (e) => {
         e.stopPropagation();
-        const collapsed = box.classList.toggle("ch-mob-collapsed");
-        if(!collapsed){
-          box.style.top = "auto";
-          box.style.bottom = "46px";
-          box.style.left = "10px";
-          fab.innerHTML = "<span>✕ Fermer Outils</span>";
-          fab.style.background = "linear-gradient(135deg,#dc2626,#b91c1c)";
-          fab.style.marginBottom = "6px";
-        } else {
-          fab.innerHTML = "<span>🛠 Outils & Tracés</span>";
-          fab.style.background = "linear-gradient(135deg,#0284c7,#0369a1)";
-          fab.style.marginBottom = "0";
-        }
+        const isClosed = hud.classList.contains("ch-mob-tools-closed");
+        setMobileToolsOpen(isClosed);
       };
-      box.insertBefore(fab, box.firstChild);
+      hud.insertBefore(fab, hud.firstChild);
     }
+    fab.style.display = "inline-flex";
   }
 
-  // 2. Pont tactile universel (Dessiner au doigt avec n'importe quel outil sur smartphone/tablette)
   function installTouchDrawingBridge(){
     const container = document.getElementById("chart-container");
     if(!container || container.dataset.touchBridgeInstalled) return;
     container.dataset.touchBridgeInstalled = "1";
 
     function isDrawingToolSelected(){
-      const selTool = document.getElementById("selOutilDessin") || document.querySelector("select[id*='Outil'], select[id*='Tool']");
+      const selTool = document.getElementById("selOutilDessin");
       if(!selTool) return false;
       const v = String(selTool.value || "").toUpperCase();
       return v !== "" && v !== "NONE" && v !== "CURSEUR" && v !== "MAIN" && v !== "MAIN_LIBRE" && v !== "PAN";
@@ -10969,7 +11072,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
       if(isDrawingToolSelected()){
         activeTouchDrawing = true;
         e.preventDefault();
-        const t = e.touches[0];
+        const t = e.touches.item(0);
         const target = document.elementFromPoint(t.clientX, t.clientY) || container;
         dispatchSimulatedMouse("mousemove", t, target);
         dispatchSimulatedMouse("mousedown", t, target);
@@ -10979,7 +11082,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     container.addEventListener("touchmove", function(e){
       if(!activeTouchDrawing || e.touches.length !== 1) return;
       e.preventDefault();
-      const t = e.touches[0];
+      const t = e.touches.item(0);
       const target = document.elementFromPoint(t.clientX, t.clientY) || container;
       dispatchSimulatedMouse("mousemove", t, target);
     }, { passive: false });
@@ -10987,7 +11090,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     container.addEventListener("touchend", function(e){
       if(!activeTouchDrawing) return;
       activeTouchDrawing = false;
-      const t = e.changedTouches[0];
+      const t = e.changedTouches ? e.changedTouches.item(0) : null;
       const target = (t && document.elementFromPoint(t.clientX, t.clientY)) || container;
       dispatchSimulatedMouse("mouseup", t, target);
       dispatchSimulatedMouse("click", t, target);
@@ -10995,14 +11098,16 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
   }
 
   window.addEventListener("load", () => {
+    unlockHudInteractiveControls();
     setupMobileToolsFab();
     installTouchDrawingBridge();
   });
   window.addEventListener("resize", setupMobileToolsFab);
   setInterval(() => {
+    unlockHudInteractiveControls();
     setupMobileToolsFab();
     installTouchDrawingBridge();
-  }, 800);
+  }, 600);
 })();
 </script>
 </body>
