@@ -11405,5 +11405,74 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
   }, 500);
 })();
 </script>
+<script id="ch-per-ticker-zoom-memory">
+(function(){
+  window.__CH_ZOOM_BY_TICKER = window.__CH_ZOOM_BY_TICKER || {};
+  let lastActiveTicker = "";
+
+  function getCurrentTickerKey(){
+    const sel = document.getElementById("selTicker");
+    return sel && sel.value ? String(sel.value).trim().toUpperCase() : "";
+  }
+
+  function handleTickerSwitch(newTicker){
+    if(!newTicker) return;
+    if(lastActiveTicker && lastActiveTicker !== newTicker){
+      // Sauvegarder le zoom de l'ancienne valeur avant de basculer
+      window.__CH_ZOOM_BY_TICKER[lastActiveTicker] = window.__CH_SAVED_PERIOD_ZOOM
+        ? JSON.parse(JSON.stringify(window.__CH_SAVED_PERIOD_ZOOM))
+        : null;
+    }
+    lastActiveTicker = newTicker;
+
+    // Charger le zoom propre a la nouvelle valeur (ou null => reinitialisation 100%)
+    const savedForNew = window.__CH_ZOOM_BY_TICKER[newTicker] || null;
+    window.__CH_SAVED_PERIOD_ZOOM = savedForNew ? JSON.parse(JSON.stringify(savedForNew)) : null;
+
+    if(!window.__CH_SAVED_PERIOD_ZOOM && typeof chart !== "undefined" && chart){
+      try {
+        window.__CH_RESTORING_Y = true;
+        new Array("zoomX_inside", "zoomX_slider", "zoomY_inside", "zoomY_slider").forEach(zId => {
+          try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: 0, end: 100, startValue: null, endValue: null }); } catch(e){}
+        });
+        setTimeout(() => { window.__CH_RESTORING_Y = false; }, 160);
+      } catch(e){ window.__CH_RESTORING_Y = false; }
+    }
+  }
+
+  function monitorTickerAndSaveZoom(){
+    const curTk = getCurrentTickerKey();
+    if(curTk && curTk !== lastActiveTicker){
+      handleTickerSwitch(curTk);
+    } else if(curTk){
+      window.__CH_ZOOM_BY_TICKER[curTk] = window.__CH_SAVED_PERIOD_ZOOM
+        ? JSON.parse(JSON.stringify(window.__CH_SAVED_PERIOD_ZOOM))
+        : null;
+    }
+  }
+
+  // Eviter le double titre central sur PC lorsque le cartouche haut-gauche est affiche
+  function hideDuplicateCenterTitleOnDesktop(){
+    if(window.innerWidth <= 960 || typeof chart === "undefined" || !chart) return;
+    const wm = document.getElementById("ch-chart-ticker-watermark");
+    if(!wm || wm.style.display === "none") return;
+    try {
+      const opt = chart.getOption() || {};
+      const titles = Array.isArray(opt.title) ? opt.title : (opt.title ? [opt.title] : []);
+      if(titles.some(t => t && t.show !== false && t.text)){
+        chart.setOption({ title: titles.map(() => ({ show: false })) });
+      }
+    } catch(e){}
+  }
+
+  window.addEventListener("load", () => {
+    lastActiveTicker = getCurrentTickerKey();
+  });
+  setInterval(() => {
+    monitorTickerAndSaveZoom();
+    hideDuplicateCenterTitleOnDesktop();
+  }, 250);
+})();
+</script>
 </body>
 </html>
