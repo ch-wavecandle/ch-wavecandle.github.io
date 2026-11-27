@@ -6163,7 +6163,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     const match = Array.from(sel.options).find(o => targetRe.test((o.textContent || "") + " " + (o.value || "")));
     if(match){
       sel.value = match.value;
-      sel.dispatchEvent(new Event("change", { bubbles: true }));
+      window.__CH_MOB_SHEET_SELECTING = true; sel.dispatchEvent(new Event("change", { bubbles: true })); setTimeout(() => { window.__CH_MOB_SHEET_SELECTING = false; }, 80);
     }
     setTimeout(() => { if(typeof resumeAction === "function") resumeAction(); }, 200);
   }
@@ -6758,7 +6758,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     const info = ensureFreeHandOption();
     if(!info) return;
     info.sel.value = info.handOpt.value;
-    info.sel.dispatchEvent(new Event("change", { bubbles: true }));
+    info.window.__CH_MOB_SHEET_SELECTING = true; sel.dispatchEvent(new Event("change", { bubbles: true })); setTimeout(() => { window.__CH_MOB_SHEET_SELECTING = false; }, 80);
     isDrawingTool = false;
     clicksNeeded = 0;
     clicksDone = 0;
@@ -10051,7 +10051,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
   window.__CH_BAD_FAV = window.__CH_BAD_FAV || new Set(); function setImgWithFallback(img, ticker){ const u = getBvmtLogoUrls(ticker); img.src = u.fallback; if(window.__CH_BAD_FAV.has(u.primary)) return; const probe = new Image(); probe.onerror = function(){ window.__CH_BAD_FAV.add(u.primary); }; probe.onload = function(){ if(probe.naturalWidth > 16) img.src = u.primary; else window.__CH_BAD_FAV.add(u.primary); }; probe.src = u.primary; }
   window.getBvmtLogoUrls = getBvmtLogoUrls;
   function syncTickerLogos(){ const sel = document.getElementById("selTicker"); if(!sel) return; const tk = (sel.value || "DELICE HOLDING").trim().toUpperCase(); sel.style.setProperty("display", "none", "important"); let uBtn = document.getElementById("chUnifiedTickerBtn"); if(!uBtn){ uBtn = document.createElement("button"); uBtn.type = "button"; uBtn.id = "chUnifiedTickerBtn"; uBtn.style.cssText = "display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 10px 0 6px;border-radius:6px;border:1px solid rgba(148,163,184,0.38);font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap;"; uBtn.innerHTML = '<img id="chTopTickerLogo" class="ch-tk-logo-img" style="margin:0;" /><span id="chUnifiedTickerLbl"></span><span style="opacity:0.65;font-size:10px;margin-left:4px;">&#9662;</span>'; sel.parentElement.insertBefore(uBtn, sel); } const isDark = !document.body.classList.contains("theme-clair"); uBtn.style.background = isDark ? "rgba(15,23,42,0.88)" : "#FFFFFF"; uBtn.style.color = isDark ? "#F8FAFC" : "#0F172A"; const lblSpan = document.getElementById("chUnifiedTickerLbl"); if(lblSpan && lblSpan.textContent !== tk) lblSpan.textContent = tk; const topLogo = document.getElementById("chTopTickerLogo"); if(topLogo && topLogo.dataset.tk !== tk){ topLogo.dataset.tk = tk; setImgWithFallback(topLogo, tk); } const banner = document.getElementById("chChartTickerBanner"); if(banner){ if(!banner.dataset.logoObs){ banner.dataset.logoObs = "1"; new MutationObserver(() => syncTickerLogos()).observe(banner, { childList: true }); } let bLogo = banner.querySelector(".ch-tk-logo-img"); if(!bLogo){ bLogo = document.createElement("img"); bLogo.className = "ch-tk-logo-img"; banner.insertBefore(bLogo, banner.firstChild); } if(bLogo.dataset.tk !== tk){ bLogo.dataset.tk = tk; setImgWithFallback(bLogo, tk); } } }
-  function initVisualLogoDropdown(){ const sel = document.getElementById("selTicker"), topLogo = document.getElementById("chUnifiedTickerBtn") || document.getElementById("chTopTickerLogo"); if(!sel || !topLogo || document.getElementById("chLogoPickerDrop")) return; const drop = document.createElement("div"); drop.id = "chLogoPickerDrop"; drop.innerHTML = '<input id="chLogoPickerSearch" type="text" placeholder="Rechercher parmi les 77 valeurs BVMT..." /><div id="chLogoPickerList"></div>'; document.body.appendChild(drop); const inp = drop.querySelector("#chLogoPickerSearch"), listBox = drop.querySelector("#chLogoPickerList"); function renderItems(filter){ const q = (filter || "").trim().toUpperCase(), cur = (sel.value || "").trim().toUpperCase(); listBox.innerHTML = ""; Array.from(sel.options).forEach(opt => { const val = opt.value.trim().toUpperCase(); if(q && !val.includes(q)) return; const row = document.createElement("div"); row.className = "ch-lp-item" + (val === cur ? " active" : ""); const im = document.createElement("img"); im.className = "ch-tk-logo-img"; setImgWithFallback(im, val); const sp = document.createElement("span"); sp.textContent = opt.textContent || val; row.appendChild(im); row.appendChild(sp); row.onclick = () => { sel.value = opt.value; sel.dispatchEvent(new Event("change", { bubbles: true })); drop.style.display = "none"; syncTickerLogos(); }; listBox.appendChild(row); }); } topLogo.onclick = (e) => { e.stopPropagation(); if(drop.style.display === "flex"){ drop.style.display = "none"; return; } const r = topLogo.getBoundingClientRect(); drop.style.left = Math.max(8, r.left) + "px"; drop.style.top = (r.bottom + 6) + "px"; drop.style.display = "flex"; inp.value = ""; renderItems(""); setTimeout(() => inp.focus(), 30); }; inp.oninput = () => renderItems(inp.value); drop.onclick = (e) => e.stopPropagation(); document.addEventListener("click", () => { drop.style.display = "none"; }); }
+  function initVisualLogoDropdown(){ const sel = document.getElementById("selTicker"), topLogo = document.getElementById("chUnifiedTickerBtn") || document.getElementById("chTopTickerLogo"); if(!sel || !topLogo || document.getElementById("chLogoPickerDrop")) return; const drop = document.createElement("div"); drop.id = "chLogoPickerDrop"; drop.innerHTML = '<input id="chLogoPickerSearch" type="text" placeholder="Rechercher parmi les 77 valeurs BVMT..." /><div id="chLogoPickerList"></div>'; document.body.appendChild(drop); const inp = drop.querySelector("#chLogoPickerSearch"), listBox = drop.querySelector("#chLogoPickerList"); function renderItems(filter){ const q = (filter || "").trim().toUpperCase(), cur = (sel.value || "").trim().toUpperCase(); listBox.innerHTML = ""; Array.from(sel.options).forEach(opt => { const val = opt.value.trim().toUpperCase(); if(q && !val.includes(q)) return; const row = document.createElement("div"); row.className = "ch-lp-item" + (val === cur ? " active" : ""); const im = document.createElement("img"); im.className = "ch-tk-logo-img"; setImgWithFallback(im, val); const sp = document.createElement("span"); sp.textContent = opt.textContent || val; row.appendChild(im); row.appendChild(sp); row.onclick = () => { sel.value = opt.value; window.__CH_MOB_SHEET_SELECTING = true; sel.dispatchEvent(new Event("change", { bubbles: true })); setTimeout(() => { window.__CH_MOB_SHEET_SELECTING = false; }, 80); drop.style.display = "none"; syncTickerLogos(); }; listBox.appendChild(row); }); } topLogo.onclick = (e) => { e.stopPropagation(); if(drop.style.display === "flex"){ drop.style.display = "none"; return; } const r = topLogo.getBoundingClientRect(); drop.style.left = Math.max(8, r.left) + "px"; drop.style.top = (r.bottom + 6) + "px"; drop.style.display = "flex"; inp.value = ""; renderItems(""); setTimeout(() => inp.focus(), 30); }; inp.oninput = () => renderItems(inp.value); drop.onclick = (e) => e.stopPropagation(); document.addEventListener("click", () => { drop.style.display = "none"; }); }
   function bootLogos(){ syncTickerLogos(); initVisualLogoDropdown(); const sel = document.getElementById("selTicker"); if(sel && !sel.dataset.logoHooked){ sel.dataset.logoHooked = "1"; sel.addEventListener("change", syncTickerLogos); } }
   bootLogos(); window.addEventListener("load", bootLogos); setInterval(bootLogos, 700);
 })();</script>
@@ -10995,7 +10995,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
       btn.onclick = () => {
         sel.selectedIndex = i;
         sel.value = opt.value;
-        sel.dispatchEvent(new Event("change", { bubbles: true }));
+        window.__CH_MOB_SHEET_SELECTING = true; sel.dispatchEvent(new Event("change", { bubbles: true })); setTimeout(() => { window.__CH_MOB_SHEET_SELECTING = false; }, 80);
         sheetOverlay.remove();
       };
       list.appendChild(btn);
@@ -11501,7 +11501,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
 </script>
 <script id="ch-autoheal-and-horizon-rendu">
 (function(){
-  const STORAGE_KEY = "ch_rendu_by_horizon_v1";
+  const STORAGE_KEY = "ch_rendu_by_horizon_v2";
 
   function loadRenduMap(){
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}") || {}; }
@@ -11513,8 +11513,23 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
 
   let lastHorizon = "";
   let emptySeriesStreak = 0;
+  let applyingSavedRendu = false;
 
-  // 1. Memoriser et restaurer le mode de rendu (Chandeliers 3D / Vagues / Jap.) par mode de seance (UNIQUE / LIVE / MULTI)
+  function applySavedRenduForCurrentHorizon(){
+    const selH = document.getElementById("selHorizon");
+    const selR = document.getElementById("selModeRendu");
+    if(!selH || !selR) return;
+    const curH = selH.value || "LIVE";
+    const map = loadRenduMap();
+    const savedRendu = map[curH];
+    if(savedRendu && Array.from(selR.options).some(o => o.value === savedRendu) && selR.value !== savedRendu){
+      applyingSavedRendu = true;
+      selR.value = savedRendu;
+      selR.dispatchEvent(new Event("change", { bubbles: true }));
+      setTimeout(() => { applyingSavedRendu = false; }, 120);
+    }
+  }
+
   function syncRenduPerHorizon(){
     const selH = document.getElementById("selHorizon");
     const selR = document.getElementById("selModeRendu");
@@ -11522,30 +11537,32 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
 
     if(!selR.dataset.horizonMemBound){
       selR.dataset.horizonMemBound = "1";
-      selR.addEventListener("change", () => {
+      selR.addEventListener("change", (e) => {
+        if(applyingSavedRendu) return;
+        // N'enregistrer que les choix explicites (utilisateur PC ou Action-Sheet mobile), jamais les resets internes
+        if(e && e.isTrusted === false && !window.__CH_MOB_SHEET_SELECTING) return;
         const h = selH.value || "LIVE";
         const map = loadRenduMap();
         map[h] = selR.value;
         saveRenduMap(map);
       });
+
+      // Observer toute reconstruction des <option> de #selModeRendu lors d'un changement de mode de seance
+      const obs = new MutationObserver(() => {
+        applySavedRenduForCurrentHorizon();
+      });
+      obs.observe(selR, { childList: true });
     }
 
     const curH = selH.value || "LIVE";
     if(curH !== lastHorizon){
       lastHorizon = curH;
-      const map = loadRenduMap();
-      const savedRendu = map[curH];
-      if(savedRendu && Array.from(selR.options).some(o => o.value === savedRendu) && selR.value !== savedRendu){
-        selR.value = savedRendu;
-        selR.dispatchEvent(new Event("change", { bubbles: true }));
-      } else {
-        map[curH] = selR.value;
-        saveRenduMap(map);
-      }
+      applySavedRenduForCurrentHorizon();
+      setTimeout(applySavedRenduForCurrentHorizon, 80);
+      setTimeout(applySavedRenduForCurrentHorizon, 260);
     }
   }
 
-  // 2. Auto-reparation instantanee si le graphique perd ses series/axes apres une synchro asynchrone
   function watchEmptyCanvasAndAutoRedraw(){
     const closedOv = document.getElementById("ch-live-closed-overlay");
     if(closedOv && closedOv.style.display !== "none"){ emptySeriesStreak = 0; return; }
@@ -11578,21 +11595,15 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
 
   window.addEventListener("load", () => {
     const selH = document.getElementById("selHorizon");
-    const selR = document.getElementById("selModeRendu");
-    if(selH && selR){
-      lastHorizon = selH.value || "LIVE";
-      const map = loadRenduMap();
-      if(map[lastHorizon] && Array.from(selR.options).some(o => o.value === map[lastHorizon]) && selR.value !== map[lastHorizon]){
-        selR.value = map[lastHorizon];
-        selR.dispatchEvent(new Event("change", { bubbles: true }));
-      }
-    }
+    if(selH) lastHorizon = selH.value || "LIVE";
+    applySavedRenduForCurrentHorizon();
+    setTimeout(applySavedRenduForCurrentHorizon, 250);
   });
 
   setInterval(() => {
     syncRenduPerHorizon();
     watchEmptyCanvasAndAutoRedraw();
-  }, 350);
+  }, 300);
 })();
 </script>
 </body>
