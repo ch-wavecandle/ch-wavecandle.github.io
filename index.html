@@ -2381,7 +2381,7 @@ function dessinerChandeliersMulti(data) { if (document.getElementById('selHorizo
     backgroundColor: '#0A0A0A',
     animation: false,
     title: { show: false, id: 'titreCamembert', text: `${data.date_deb_fr || data.date_fr || ""} → ${data.date_fin_fr || data.date_fr || ""}`, left: pieAuto.pos[0], top: pieAuto.topTitle, textAlign: 'center', textStyle: { color: '#FFD700', fontSize: 11, fontFamily: 'Consolas', fontWeight: 'bold' } },
-    grid: new Array({ left: 45, right: 100, top: 32, bottom: 48 }, { left: 45, right: 100, show: false }, { left: 45, right: 100, show: false }, { left: 45, right: 100, show: false }),
+    grid: new Array({ left: 45, right: 100, top: 32, bottom: 22 }, { left: 45, right: 100, show: false }, { left: 45, right: 100, show: false }, { left: 45, right: 100, show: false }),
     tooltip: {
       trigger: 'item', z: 999, backgroundColor: 'rgba(18,18,18,0.96)', borderColor: '#444', textStyle: { color: '#FFF', fontFamily: 'Consolas', fontSize: 12 },
       formatter: p => {
@@ -2396,7 +2396,7 @@ function dessinerChandeliersMulti(data) { if (document.getElementById('selHorizo
     dataZoom: [
       Object.assign({ id: 'zoomX_inside', type: 'inside', xAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: true, moveOnMouseMove: true }, window.__CH_GET_INIT_X_ZOOM(bougies)),
       Object.assign({ id: 'zoomY_inside', type: 'inside', yAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: 'shift', moveOnMouseMove: true }, window.__CH_GET_INIT_Y_ZOOM(typeof bougies !== 'undefined' ? bougies : null)),
-      Object.assign({ id: 'zoomX_slider', type: 'slider', show: true, xAxisIndex: 0, height: 14, bottom: 26, borderColor: '#333', fillerColor: 'rgba(0,229,255,0.15)' }, window.__CH_GET_INIT_X_ZOOM(bougies)),
+      Object.assign({ id: 'zoomX_slider', type: 'slider', show: true, xAxisIndex: 0, height: 18, bottom: 8, borderColor: '#333', fillerColor: 'rgba(0,229,255,0.15)' }, window.__CH_GET_INIT_X_ZOOM(bougies)),
       Object.assign({ id: 'zoomY_slider', type: 'slider', show: true, orient: 'vertical', yAxisIndex: 0, top: 42, height: Math.max(260, (document.getElementById('chart-container')?.clientHeight || 520) - 92), right: 4, width: 16, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false }, window.__CH_GET_INIT_Y_ZOOM(typeof bougies !== 'undefined' ? bougies : null))
     ],
     xAxis: {
@@ -2820,7 +2820,7 @@ function dessinerGraphique(data) { if(document.getElementById("selHorizon")?.val
   chart.setOption({
     backgroundColor: '#0A0A0A', animation: false,
     title: { show: false, id: 'titreCamembert', text: `Séance ${data.date_fr} (09:00 → 15:00)`, left: pieAutoV.pos[0], top: pieAutoV.topTitle, textAlign: 'center', textStyle: { color: '#FFD700', fontSize: 11, fontFamily: 'Consolas', fontWeight: 'bold' } },
-    grid: new Array({ left: 45, right: 100, top: 32, bottom: 48 }, { left: 45, right: 100, show: false }, { left: 45, right: 100, show: false }, { left: 45, right: 100, show: false }),
+    grid: new Array({ left: 45, right: 100, top: 32, bottom: 22 }, { left: 45, right: 100, show: false }, { left: 45, right: 100, show: false }, { left: 45, right: 100, show: false }),
     tooltip: {
       trigger: 'item', z: 999, backgroundColor: 'rgba(18,18,18,0.96)', borderColor: '#444', textStyle: { color: '#FFF', fontFamily: 'Consolas', fontSize: 12 },
       formatter: p => {
@@ -2832,7 +2832,7 @@ function dessinerGraphique(data) { if(document.getElementById("selHorizon")?.val
     dataZoom: [
       { id: 'zoomX_inside', type: 'inside', xAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: true, moveOnMouseMove: true, start: zoomXStart, end: zoomXEnd },
       { id: 'zoomY_inside', type: 'inside', yAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: 'shift', moveOnMouseMove: true, start: zoomYStart, end: zoomYEnd },
-      { id: 'zoomX_slider', type: 'slider', show: true, xAxisIndex: 0, height: 14, bottom: 26, borderColor: '#333', fillerColor: 'rgba(0,229,255,0.15)', start: zoomXStart, end: zoomXEnd },
+      { id: 'zoomX_slider', type: 'slider', show: true, xAxisIndex: 0, height: 18, bottom: 8, borderColor: '#333', fillerColor: 'rgba(0,229,255,0.15)', start: zoomXStart, end: zoomXEnd },
       Object.assign({ id: 'zoomY_slider', type: 'slider', show: true, orient: 'vertical', yAxisIndex: 0, top: 42, height: Math.max(260, (document.getElementById('chart-container')?.clientHeight || 520) - 92), right: 4, width: 16, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false }, window.__CH_GET_INIT_Y_ZOOM(typeof bougies !== 'undefined' ? bougies : null))
     ],
     xAxis: { type: 'value', min: 32400, max: 54000, interval: 3600, axisLine: { lineStyle: { color: '#333' } }, splitLine: { lineStyle: { color: '#1E1E1E' } }, axisLabel: { color: '#999', formatter: val => heureDepuisSec(val).slice(0,5) } },
@@ -5160,15 +5160,15 @@ window.__chInjecterIndicateurs = function() {
   if (cfg.oscs.length === 0) {
     if (Array.isArray(opt.grid) && opt.grid.length > 1) {
       chart.setOption({
-        grid: new Array({ left: 45, right: 100, top: 32, bottom: 48 }),
+        grid: new Array({ left: 45, right: 100, top: 32, bottom: 22 }),
         xAxis: new Array({ ...xBase, gridIndex: 0 }),
         yAxis: baseYAxes,
-        dataZoom: new Array({ id: "zoomX_inside", type: "inside", xAxisIndex: new Array(0), filterMode: "none", zoomOnMouseWheel: true, moveOnMouseMove: true, moveOnMouseWheel: false }, { id: "zoomX_slider", type: "slider", show: true, xAxisIndex: new Array(0), filterMode: "none", left: 45, right: 100, bottom: 26, height: 14, brushSelect: false, showDetail: false }, { id: "zoomY_inside", type: "inside", yAxisIndex: 0, filterMode: "none", zoomOnMouseWheel: "shift", moveOnMouseMove: true, moveOnMouseWheel: false }, { id: "zoomY_slider", type: "slider", show: true, orient: "vertical", yAxisIndex: 0, filterMode: "none", right: 4, top: 32, height: "72%", width: 12, brushSelect: false, showDetail: false }),
+        dataZoom: new Array({ id: "zoomX_inside", type: "inside", xAxisIndex: new Array(0), filterMode: "none", zoomOnMouseWheel: true, moveOnMouseMove: true, moveOnMouseWheel: false }, { id: "zoomX_slider", type: "slider", show: true, xAxisIndex: new Array(0), filterMode: "none", left: 45, right: 100, bottom: 8, height: 14, brushSelect: false, showDetail: false }, { id: "zoomY_inside", type: "inside", yAxisIndex: 0, filterMode: "none", zoomOnMouseWheel: "shift", moveOnMouseMove: true, moveOnMouseWheel: false }, { id: "zoomY_slider", type: "slider", show: true, orient: "vertical", yAxisIndex: 0, filterMode: "none", right: 4, top: 32, height: "72%", width: 12, brushSelect: false, showDetail: false }),
         series: extra
   }, { replaceMerge: new Array("grid") });
     } else {
       chart.setOption({
-        grid: new Array({ left: 45, right: 100, top: 32, bottom: 48 }),
+        grid: new Array({ left: 45, right: 100, top: 32, bottom: 22 }),
         series: extra
   }, { replaceMerge: new Array("grid") });
     }
@@ -5178,7 +5178,7 @@ window.__chInjecterIndicateurs = function() {
   const nOsc = cfg.oscs.length;
   const mainH = nOsc === 1 ? 71 : (nOsc === 2 ? 59 : (nOsc === 3 ? 50 : 43));
   const gapPct = 3.2;
-  const availH = 89.0 - mainH - (nOsc * gapPct);
+  const availH = 92.2 - mainH - (nOsc * gapPct);
   const subH = +(availH / nOsc).toFixed(1);
 
   const grids = new Array({ left: 45, right: 100, top: 32, height: mainH + "%" });
@@ -5267,7 +5267,7 @@ window.__chInjecterIndicateurs = function() {
     grid: grids,
     xAxis: xAxes,
     yAxis: yAxes,
-    dataZoom: new Array({ id: "zoomX_inside", type: "inside", xAxisIndex: allXIdx, filterMode: "none", zoomOnMouseWheel: true, moveOnMouseMove: true, moveOnMouseWheel: false }, { id: "zoomX_slider", type: "slider", xAxisIndex: allXIdx, filterMode: "none", left: 45, right: 100, bottom: 26, height: 14, showDetail: false }, { id: "zoomY_inside", type: "inside", yAxisIndex: 0, filterMode: "none", zoomOnMouseWheel: "shift", moveOnMouseMove: true, moveOnMouseWheel: false }, { id: "zoomY_slider", type: "slider", orient: "vertical", yAxisIndex: 0, filterMode: "none", right: 4, top: 32, height: (mainH - 2) + "%", width: 12, showDetail: false }),
+    dataZoom: new Array({ id: "zoomX_inside", type: "inside", xAxisIndex: allXIdx, filterMode: "none", zoomOnMouseWheel: true, moveOnMouseMove: true, moveOnMouseWheel: false }, { id: "zoomX_slider", type: "slider", xAxisIndex: allXIdx, filterMode: "none", left: 45, right: 100, bottom: 8, height: 14, showDetail: false }, { id: "zoomY_inside", type: "inside", yAxisIndex: 0, filterMode: "none", zoomOnMouseWheel: "shift", moveOnMouseMove: true, moveOnMouseWheel: false }, { id: "zoomY_slider", type: "slider", orient: "vertical", yAxisIndex: 0, filterMode: "none", right: 4, top: 32, height: (mainH - 2) + "%", width: 12, showDetail: false }),
     series: extra
   }, { replaceMerge: new Array("grid") });
 };
@@ -6094,7 +6094,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
 
 
 
-<script id="ch-slim-datazoom">(function(){const isMob=()=>window.innerWidth<=960&&(window.innerHeight<=560||window.innerWidth<=768);const fitAll=()=>{if(!isMob())return;const vh=window.visualViewport?window.visualViewport.height:window.innerHeight;let barH=18;document.querySelectorAll("div,footer,section").forEach(el=>{const t=(el.innerText||"").trim();if(t.includes("Diagnostic")&&t.includes("CH-WAVECANDLE")&&el.offsetHeight>12&&el.offsetHeight<90){el.style.cssText+=";position:fixed!important;left:0!important;right:0!important;bottom:0!important;height:18px!important;min-height:18px!important;max-height:18px!important;padding:0 8px!important;margin:0!important;display:flex!important;align-items:center!important;justify-content:space-between!important;flex-wrap:nowrap!important;overflow:hidden!important;z-index:50!important;";el.querySelectorAll("div,span").forEach(c=>{c.style.whiteSpace="nowrap";c.style.fontSize="8.8px";c.style.lineHeight="17px";});barH=18;}});document.querySelectorAll("[_echarts_instance_]").forEach(el=>{el.style.setProperty("position","fixed","important");el.style.setProperty("top","0","important");el.style.setProperty("left","0","important");el.style.setProperty("width","100vw","important");el.style.setProperty("height",(vh-barH)+"px","important");el.style.setProperty("max-height",(vh-barH)+"px","important");el.style.setProperty("margin","0","important");el.style.setProperty("padding","0","important");});};const smartLayout=function(opt){if(!opt||typeof opt!=="object")return;const mob=isMob();const dzW=mob?6:13,dzH=mob?6:13;if(opt.dataZoom){const list=Array.isArray(opt.dataZoom)?opt.dataZoom:[opt.dataZoom];list.forEach(dz=>{if(!dz||typeof dz!=="object"||dz.type==="inside")return;const isVert=dz.orient==="vertical"||(dz.yAxisIndex!==undefined&&dz.xAxisIndex===undefined);if(isVert){const hasSub=Array.isArray(opt.grid)&&opt.grid.filter(x=>x&&x.show!==false).length>1;dz.width=mob?8:14;dz.right=4;dz.top=32;dz.height=hasSub?"40%":Math.max(260,(document.getElementById('chart-container')?.clientHeight||520)-92);delete dz.bottom;dz.handleSize=mob?16:22;}else{dz.height=14;dz.bottom=26;dz.showDetail=false;dz.handleSize=mob?"65%":"90%";}});}if(opt.grid){const grids=Array.isArray(opt.grid)?opt.grid:[opt.grid];const first=grids[0];if(first&&typeof first==="object"){first.top=mob?24:24;first.left=mob?16:48;}const last=grids[grids.length-1];if(last&&typeof last==="object"){last.bottom=mob?(dzH+25):40;last.right=grids.length>1?100:(mob?(dzW+36):50);}}if(opt.xAxis){(Array.isArray(opt.xAxis)?opt.xAxis:[opt.xAxis]).forEach(x=>{if(x&&x.axisLabel){x.axisLabel.fontSize=mob?8.5:11;x.axisLabel.margin=mob?2:6;}});}if(opt.yAxis){(Array.isArray(opt.yAxis)?opt.yAxis:[opt.yAxis]).forEach(y=>{if(y&&y.axisLabel){y.axisLabel.fontSize=mob?8.5:11;y.axisLabel.margin=mob?2:6;}});}};const patchInst=function(inst){if(!inst||inst.__chSlimDZ||typeof inst.setOption!=="function")return inst;inst.__chSlimDZ=true;const orig=inst.setOption.bind(inst);inst.setOption=function(opt,notMerge,lazyUpdate){try{fitAll();smartLayout(opt);}catch(e){}return orig(opt,notMerge,lazyUpdate);};try{fitAll();inst.resize({devicePixelRatio:Math.min(Math.max(window.devicePixelRatio||1,1),3)});}catch(e){}return inst;};const hook=function(){if(!window.echarts||window.echarts.__chHooked)return;window.echarts.__chHooked=true;const origInit=window.echarts.init.bind(window.echarts);window.echarts.init=function(dom,theme,opts){fitAll();const o=Object.assign({devicePixelRatio:Math.min(Math.max(window.devicePixelRatio||1,1),3)},opts||{});return patchInst(origInit(dom,theme,o));};document.querySelectorAll("[_echarts_instance_]").forEach(el=>{try{patchInst(window.echarts.getInstanceByDom(el));}catch(e){}});};const onResize=()=>{fitAll();document.querySelectorAll("[_echarts_instance_]").forEach(el=>{try{const ins=window.echarts.getInstanceByDom(el);if(ins)ins.resize({devicePixelRatio:Math.min(Math.max(window.devicePixelRatio||1,1),3)});}catch(e){}});};hook();window.addEventListener("load",()=>{fitAll();hook();onResize();});window.addEventListener("resize",onResize);if(window.visualViewport)window.visualViewport.addEventListener("resize",onResize);setTimeout(onResize,400);})();</script>
+<script id="ch-slim-datazoom">(function(){const isMob=()=>window.innerWidth<=960&&(window.innerHeight<=560||window.innerWidth<=768);const fitAll=()=>{if(!isMob())return;const vh=window.visualViewport?window.visualViewport.height:window.innerHeight;let barH=18;document.querySelectorAll("div,footer,section").forEach(el=>{const t=(el.innerText||"").trim();if(t.includes("Diagnostic")&&t.includes("CH-WAVECANDLE")&&el.offsetHeight>12&&el.offsetHeight<90){el.style.cssText+=";position:fixed!important;left:0!important;right:0!important;bottom:0!important;height:18px!important;min-height:18px!important;max-height:18px!important;padding:0 8px!important;margin:0!important;display:flex!important;align-items:center!important;justify-content:space-between!important;flex-wrap:nowrap!important;overflow:hidden!important;z-index:50!important;";el.querySelectorAll("div,span").forEach(c=>{c.style.whiteSpace="nowrap";c.style.fontSize="8.8px";c.style.lineHeight="17px";});barH=18;}});document.querySelectorAll("[_echarts_instance_]").forEach(el=>{el.style.setProperty("position","fixed","important");el.style.setProperty("top","0","important");el.style.setProperty("left","0","important");el.style.setProperty("width","100vw","important");el.style.setProperty("height",(vh-barH)+"px","important");el.style.setProperty("max-height",(vh-barH)+"px","important");el.style.setProperty("margin","0","important");el.style.setProperty("padding","0","important");});};const smartLayout=function(opt){if(!opt||typeof opt!=="object")return;const mob=isMob();const dzW=mob?6:13,dzH=mob?6:13;if(opt.dataZoom){const list=Array.isArray(opt.dataZoom)?opt.dataZoom:[opt.dataZoom];list.forEach(dz=>{if(!dz||typeof dz!=="object"||dz.type==="inside")return;const isVert=dz.orient==="vertical"||(dz.yAxisIndex!==undefined&&dz.xAxisIndex===undefined);if(isVert){const hasSub=Array.isArray(opt.grid)&&opt.grid.filter(x=>x&&x.show!==false).length>1;dz.width=mob?8:14;dz.right=4;dz.top=32;dz.height=hasSub?"40%":Math.max(260,(document.getElementById('chart-container')?.clientHeight||520)-92);delete dz.bottom;dz.handleSize=mob?16:22;}else{dz.height=dzH;dz.bottom=2;dz.showDetail=false;dz.handleSize=mob?"65%":"90%";}});}if(opt.grid){const grids=Array.isArray(opt.grid)?opt.grid:[opt.grid];const first=grids[0];if(first&&typeof first==="object"){first.top=mob?24:24;first.left=mob?16:48;}const last=grids[grids.length-1];if(last&&typeof last==="object"){last.bottom=mob?(dzH+25):40;last.right=grids.length>1?100:(mob?(dzW+36):50);}}if(opt.xAxis){(Array.isArray(opt.xAxis)?opt.xAxis:[opt.xAxis]).forEach(x=>{if(x&&x.axisLabel){x.axisLabel.fontSize=mob?8.5:11;x.axisLabel.margin=mob?2:6;}});}if(opt.yAxis){(Array.isArray(opt.yAxis)?opt.yAxis:[opt.yAxis]).forEach(y=>{if(y&&y.axisLabel){y.axisLabel.fontSize=mob?8.5:11;y.axisLabel.margin=mob?2:6;}});}};const patchInst=function(inst){if(!inst||inst.__chSlimDZ||typeof inst.setOption!=="function")return inst;inst.__chSlimDZ=true;const orig=inst.setOption.bind(inst);inst.setOption=function(opt,notMerge,lazyUpdate){try{fitAll();smartLayout(opt);}catch(e){}return orig(opt,notMerge,lazyUpdate);};try{fitAll();inst.resize({devicePixelRatio:Math.min(Math.max(window.devicePixelRatio||1,1),3)});}catch(e){}return inst;};const hook=function(){if(!window.echarts||window.echarts.__chHooked)return;window.echarts.__chHooked=true;const origInit=window.echarts.init.bind(window.echarts);window.echarts.init=function(dom,theme,opts){fitAll();const o=Object.assign({devicePixelRatio:Math.min(Math.max(window.devicePixelRatio||1,1),3)},opts||{});return patchInst(origInit(dom,theme,o));};document.querySelectorAll("[_echarts_instance_]").forEach(el=>{try{patchInst(window.echarts.getInstanceByDom(el));}catch(e){}});};const onResize=()=>{fitAll();document.querySelectorAll("[_echarts_instance_]").forEach(el=>{try{const ins=window.echarts.getInstanceByDom(el);if(ins)ins.resize({devicePixelRatio:Math.min(Math.max(window.devicePixelRatio||1,1),3)});}catch(e){}});};hook();window.addEventListener("load",()=>{fitAll();hook();onResize();});window.addEventListener("resize",onResize);if(window.visualViewport)window.visualViewport.addEventListener("resize",onResize);setTimeout(onResize,400);})();</script>
 
 
 
@@ -12235,11 +12235,11 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
       const sx = dzList.find(d => d && d.id === "zoomX_slider");
       const sy = dzList.find(d => d && d.id === "zoomY_slider");
 
-      if(!sx || sx.show === false || Number(sx.bottom) < 20 || !sy || sy.show === false){
+      if(!sx || sx.show === false || false || !sy || sy.show === false){
         ch.setOption({
           dataZoom: [
             { id: "zoomX_inside", type: "inside", xAxisIndex: allX, filterMode: "none", zoomOnMouseWheel: true, moveOnMouseMove: true, moveOnMouseWheel: false },
-            { id: "zoomX_slider", type: "slider", show: true, xAxisIndex: allX, filterMode: "none", left: 45, right: 100, bottom: 26, height: 14, brushSelect: false, showDetail: false, borderColor: "#475569", fillerColor: "rgba(56,189,248,0.22)" },
+            { id: "zoomX_slider", type: "slider", show: true, xAxisIndex: allX, filterMode: "none", left: 45, right: 100, bottom: 8, height: 14, brushSelect: false, showDetail: false, borderColor: "#475569", fillerColor: "rgba(56,189,248,0.22)" },
             { id: "zoomY_inside", type: "inside", yAxisIndex: 0, filterMode: "none", zoomOnMouseWheel: "shift", moveOnMouseMove: true, moveOnMouseWheel: false },
             { id: "zoomY_slider", type: "slider", show: true, orient: "vertical", yAxisIndex: 0, filterMode: "none", right: 4, top: 32, height: vHeight, width: 12, brushSelect: false, showDetail: false, borderColor: "#475569", fillerColor: "rgba(56,189,248,0.22)" }
           ]
@@ -12249,6 +12249,59 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
   }
 
   setInterval(enforceZoomSlidersAlwaysVisible, 250);
+})();
+</script>
+<script id="ch-slider-disappearance-detector">
+(function(){
+  window.__CH_SLIDER_TRACE = "En attente d'observation...";
+  let hooked = false;
+
+  function installSliderSpy(){
+    const dom = document.getElementById("chart-container");
+    const ch = (typeof chart !== "undefined" && chart) ? chart : (window.echarts && dom ? echarts.getInstanceByDom(dom) : null);
+    if(!ch || hooked) return;
+    hooked = true;
+
+    const origSetOption = ch.setOption.bind(ch);
+    ch.setOption = function(opt, notMerge, lazyUpdate){
+      const beforeOpt = ch.getOption() || {};
+      const hadSlider = Array.isArray(beforeOpt.dataZoom) && beforeOpt.dataZoom.some(d => d && d.id === "zoomX_slider" && d.show !== false);
+      const res = origSetOption(opt, notMerge, lazyUpdate);
+      try {
+        const afterOpt = ch.getOption() || {};
+        const hasSlider = Array.isArray(afterOpt.dataZoom) && afterOpt.dataZoom.some(d => d && d.id === "zoomX_slider" && d.show !== false);
+        const dzSent = opt && opt.dataZoom ? JSON.stringify(opt.dataZoom).slice(0, 140) : "aucun dataZoom dans setOption";
+        const stackLines = (new Error().stack || "").split("\n").slice(2, 6).map(s => s.trim().replace(/^at\s+/, "")).join(" <- ");
+        if(hadSlider && !hasSlider){
+          window.__CH_SLIDER_TRACE = `[MASQUÉ !] notMerge=${JSON.stringify(notMerge)} | dzSent=${dzSent} | Pile: ${stackLines}`;
+          console.warn("CH_SLIDER_HIDDEN:", window.__CH_SLIDER_TRACE);
+        } else if(!hasSlider){
+          window.__CH_SLIDER_TRACE = `[ABSENT] dzSent=${dzSent} | Pile: ${stackLines}`;
+        } else {
+          window.__CH_SLIDER_TRACE = `[VISIBLE OK] (${afterOpt.dataZoom.length} dz)`;
+        }
+      } catch(e){}
+      return res;
+    };
+  }
+
+  function renderSliderTraceInHud(){
+    installSliderSpy();
+    const hudBody = document.getElementById("ch-hud-body");
+    if(!hudBody) return;
+    let traceEl = document.getElementById("ch-hud-slider-spy-row");
+    if(!traceEl){
+      traceEl = document.createElement("div");
+      traceEl.id = "ch-hud-slider-spy-row";
+      traceEl.style.cssText = "margin-top:5px;padding:4px 6px;background:rgba(239,68,68,0.14);border:1px solid rgba(248,113,113,0.45);border-radius:4px;font-size:10px;color:#fca5a5;word-break:break-all;";
+      const hudBox = document.getElementById("ch-zoom-telemetry-hud-box");
+      if(hudBox) hudBox.appendChild(traceEl);
+    }
+    const nextTxt = "🕵️ Trace Slider X : " + (window.__CH_SLIDER_TRACE || "");
+    if(traceEl.textContent !== nextTxt) traceEl.textContent = nextTxt;
+  }
+
+  setInterval(renderSliderTraceInHud, 200);
 })();
 </script>
 </body>
