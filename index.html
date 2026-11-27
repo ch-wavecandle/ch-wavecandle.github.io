@@ -1794,15 +1794,15 @@ function detecterCentreCamembert(pointsPrix, prixMin, prixMax) {
 
   // Grille de 12 positions candidates (4 colonnes X x 3 rangees Y)
   const cols = [
-    { xPct: '13%', xNorm: 0.13 },
+    { xPct: '24%', xNorm: 0.24 },
     { xPct: '36%', xNorm: 0.36 },
     { xPct: '62%', xNorm: 0.62 },
     { xPct: '83%', xNorm: 0.83 }
   ];
     const rows = [
-    { yPct: '24%', topTitle: '9.5%',  topSub: '36.5%', yNorm: 0.80 },
+    { yPct: '27%', topTitle: '14%',  topSub: '39%', yNorm: 0.78 },
     { yPct: '50%', topTitle: '35.5%', topSub: '62.5%', yNorm: 0.50 },
-    { yPct: '75%', topTitle: '60.5%', topSub: '87.5%', yNorm: 0.20 }
+    { yPct: '71%', topTitle: '58%', topSub: '83%', yNorm: 0.24 }
   ];
 
   // Normalisation de chaque vague/bougie en boite englobante [x0, x1, yBas, yHaut]
@@ -5383,7 +5383,7 @@ document.addEventListener("change", (e) => {
       await origLive.apply(this, arguments);
 
       // Si le flux live temporaire est vide (ex: week-end ou avant 08h30), charger automatiquement la dernière séance disponible
-      const isEncoreMulti = globalData && Array.isArray(globalData.bougies) && !globalData.vagues;
+      if(document.getElementById("selHorizon")?.value !== "LIVE") return; const isEncoreMulti = globalData && Array.isArray(globalData.bougies) && !globalData.vagues;
       const mauvValeur = globalData && globalData.ticker && globalData.ticker.toUpperCase() !== tk.toUpperCase();
       if ((isEncoreMulti || mauvValeur || !globalData) && typeof seancesLocales !== "undefined" && seancesLocales.length > 0) {
         const _tnD = new Date(new Date().toLocaleString("en-US", { timeZone: "Africa/Tunis" })); const _tnFr = String(_tnD.getDate()).padStart(2,"0")+"/"+String(_tnD.getMonth()+1).padStart(2,"0")+"/"+_tnD.getFullYear(); const _av0830 = (_tnD.getDay()===0||_tnD.getDay()===6||(_tnD.getHours()*60+_tnD.getMinutes())<510); const dern = (_av0830 ? seancesLocales.find(s => s && s.date_fr !== _tnFr) : null) || seancesLocales;
@@ -11608,6 +11608,113 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     syncRenduPerHorizon();
     watchEmptyCanvasAndAutoRedraw();
   }, 300);
+})();
+</script>
+<script id="ch-unified-pie-and-live-trim">
+(function(){
+  // A. Rendu unifie et indissociable du Camembert (Disque + Titre haut + Titre bas sur le meme centre et rayon exact)
+  function enforceUnifiedPieGeometry(){
+    if(typeof chart === "undefined" || !chart) return;
+    try {
+      const opt = chart.getOption() || {};
+      const sList = Array.isArray(opt.series) ? opt.series : [];
+      const pieS = sList.find(s => s && (s.id === "pieCamembert" || s.type === "pie"));
+      if(!pieS || !Array.isArray(pieS.center) || pieS.center.length < 2) return;
+
+      const w = chart.getWidth(), h = chart.getHeight();
+      if(!(w > 0 && h > 0)) return;
+
+      const isMasque = (document.getElementById("selPosCamembert")?.value === "MASQUE") || (Array.isArray(pieS.radius) && parseFloat(pieS.radius.at(1)) === 0);
+      const R = Math.max(38, Math.round(Math.min(w, h) * 0.125));
+      const cx = (parseFloat(pieS.center.at(0)) / 100) * w;
+      const cy = (parseFloat(pieS.center.at(1)) / 100) * h;
+      const yTop = Math.max(6, cy - R - 20);
+      const yBot = Math.min(h - 20, cy + R + 8);
+
+      // Verifier si le rayon du disque doit etre normalise en pixels exacts
+      const curR1 = Array.isArray(pieS.radius) ? pieS.radius.at(1) : null;
+      if(!isMasque && curR1 !== R){
+        chart.setOption({ series: [{ id: "pieCamembert", radius: [0, R], center: pieS.center }] });
+      }
+
+      const relTopY = -(R + 18);
+      const relBotY = R + 6;
+      const gList = Array.isArray(opt.graphic) ? opt.graphic : [];
+      const grp = gList.find(g => g && g.id === "grpAgressivitePie");
+      if(grp && Array.isArray(grp.children)){
+        const tTop = grp.children.find(c => c && c.id === "pieTxtTop");
+        const tBot = grp.children.find(c => c && c.id === "pieTxtBot");
+        const needSync = (Math.abs((grp.x || 0) - cx) > 1 || Math.abs((grp.y || 0) - cy) > 1)
+                      || (tTop && tTop.style && (Math.abs((tTop.style.x || 0)) > 1 || Math.abs((tTop.style.y || 0) - relTopY) > 1))
+                      || (tBot && tBot.style && (Math.abs((tBot.style.x || 0)) > 1 || Math.abs((tBot.style.y || 0) - relBotY) > 1))
+                      || (Boolean(grp.invisible) !== isMasque);
+        if(needSync){
+          chart.setOption({
+            graphic: [{
+              id: "grpAgressivitePie",
+              x: cx,
+              y: cy,
+              invisible: isMasque,
+              children: [
+                { id: "pieTxtTop", invisible: isMasque, style: { x: 0, y: relTopY } },
+                { id: "pieTxtBot", invisible: isMasque, style: { x: 0, y: relBotY } }
+              ]
+            }]
+          });
+        }
+      }
+    } catch(e){}
+  }
+
+  // B. En mode Live + Chandeliers (3D / Japonais), arreter l'axe X a la derniere periode recue (sans creneaux vides jusqu'a 14:00)
+  function trimLiveCandlesticksToLastPeriod(){
+    const selH = document.getElementById("selHorizon");
+    const selR = document.getElementById("selModeRendu");
+    if(!selH || selH.value !== "LIVE" || !selR) return;
+    const modeVal = String(selR.value || "").toUpperCase();
+    const modeTxt = (selR.options && selR.selectedIndex >= 0) ? String(selR.options.item(selR.selectedIndex)?.text || "").toUpperCase() : "";
+    // Ne s'applique qu'aux modes Chandeliers / Bougies (pas aux Vagues Polygonales qui couvrent la seance)
+    if(modeVal.includes("POLY") || modeVal.includes("VAGUE") || modeTxt.includes("VAGUE") || modeTxt.includes("POLYGONE")) return;
+    if(typeof chart === "undefined" || !chart) return;
+
+    try {
+      const opt = chart.getOption() || {};
+      const xa = Array.isArray(opt.xAxis) ? opt.xAxis.at(0) : null;
+      const sList = Array.isArray(opt.series) ? opt.series : [];
+      if(!xa || !Array.isArray(xa.data) || xa.data.length < 3) return;
+
+      let lastIdx = -1;
+      for(const s of sList){
+        if(!s || s.type === "pie" || !Array.isArray(s.data)) continue;
+        for(let i = s.data.length - 1; i >= 0; i--){
+          const item = s.data.at(i);
+          if(item !== null && item !== undefined){
+            const valArr = Array.isArray(item) ? item : (Array.isArray(item.value) ? item.value : null);
+            const hasPrice = valArr ? valArr.some((v, idx) => idx > 0 && typeof v === "number" && v > 0) : (typeof item === "number" && item > 0);
+            if(hasPrice && i > lastIdx){ lastIdx = i; break; }
+          }
+        }
+      }
+
+      if(lastIdx >= 0 && lastIdx < xa.data.length - 1){
+        const cutLen = lastIdx + 1;
+        const newX = xa.data.slice(0, cutLen);
+        const newSeries = sList.map(s => {
+          if(!s || s.type === "pie" || !Array.isArray(s.data)) return s;
+          return { id: s.id, name: s.name, data: s.data.slice(0, cutLen) };
+        });
+        chart.setOption({
+          xAxis: [{ data: newX }],
+          series: newSeries
+        });
+      }
+    } catch(e){}
+  }
+
+  setInterval(() => {
+    enforceUnifiedPieGeometry();
+    trimLiveCandlesticksToLastPeriod();
+  }, 220);
 })();
 </script>
 </body>
