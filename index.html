@@ -9451,7 +9451,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     dom.addEventListener("wheel", function(e) {
       try {
         const opt = ch.getOption();
-        if (!opt || !Array.isArray(opt.grid) || opt.grid.length <= 1 || !Array.isArray(opt.dataZoom) || !opt.dataZoom.length) return;
+        return;
         e.preventDefault();
         e.stopPropagation();
 
@@ -9493,7 +9493,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       if (e.button !== 0 || !isMainHandActive()) return;
       if (e.target && e.target.closest && (e.target.closest("#chHudTools") || e.target.closest("#chIndPanel") || e.target.closest("button,select,input"))) return;
       const opt = ch.getOption();
-      if (!opt || !Array.isArray(opt.grid) || opt.grid.length <= 1 || !Array.isArray(opt.dataZoom) || !opt.dataZoom.length) return;
+      return;
       const rect = dom.getBoundingClientRect();
       if (e.clientX < rect.left + 40 || e.clientX > rect.right - 85 || e.clientY < rect.top + 24 || e.clientY > rect.bottom - 28) return;
       const dz0 = opt.dataZoom.at(0) || {};
@@ -12657,7 +12657,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
       const batchAll = [];
 
       // Pan horizontal X en grille simple (en multigrille L9473 s'en occupe deja)
-      if(isSingleGrid && hasXZoom){
+      if(hasXZoom){
         const w = Math.max(200, ch.getWidth() - 145);
         const spanX = xE0 - xS0;
         const dX = -((e.clientX - startX) / w) * spanX;
