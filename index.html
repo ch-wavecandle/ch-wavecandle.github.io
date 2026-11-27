@@ -1221,6 +1221,34 @@ window.__CH_GET_INIT_Y_ZOOM = function(bougies){
   if(ys <= 0.5 && ye >= 99.5) return {};
   return { start: ys, end: ye };
 };</script>
+<script id="ch-safe-coord-guard">
+(function(){
+  function wrapChartCoordMethods(){
+    if(typeof chart === "undefined" || !chart || chart.__chCoordGuarded) return;
+    chart.__chCoordGuarded = true;
+    const origFrom = chart.convertFromPixel.bind(chart);
+    const origTo = chart.convertToPixel.bind(chart);
+    chart.convertFromPixel = function(){
+      try {
+        const m = chart.getModel ? chart.getModel() : null;
+        const s0 = m && m.getSeriesByIndex ? m.getSeriesByIndex(0) : null;
+        if(!s0 || !s0.coordinateSystem) return new Array(NaN, NaN);
+        return origFrom.apply(chart, arguments);
+      } catch(e){ return new Array(NaN, NaN); }
+    };
+    chart.convertToPixel = function(){
+      try {
+        const m = chart.getModel ? chart.getModel() : null;
+        const s0 = m && m.getSeriesByIndex ? m.getSeriesByIndex(0) : null;
+        if(!s0 || !s0.coordinateSystem) return new Array(NaN, NaN);
+        return origTo.apply(chart, arguments);
+      } catch(e){ return new Array(NaN, NaN); }
+    };
+  }
+  wrapChartCoordMethods();
+  setInterval(wrapChartCoordMethods, 500);
+})();
+</script>
 </head>
 <body>
 <style>
@@ -10161,7 +10189,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     return Math.max(180, h - 90);
   }
 
-  function recordUserZoom(){
+  function recordUserZoom(){ if(window.__CH_RESTORING_Y) return;
     if(typeof chart === "undefined" || !chart || typeof globalData === "undefined" || !globalData) return;
     const opt = chart.getOption();
     const dzList = (opt && Array.isArray(opt.dataZoom)) ? opt.dataZoom : [];
@@ -10239,7 +10267,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     const newMin = Math.max(0.01, +(a.centerPrice - halfSpan).toFixed(3));
     const newMax = +(newMin + targetSpan).toFixed(3);
     try {
-      chart.setOption({ yAxis: [{ min: newMin, max: newMax, scale: false }] });
+      window.__CH_RESTORING_Y = true; chart.setOption({ yAxis: [{ min: newMin, max: newMax, scale: false }] }); setTimeout(() => { window.__CH_RESTORING_Y = false; }, 180);
     } catch(e){}
   };
 
