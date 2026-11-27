@@ -2401,7 +2401,7 @@ function dessinerChandeliersMulti(data) { if (document.getElementById('selHorizo
     ],
     xAxis: {
       type: 'category', data: bougies.map(b => b.label),
-      axisLine: { lineStyle: { color: '#333' } }, splitLine: { show: true, lineStyle: { color: '#1E1E1E' } },
+      axisLine: { lineStyle: { color: '#333' } }, splitLine: { show: (lastVal !== null), lineStyle: { color: '#1E1E1E' } },
       axisLabel: {
         color: '#999', fontFamily: 'Consolas',
         interval: (data.granularite === 'SEMAINE' || data.granularite === 'MOIS') ? 0 : 'auto',
@@ -5192,7 +5192,7 @@ window.__chInjecterIndicateurs = function() {
     allXIdx.push(gIdx);
     grids.push({ left: 45, right: 92, top: topPct + "%", height: subH + "%" });
     const isLastSub = (idx === nOsc - 1); xAxes.push({ ...xBase, gridIndex: gIdx, axisLabel: isLastSub ? (xBase.axisLabel || { show: true }) : { show: false } });
-    let yOsc = { gridIndex: gIdx, position: "right", name: oscName, nameLocation: "middle", nameGap: 46, nameRotate: 90, nameTextStyle: { color: axisCol, fontSize: 9, fontWeight: "bold" }, axisLabel: { color: axisCol, fontSize: 9, hideOverlap: true, showMinLabel: false, showMaxLabel: false }, splitLine: { lineStyle: { color: splitCol } } };
+    let yOsc = { gridIndex: gIdx, position: "right", name: oscName, nameLocation: "middle", nameGap: 32, nameRotate: 90, nameTextStyle: { color: axisCol, fontSize: 9, fontWeight: "bold" }, axisLabel: { color: axisCol, fontSize: 9, hideOverlap: true, showMinLabel: false, showMaxLabel: false }, splitLine: { lineStyle: { color: splitCol } } };
 
     if (oscName === "DELTA") {
       extra.push({ id: "ind_osc_delta", name: "Delta Net", type: "bar", barMaxWidth: 14, xAxisIndex: gIdx, yAxisIndex: yIdx, itemStyle: { color: (p) => ((Array.isArray(p.value) ? p.value.at(1) : p.value) >= 0) ? "#10B981" : "#EF4444" }, data: pair(deltaArr) });
@@ -5218,10 +5218,7 @@ window.__chInjecterIndicateurs = function() {
       yOsc = { ...yOsc, min: 0, max: 100, interval: 40 };
       const tp = closes.map((c, i) => c === null ? null : ((highs.at(i) + lows.at(i) + c) / 3));
       const mfiArr = tp.map((t, i) => {
-        if (i < 14 || t === null) return null;
-        let pos = 0, neg = 0;
-        for (let j = i - 13; j <= i; j++) { const mf = (tp.at(j) || 0) * vols.at(j); if (tp.at(j) >= (tp.at(j-1) || 0)) pos += mf; else neg += mf; }
-        return neg === 0 ? 100 : +(100 - (100 / (1 + pos / neg))).toFixed(1);
+        if (i < 2 || t === null) return null; const win = Math.min(14, i); let pos = 0, neg = 0; for (let j = i - win + 1; j <= i; j++) { const mf = (tp.at(j) || 0) * vols.at(j); if (tp.at(j) >= (tp.at(j-1) || 0)) pos += mf; else neg += mf; } if (pos === 0 && neg === 0) return 50; return neg === 0 ? 100 : +(100 - (100 / (1 + pos / neg))).toFixed(1);
       });
       extra.push({ id: "ind_osc_mfi", name: "MFI(14)", type: "line", xAxisIndex: gIdx, yAxisIndex: yIdx, showSymbol: false, lineStyle: { width: 1.8, color: "#10B981" }, markLine: { silent: true, symbol: "none", data: new Array({ yAxis: 80, lineStyle: { color: "#EF4444" } }, { yAxis: 20, lineStyle: { color: "#10B981" } }) }, data: pair(mfiArr) });
     }
@@ -11833,7 +11830,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
           if(needTrim) upd.data = trimmedData;
           if(s.type === "line"){
             upd.endLabel = {
-              show: true,
+              show: (lastVal !== null),
               formatter: cleanName,
               color: col,
               fontSize: 10,
