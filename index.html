@@ -10718,6 +10718,13 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
       bottomPx = 46;
     }
 
+    const topLogoImg = document.querySelector("#ticker-logo-badge img");
+    const logoSrc = (topLogoImg && topLogoImg.src && topLogoImg.complete && topLogoImg.naturalWidth > 0) ? topLogoImg.src : "";
+    const initials = tickerName.split(/\s+/).map(w => w[0] || "").join("").slice(0, 3) || tickerName.slice(0, 3);
+    const logoHtml = logoSrc
+      ? `<img src="${logoSrc}" alt="${tickerName}" style="width:28px;height:28px;object-fit:contain;border-radius:6px;background:#ffffff;padding:2px;border:1px solid rgba(148,163,184,0.3);flex-shrink:0;" />`
+      : `<div style="width:28px;height:28px;border-radius:6px;background:${isClair ? "#e0f2fe" : "rgba(56,189,248,0.18)"};color:${isClair ? "#0284c7" : "#38bdf8"};font-weight:800;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${initials}</div>`;
+
     wm.style.cssText = `
       position:absolute;
       left:${leftPx}px;
@@ -10727,17 +10734,21 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
       pointer-events:none;
       user-select:none;
       display:flex;
-      flex-direction:column;
-      gap:1px;
-      padding:4px 10px;
-      border-radius:8px;
-      background:${isClair ? "rgba(255,255,255,0.72)" : "rgba(15,23,42,0.68)"};
-      border:1px solid ${isClair ? "rgba(148,163,184,0.28)" : "rgba(56,189,248,0.22)"};
-      backdrop-filter:blur(4px);
+      flex-direction:row;
+      align-items:center;
+      gap:9px;
+      padding:5px 11px;
+      border-radius:9px;
+      background:${isClair ? "rgba(255,255,255,0.78)" : "rgba(15,23,42,0.74)"};
+      border:1px solid ${isClair ? "rgba(148,163,184,0.3)" : "rgba(56,189,248,0.24)"};
+      backdrop-filter:blur(5px);
     `;
     wm.innerHTML = `
-      <div style="font-family:Inter,system-ui,sans-serif;font-size:15px;font-weight:800;letter-spacing:0.6px;color:${isClair ? "#0f172a" : "#f1f5f9"};line-height:1.15;">${tickerName}</div>
-      <div style="font-family:Consolas,monospace;font-size:10.5px;font-weight:600;color:${isClair ? "#0284c7" : "#38bdf8"};">${subLabel} • BVMT</div>
+      ${logoHtml}
+      <div style="display:flex;flex-direction:column;gap:1px;">
+        <div style="font-family:Inter,system-ui,sans-serif;font-size:15px;font-weight:800;letter-spacing:0.6px;color:${isClair ? "#0f172a" : "#f1f5f9"};line-height:1.15;">${tickerName}</div>
+        <div style="font-family:Consolas,monospace;font-size:10.5px;font-weight:600;color:${isClair ? "#0284c7" : "#38bdf8"};">${subLabel} • BVMT</div>
+      </div>
     `;
   }
 
