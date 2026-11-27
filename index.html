@@ -1882,7 +1882,7 @@ function creerElementAgressivite(posPct, st) {
   _dernierPiePos = posPct;
   _dernierPieSt = st;
   const w = chart.getWidth(), h = chart.getHeight();
-  const cx = (parseFloat(posPct.at(0)) / 100) * w;
+  try { const optS0 = chart.getOption()?.series; const pS0 = Array.isArray(optS0) ? optS0.find(s => s && (s.id === 'pieCamembert' || s.type === 'pie')) : null; if(pS0 && Array.isArray(pS0.center) && pS0.center.length >= 2 && document.getElementById('selPosCamembert')?.value !== 'MANUEL'){ posPct = pS0.center; _dernierPiePos = posPct; } } catch(e){} const cx = (parseFloat(posPct.at(0)) / 100) * w;
   const cy = (parseFloat(posPct.at(1)) / 100) * h;
   const rayonPx = Math.min(w, h) * 0.11;
   const agr = infoAgressivite(st);
@@ -1907,12 +1907,24 @@ function creerElementAgressivite(posPct, st) {
   };
 }
 function placerLabelAgressivite(posPct, st) {
-  const elPie = creerElementAgressivite(posPct, st);
+  if (!chart) return;
+  let syncPos = posPct;
+  try {
+    const optS = chart.getOption()?.series;
+    const pieS = Array.isArray(optS) ? optS.find(s => s && (s.id === 'pieCamembert' || s.type === 'pie')) : null;
+    if ((!Array.isArray(syncPos) || syncPos.length < 2) && pieS && Array.isArray(pieS.center) && pieS.center.length >= 2) {
+      syncPos = pieS.center;
+    }
+  } catch(e){}
+  const elPie = creerElementAgressivite(syncPos, st);
   if (elPie && chart) {
+    const isMasque = (document.getElementById('selPosCamembert')?.value === 'MASQUE');
+    const rPie = isMasque ? new Array(0, 0) : new Array('0%', '22%');
     chart.setOption({
-      title: [{ show: false }, { show: false }],
-      graphic: [elPie]
-    }, { replaceMerge: ['graphic'] });
+      title: new Array({ show: false }, { show: false }),
+      series: new Array({ id: 'pieCamembert', center: syncPos, radius: rPie }),
+      graphic: new Array(elPie)
+    }, { replaceMerge: new Array('graphic') });
   }
 }
 function _old_placer(posPct, st) {
