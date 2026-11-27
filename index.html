@@ -5154,7 +5154,7 @@ window.__chInjecterIndicateurs = function() {
   const isClair = (typeof estThemeClair === "function" && estThemeClair()) || document.body.classList.contains("theme-clair");
   const axisCol = isClair ? "#475569" : "#94A3B8";
   const splitCol = isClair ? "#E2E8F0" : "#1E293B";
-  const xBase = Array.isArray(opt.xAxis) ? opt.xAxis.at(0) : opt.xAxis;
+  const xBase = (Array.isArray(opt.xAxis) ? opt.xAxis.at(0) : opt.xAxis) || { type: "category", data: new Array() };
   const baseYAxes = (Array.isArray(opt.yAxis) ? opt.yAxis : new Array(opt.yAxis)).filter(y => (y.gridIndex || 0) === 0).map(y => ({ ...y, gridIndex: 0 })); const yBase = baseYAxes.at(0); const yOscOffset = baseYAxes.length;
 
   if (cfg.oscs.length === 0) {
