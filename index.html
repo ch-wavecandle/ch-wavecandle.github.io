@@ -12241,52 +12241,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
   setInterval(ensurePieWindowFrame, 100);
 })();
 </script>
-<script id="ch-vertical-pan-fix">
-(function(){
-  function bindSmoothVerticalPan(){
-    const container = document.getElementById("chart-container");
-    if(!container || container.dataset.smoothPanYBound) return;
-    container.dataset.smoothPanYBound = "1";
 
-    let panActive = false, startY = 0, s0 = 0, e0 = 100;
-
-    container.addEventListener("mousedown", (e) => {
-      if(e.button !== 0) return;
-      if(e.target.closest("#ch-hud-tools, #ch-zoom-telemetry-hud-box, #ch-active-indicators-legend, #ch-pie-win-frame")) return;
-      if(typeof chart === "undefined" || !chart) return;
-      const opt = chart.getOption() || {};
-      const dzList = Array.isArray(opt.dataZoom) ? opt.dataZoom : [];
-      const dzY = dzList.find(d => d && (d.id === "zoomY_inside" || d.id === "zoomY_slider" || d.yAxisIndex !== undefined));
-      if(!dzY) return;
-      const curS = (typeof dzY.start === "number") ? dzY.start : 0;
-      const curE = (typeof dzY.end === "number") ? dzY.end : 100;
-      if(curS <= 0.1 && curE >= 99.9) return;
-      panActive = true;
-      startY = e.clientY;
-      s0 = curS;
-      e0 = curE;
-    });
-
-    window.addEventListener("mousemove", (e) => {
-      if(!panActive || typeof chart === "undefined" || !chart) return;
-      const h = Math.max(180, chart.getHeight() * 0.55);
-      const span = e0 - s0;
-      const deltaPct = ((e.clientY - startY) / h) * span;
-      let nextS = s0 + deltaPct;
-      let nextE = e0 + deltaPct;
-      if(nextS < 0){ nextE -= nextS; nextS = 0; }
-      if(nextE > 100){ nextS -= (nextE - 100); nextE = 100; }
-      nextS = Math.max(0, nextS);
-      nextE = Math.min(100, nextE);
-      chart.dispatchAction({ type: "dataZoom", dataZoomId: "zoomY_inside", start: nextS, end: nextE });
-    });
-
-    window.addEventListener("mouseup", () => { panActive = false; });
-  }
-
-  setInterval(bindSmoothVerticalPan, 300);
-})();
-</script>
 <script id="ch-keep-zoom-sliders-visible">
 (function(){
   function enforceZoomSlidersAlwaysVisible(){
@@ -12587,6 +12542,70 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     });
   }
   setInterval(bindStrictXSync, 300);
+})();
+</script>
+<script id="ch-vertical-pan-fix">
+(function(){
+  function bindSmoothVerticalPan(){
+    const container = document.getElementById("chart-container");
+    if(!container || container.dataset.smoothPanYBound) return;
+    container.dataset.smoothPanYBound = "1";
+
+    let panActive = false, startY = 0, s0 = 0, e0 = 100;
+
+    container.addEventListener("mousedown", (e) => {
+      if(e.button !== 0) return;
+      if(e.target.closest("#ch-hud-tools, #ch-zoom-telemetry-hud-box, #ch-active-indicators-legend, #ch-pie-win-frame")) return;
+      const ch = (typeof chart !== "undefined" && chart) ? chart : (window.echarts ? echarts.getInstanceByDom(container) : null);
+      if(!ch) return;
+      const opt = ch.getOption() || {};
+      const dzList = Array.isArray(opt.dataZoom) ? opt.dataZoom : [];
+      const ySliders = dzList.filter(d => d && (d.orient === "vertical" || (d.yAxisIndex !== undefined && d.xAxisIndex === undefined)));
+      if(!ySliders.length) return;
+
+      // Lire la plage active sur le slider vertical (ou zoomY_inside)
+      const activeY = ySliders.find(d => (typeof d.start === "number" && d.start > 0.2) || (typeof d.end === "number" && d.end < 99.8)) || ySliders.at(0);
+      const curS = (typeof activeY.start === "number") ? activeY.start : 0;
+      const curE = (typeof activeY.end === "number") ? activeY.end : 100;
+      if(curS <= 0.2 && curE >= 99.8) return;
+
+      panActive = true;
+      startY = e.clientY;
+      s0 = curS;
+      e0 = curE;
+    });
+
+    window.addEventListener("mousemove", (e) => {
+      if(!panActive) return;
+      const ch = (typeof chart !== "undefined" && chart) ? chart : (window.echarts ? echarts.getInstanceByDom(container) : null);
+      if(!ch) return;
+      const opt = ch.getOption() || {};
+      const dzList = Array.isArray(opt.dataZoom) ? opt.dataZoom : [];
+      const h = Math.max(160, ch.getHeight() * 0.45);
+      const span = e0 - s0;
+      const deltaPct = ((e.clientY - startY) / h) * span;
+      let nextS = s0 + deltaPct;
+      let nextE = e0 + deltaPct;
+      if(nextS < 0){ nextE -= nextS; nextS = 0; }
+      if(nextE > 100){ nextS -= (nextE - 100); nextE = 100; }
+      nextS = Math.max(0, nextS);
+      nextE = Math.min(100, nextE);
+
+      const batchY = [];
+      dzList.forEach((d, idx) => {
+        if(d && (d.orient === "vertical" || (d.yAxisIndex !== undefined && d.xAxisIndex === undefined))){
+          batchY.push({ dataZoomIndex: idx, start: nextS, end: nextE });
+        }
+      });
+      if(batchY.length){
+        ch.dispatchAction({ type: "dataZoom", batch: batchY });
+      }
+    });
+
+    window.addEventListener("mouseup", () => { panActive = false; });
+  }
+
+  setInterval(bindSmoothVerticalPan, 300);
 })();
 </script>
 </body>
