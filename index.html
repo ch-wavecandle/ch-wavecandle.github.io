@@ -2380,8 +2380,8 @@ function dessinerChandeliersMulti(data) { if (document.getElementById('selHorizo
   const option = {
     backgroundColor: '#0A0A0A',
     animation: false,
-    title: { show: false, id: 'titreCamembert', text: `${data.date_deb_fr} → ${data.date_fin_fr}`, left: pieAuto.pos[0], top: pieAuto.topTitle, textAlign: 'center', textStyle: { color: '#FFD700', fontSize: 11, fontFamily: 'Consolas', fontWeight: 'bold' } },
-    grid: { left: 45, right: 100, top: 32, bottom: 22 },
+    title: { show: false, id: 'titreCamembert', text: `${data.date_deb_fr || data.date_fr || ""} → ${data.date_fin_fr || data.date_fr || ""}`, left: pieAuto.pos[0], top: pieAuto.topTitle, textAlign: 'center', textStyle: { color: '#FFD700', fontSize: 11, fontFamily: 'Consolas', fontWeight: 'bold' } },
+    grid: new Array({ left: 45, right: 100, top: 32, bottom: 22 }, { left: 45, right: 100, show: false }, { left: 45, right: 100, show: false }, { left: 45, right: 100, show: false }),
     tooltip: {
       trigger: 'item', z: 999, backgroundColor: 'rgba(18,18,18,0.96)', borderColor: '#444', textStyle: { color: '#FFF', fontFamily: 'Consolas', fontSize: 12 },
       formatter: p => {
@@ -2820,7 +2820,7 @@ function dessinerGraphique(data) { if(document.getElementById("selHorizon")?.val
   chart.setOption({
     backgroundColor: '#0A0A0A', animation: false,
     title: { show: false, id: 'titreCamembert', text: `Séance ${data.date_fr} (09:00 → 15:00)`, left: pieAutoV.pos[0], top: pieAutoV.topTitle, textAlign: 'center', textStyle: { color: '#FFD700', fontSize: 11, fontFamily: 'Consolas', fontWeight: 'bold' } },
-    grid: { left: 45, right: 100, top: 32, bottom: 22 },
+    grid: new Array({ left: 45, right: 100, top: 32, bottom: 22 }, { left: 45, right: 100, show: false }, { left: 45, right: 100, show: false }, { left: 45, right: 100, show: false }),
     tooltip: {
       trigger: 'item', z: 999, backgroundColor: 'rgba(18,18,18,0.96)', borderColor: '#444', textStyle: { color: '#FFF', fontFamily: 'Consolas', fontSize: 12 },
       formatter: p => {
@@ -11909,15 +11909,15 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
 (function(){
   function updateHudActiveIndicatorsList(){
     const hudBox = document.getElementById("ch-zoom-telemetry-hud-box");
-    const hudBody = document.getElementById("ch-hud-body") || hudBox;
-    if(!hudBox || !hudBody || hudBox.style.display === "none") return;
+    hudBox.style.width = "285px"; hudBox.style.minWidth = "285px"; hudBox.style.maxWidth = "285px"; const hudBody = document.getElementById("ch-hud-body");
+    if(!hudBox || hudBox.style.display === "none") return; if(hudBody && hudBody.style.display === "none"){ const r0 = document.getElementById("ch-hud-indicators-summary"); if(r0) r0.style.display = "none"; return; } else { const r0 = document.getElementById("ch-hud-indicators-summary"); if(r0) r0.style.display = "block"; }
 
     let indRow = document.getElementById("ch-hud-indicators-summary");
     if(!indRow){
       indRow = document.createElement("div");
       indRow.id = "ch-hud-indicators-summary";
       indRow.style.cssText = "margin-top:6px;padding-top:5px;border-top:1px solid rgba(56,189,248,0.28);font-size:10.5px;line-height:1.35;color:#e2e8f0;";
-      hudBody.appendChild(indRow);
+      hudBox.appendChild(indRow);
     }
 
     if(typeof chart === "undefined" || !chart){
