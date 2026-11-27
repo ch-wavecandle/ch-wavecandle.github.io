@@ -5155,7 +5155,7 @@ window.__chInjecterIndicateurs = function() {
   const axisCol = isClair ? "#475569" : "#94A3B8";
   const splitCol = isClair ? "#E2E8F0" : "#1E293B";
   const xBase = (Array.isArray(opt.xAxis) ? opt.xAxis.at(0) : opt.xAxis) || { type: "category", data: new Array() };
-  const baseYAxes = (Array.isArray(opt.yAxis) ? opt.yAxis : new Array(opt.yAxis)).filter(y => (y.gridIndex || 0) === 0).map(y => ({ ...y, gridIndex: 0 })); const yBase = baseYAxes.at(0); const yOscOffset = baseYAxes.length;
+  const rawY0 = (Array.isArray(opt.yAxis) ? opt.yAxis.at(0) : opt.yAxis) || { type: "value", position: "right" }; const baseYAxes = new Array({ ...rawY0, gridIndex: 0, position: "right" }); const yBase = baseYAxes.at(0); const yOscOffset = 1;
 
   if (cfg.oscs.length === 0) {
     if (Array.isArray(opt.grid) && opt.grid.length > 1) {
@@ -11949,11 +11949,15 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
         return `<span style="display:inline-flex;align-items:center;gap:4px;margin:2px 4px 0 0;padding:1px 5px;border-radius:4px;background:rgba(15,23,42,0.85);border:1px solid ${col};color:#f8fafc;font-size:10px;"><span style="width:6px;height:6px;border-radius:50%;background:${col};display:inline-block;"></span>${nm}<b style="color:${col};">${vTxt}</b></span>`;
       });
 
-      indRow.innerHTML = `<div style="color:#38bdf8;font-weight:700;margin-bottom:2px;">Indicateurs actifs (${indSeries.length}) :</div><div style="display:flex;flex-wrap:wrap;">${badges.join("")}</div>`;
+      const nextHtml = `<div style="color:#38bdf8;font-weight:700;margin-bottom:2px;">Indicateurs actifs (${indSeries.length}) :</div><div style="display:flex;flex-wrap:wrap;">${badges.join("")}</div>`;
+      if(indRow.dataset.lastHtml !== nextHtml){
+        indRow.dataset.lastHtml = nextHtml;
+        indRow.innerHTML = nextHtml;
+      }
     } catch(e){}
   }
 
-  setInterval(updateHudActiveIndicatorsList, 350);
+  setInterval(updateHudActiveIndicatorsList, 600);
 })();
 </script>
 </body>
