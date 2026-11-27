@@ -5178,7 +5178,7 @@ window.__chInjecterIndicateurs = function() {
   const nOsc = cfg.oscs.length;
   const mainH = nOsc === 1 ? 67 : (nOsc === 2 ? 53 : (nOsc === 3 ? 41 : 35));
   const gapPct = 3.2;
-  const availH = 93.5 - mainH - (nOsc * gapPct);
+  const availH = 88.5 - mainH - (nOsc * gapPct);
   const subH = +(availH / nOsc).toFixed(1);
 
   const grids = new Array({ left: 45, right: 100, top: 32, height: mainH + "%" });
@@ -5191,7 +5191,7 @@ window.__chInjecterIndicateurs = function() {
     const topPct = +(mainH + 4.2 + idx * (subH + gapPct)).toFixed(1);
     allXIdx.push(gIdx);
     grids.push({ left: 45, right: 100, top: topPct + "%", height: subH + "%" });
-    const isLastSub = (idx === nOsc - 1); xAxes.push({ ...xBase, gridIndex: gIdx, axisLabel: isLastSub ? (xBase.axisLabel || { show: true }) : { show: false } });
+    const isLastSub = (idx === nOsc - 1); xAxes.push({ ...xBase, gridIndex: gIdx, axisLabel: isLastSub ? { ...(xBase.axisLabel || {}), show: true, color: axisCol, fontSize: 10 } : { show: false } });
     let yOsc = { gridIndex: gIdx, position: "right", name: oscName, nameLocation: "middle", nameGap: 44, nameRotate: 90, nameTextStyle: { color: axisCol, fontSize: 9, fontWeight: "bold" }, axisLabel: { color: axisCol, fontSize: 9, hideOverlap: true, showMinLabel: false, showMaxLabel: false }, splitLine: { lineStyle: { color: splitCol } } };
 
     if (oscName === "DELTA") {
@@ -11474,13 +11474,14 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     const curTk = getCurrentTickerKey();
     // 1. Masquer tout element DOM d'en-tete central du graphique portant le nom de la valeur
     const container = document.getElementById("chart-container");
-    if(container){
+        if(container){
       container.querySelectorAll("div, span").forEach(el => {
         if(el.id === "ch-chart-ticker-watermark" || el.closest("#ch-chart-ticker-watermark")) return;
-        if(el.closest("#ch-hud-tools") || el.closest("#ch-zoom-telemetry-hud-box")) return;
+        if(el.closest("#ch-hud-tools") || el.closest("#ch-zoom-telemetry-hud-box") || el.closest("#ch-active-indicators-legend")) return;
+        const r = el.getBoundingClientRect();
         const txt = (el.textContent || "").trim().toUpperCase();
-        if(curTk && txt === curTk && el.getBoundingClientRect().top < 140){
-          el.style.display = "none";
+        if(r.top < 110 && r.left > container.clientWidth * 0.25 && r.right < container.clientWidth * 0.78 && ((curTk && txt.includes(curTk)) || txt.includes("SÉANCE") || txt.includes("SEANCE"))){
+          el.remove();
         }
       });
     }
@@ -11888,18 +11889,17 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
       if(legendBox.dataset.userMoved !== "1"){
         legendBox.style.cssText = `
           position:absolute;
-          top:${isMob ? "42px" : "8px"};
-          left:50%;
-          transform:translateX(-50%);
+          bottom:${isMob ? "22px" : "24px"};
+          right:${isMob ? "12px" : "108px"};
           z-index:26;
           pointer-events:auto;
           cursor:move;
           user-select:none;
           display:flex;
           flex-wrap:wrap;
-          justify-content:center;
+          justify-content:flex-end;
           gap:5px;
-          max-width:${isMob ? "86vw" : "46vw"};
+          max-width:${isMob ? "90vw" : "58vw"};
         `;
       } else {
         legendBox.style.display = "flex";
