@@ -6851,7 +6851,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     const info = ensureFreeHandOption();
     if(!info) return;
     info.sel.value = info.handOpt.value;
-    info.window.__CH_MOB_SHEET_SELECTING = true; sel.dispatchEvent(new Event("change", { bubbles: true })); setTimeout(() => { window.__CH_MOB_SHEET_SELECTING = false; }, 80);
+    window.__CH_MOB_SHEET_SELECTING = true; info.sel.dispatchEvent(new Event("change", { bubbles: true })); setTimeout(() => { window.__CH_MOB_SHEET_SELECTING = false; }, 80);
     isDrawingTool = false;
     clicksNeeded = 0;
     clicksDone = 0;
