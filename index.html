@@ -12333,7 +12333,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     if(!container || !ch) return;
 
     // A. Zoom molette universel sur l'axe X (fonctionne 100% avec ou sans indicateurs)
-    if(!container.dataset.univWheelXBound){
+    if(false && !container.dataset.univWheelXBound){
       container.dataset.univWheelXBound = "1";
       container.addEventListener("wheel", (e) => {
         if(e.shiftKey || e.ctrlKey || e.altKey) return;
@@ -12550,6 +12550,40 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
   }
 
   setInterval(syncSuperposedSliders, 300);
+})();
+</script>
+<script id="ch-strict-xaxis-sync-lock">
+(function(){
+  let locking = false;
+  function bindStrictXSync(){
+    const dom = document.getElementById("chart-container");
+    const ch = (typeof chart !== "undefined" && chart) ? chart : (window.echarts && dom ? echarts.getInstanceByDom(dom) : null);
+    if(!ch || ch.__chStrictXSyncBound) return;
+    ch.__chStrictXSyncBound = true;
+
+    ch.on("datazoom", function(){
+      if(locking) return;
+      const opt = ch.getOption() || {};
+      const dzList = Array.isArray(opt.dataZoom) ? opt.dataZoom : [];
+      const xAxes = Array.isArray(opt.xAxis) ? opt.xAxis : (opt.xAxis ? [opt.xAxis] : []);
+      if(xAxes.length <= 1) return;
+
+      const dzX = dzList.find(d => d && (d.id === "zoomX_inside" || d.id === "zoomX_slider" || (Array.isArray(d.xAxisIndex) && d.xAxisIndex.includes(0))));
+      if(!dzX || typeof dzX.start !== "number" || typeof dzX.end !== "number") return;
+
+      locking = true;
+      try {
+        const batch = dzList.map((d, idx) => {
+          if(d && (d.yAxisIndex !== undefined && d.xAxisIndex === undefined)) return null;
+          return { dataZoomIndex: idx, start: dzX.start, end: dzX.end };
+        }).filter(Boolean);
+        if(batch.length > 1) ch.dispatchAction({ type: "dataZoom", batch: batch });
+      } finally {
+        locking = false;
+      }
+    });
+  }
+  setInterval(bindStrictXSync, 300);
 })();
 </script>
 </body>
