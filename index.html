@@ -2396,8 +2396,8 @@ function dessinerChandeliersMulti(data) { if (document.getElementById('selHorizo
     dataZoom: [
       Object.assign({ id: 'zoomX_inside', type: 'inside', xAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: true, moveOnMouseMove: true }, window.__CH_GET_INIT_X_ZOOM(bougies)),
       Object.assign({ id: 'zoomY_inside', type: 'inside', yAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: 'shift', moveOnMouseMove: true }, window.__CH_GET_INIT_Y_ZOOM(typeof bougies !== 'undefined' ? bougies : null)),
-      Object.assign({ id: 'zoomX_slider', type: 'slider', xAxisIndex: 0, height: 18, bottom: 8, borderColor: '#333', fillerColor: 'rgba(0,229,255,0.15)' }, window.__CH_GET_INIT_X_ZOOM(bougies)),
-      Object.assign({ id: 'zoomY_slider', type: 'slider', orient: 'vertical', yAxisIndex: 0, top: 42, height: Math.max(260, (document.getElementById('chart-container')?.clientHeight || 520) - 92), right: 4, width: 16, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false }, window.__CH_GET_INIT_Y_ZOOM(typeof bougies !== 'undefined' ? bougies : null))
+      Object.assign({ id: 'zoomX_slider', type: 'slider', show: true, xAxisIndex: 0, height: 18, bottom: 8, borderColor: '#333', fillerColor: 'rgba(0,229,255,0.15)' }, window.__CH_GET_INIT_X_ZOOM(bougies)),
+      Object.assign({ id: 'zoomY_slider', type: 'slider', show: true, orient: 'vertical', yAxisIndex: 0, top: 42, height: Math.max(260, (document.getElementById('chart-container')?.clientHeight || 520) - 92), right: 4, width: 16, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false }, window.__CH_GET_INIT_Y_ZOOM(typeof bougies !== 'undefined' ? bougies : null))
     ],
     xAxis: {
       type: 'category', data: bougies.map(b => b.label),
@@ -2832,8 +2832,8 @@ function dessinerGraphique(data) { if(document.getElementById("selHorizon")?.val
     dataZoom: [
       { id: 'zoomX_inside', type: 'inside', xAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: true, moveOnMouseMove: true, start: zoomXStart, end: zoomXEnd },
       { id: 'zoomY_inside', type: 'inside', yAxisIndex: 0, filterMode: 'none', zoomOnMouseWheel: 'shift', moveOnMouseMove: true, start: zoomYStart, end: zoomYEnd },
-      { id: 'zoomX_slider', type: 'slider', xAxisIndex: 0, height: 18, bottom: 8, borderColor: '#333', fillerColor: 'rgba(0,229,255,0.15)', start: zoomXStart, end: zoomXEnd },
-      Object.assign({ id: 'zoomY_slider', type: 'slider', orient: 'vertical', yAxisIndex: 0, top: 42, height: Math.max(260, (document.getElementById('chart-container')?.clientHeight || 520) - 92), right: 4, width: 16, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false }, window.__CH_GET_INIT_Y_ZOOM(typeof bougies !== 'undefined' ? bougies : null))
+      { id: 'zoomX_slider', type: 'slider', show: true, xAxisIndex: 0, height: 18, bottom: 8, borderColor: '#333', fillerColor: 'rgba(0,229,255,0.15)', start: zoomXStart, end: zoomXEnd },
+      Object.assign({ id: 'zoomY_slider', type: 'slider', show: true, orient: 'vertical', yAxisIndex: 0, top: 42, height: Math.max(260, (document.getElementById('chart-container')?.clientHeight || 520) - 92), right: 4, width: 16, borderColor: '#64748B', fillerColor: 'rgba(56,189,248,0.22)', handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false }, window.__CH_GET_INIT_Y_ZOOM(typeof bougies !== 'undefined' ? bougies : null))
     ],
     xAxis: { type: 'value', min: 32400, max: 54000, interval: 3600, axisLine: { lineStyle: { color: '#333' } }, splitLine: { lineStyle: { color: '#1E1E1E' } }, axisLabel: { color: '#999', formatter: val => heureDepuisSec(val).slice(0,5) } },
     yAxis: { type: 'value', position: 'right', min: +(prixMin - margeY * 0.3).toFixed(2), max: +(prixMax + margeY).toFixed(2), axisLine: { lineStyle: { color: '#333' } }, splitLine: { lineStyle: { color: '#1E1E1E' } }, axisLabel: { color: '#999', formatter: val => val.toFixed(2) } },
@@ -5163,7 +5163,7 @@ window.__chInjecterIndicateurs = function() {
         grid: new Array({ left: 45, right: 100, top: 32, bottom: 22 }),
         xAxis: new Array({ ...xBase, gridIndex: 0 }),
         yAxis: baseYAxes,
-        dataZoom: new Array({ id: "zoomX_inside", type: "inside", xAxisIndex: new Array(0), filterMode: "none", zoomOnMouseWheel: true, moveOnMouseMove: true, moveOnMouseWheel: false }, { id: "zoomX_slider", type: "slider", xAxisIndex: new Array(0), filterMode: "none", left: 45, right: 100, bottom: 4, height: 12, showDetail: false }, { id: "zoomY_inside", type: "inside", yAxisIndex: 0, filterMode: "none", zoomOnMouseWheel: "shift", moveOnMouseMove: true, moveOnMouseWheel: false }, { id: "zoomY_slider", type: "slider", orient: "vertical", yAxisIndex: 0, filterMode: "none", right: 4, top: 32, height: "70%", width: 12, showDetail: false }),
+        dataZoom: new Array({ id: "zoomX_inside", type: "inside", xAxisIndex: new Array(0), filterMode: "none", zoomOnMouseWheel: true, moveOnMouseMove: true, moveOnMouseWheel: false }, { id: "zoomX_slider", type: "slider", show: true, xAxisIndex: new Array(0), filterMode: "none", left: 45, right: 100, bottom: 4, height: 12, brushSelect: false, showDetail: false }, { id: "zoomY_inside", type: "inside", yAxisIndex: 0, filterMode: "none", zoomOnMouseWheel: "shift", moveOnMouseMove: true, moveOnMouseWheel: false }, { id: "zoomY_slider", type: "slider", show: true, orient: "vertical", yAxisIndex: 0, filterMode: "none", right: 4, top: 32, height: "72%", width: 12, brushSelect: false, showDetail: false }),
         series: extra
   }, { replaceMerge: new Array("grid") });
     } else {
