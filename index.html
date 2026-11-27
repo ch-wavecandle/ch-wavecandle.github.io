@@ -11703,8 +11703,8 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
               y: cy,
               invisible: isMasque,
               children: [
-                { id: "pieTxtTop", invisible: isMasque, style: { x: 0, y: relTopY } },
-                { id: "pieTxtBot", invisible: isMasque, style: { x: 0, y: relBotY } }
+                { id: "pieTxtTop", invisible: isMasque, style: { x: 0, y: relTopY, font: `bold ${Math.max(9, Math.round(11 * pieScale))}px Consolas` } },
+                { id: "pieTxtBot", invisible: isMasque, style: { x: 0, y: relBotY, font: `bold ${Math.max(9, Math.round(11.5 * pieScale))}px Consolas` } }
               ]
             }]
           });
@@ -11889,7 +11889,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
       if(legendBox.dataset.userMoved !== "1"){
         legendBox.style.cssText = `
           position:absolute;
-          top:${isMob ? "42px" : "8px"};
+          top:${isMob ? "42px" : "38px"};
           right:${isMob ? "12px" : "108px"};
           z-index:26;
           pointer-events:auto;
@@ -11995,66 +11995,96 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
 (function(){
   window.__CH_PIE_SCALE = window.__CH_PIE_SCALE || 1.0;
 
-  function ensurePieResizeControls(){
+  function ensurePieWindowFrame(){
     const container = document.getElementById("chart-container");
     if(!container) return;
-    let ctrl = document.getElementById("ch-pie-size-controls");
-    if(!ctrl){
-      ctrl = document.createElement("div");
-      ctrl.id = "ch-pie-size-controls";
-      ctrl.style.cssText = "position:absolute;z-index:27;display:none;align-items:center;gap:3px;background:rgba(15,23,42,0.82);border:1px solid rgba(148,163,184,0.45);border-radius:6px;padding:1px 4px;box-shadow:0 2px 6px rgba(0,0,0,0.25);";
-      ctrl.innerHTML = `
-        <button id="ch-pie-dec-btn" title="Réduire le Camembert" style="background:transparent;border:none;color:#f8fafc;font-weight:bold;font-size:12px;cursor:pointer;padding:0 4px;">−</button>
-        <span id="ch-pie-scale-lbl" style="font-family:Consolas,monospace;font-size:9.5px;color:#38bdf8;">100%</span>
-        <button id="ch-pie-inc-btn" title="Agrandir le Camembert" style="background:transparent;border:none;color:#f8fafc;font-weight:bold;font-size:12px;cursor:pointer;padding:0 4px;">+</button>
-      `;
-      container.appendChild(ctrl);
 
-      const applyScale = (delta) => {
-        window.__CH_PIE_SCALE = Math.max(0.55, Math.min(1.85, +((window.__CH_PIE_SCALE || 1.0) + delta).toFixed(2)));
-        const lbl = document.getElementById("ch-pie-scale-lbl");
-        if(lbl) lbl.textContent = Math.round(window.__CH_PIE_SCALE * 100) + "%";
+    let frame = document.getElementById("ch-pie-win-frame");
+    if(!frame){
+      frame = document.createElement("div");
+      frame.id = "ch-pie-win-frame";
+      frame.style.cssText = "position:absolute;z-index:25;pointer-events:none;border:1px dashed transparent;border-radius:10px;transition:border-color 0.15s;";
+
+      // 8 poignees style fenetre Windows : 4 cotes (n, s, e, w) + 4 angles (nw, ne, sw, se)
+      const handles = [
+        { dir: "n",  css: "top:-4px;left:10px;right:10px;height:8px;cursor:ns-resize;" },
+        { dir: "s",  css: "bottom:-4px;left:10px;right:10px;height:8px;cursor:ns-resize;" },
+        { dir: "e",  css: "right:-4px;top:10px;bottom:10px;width:8px;cursor:ew-resize;" },
+        { dir: "w",  css: "left:-4px;top:10px;bottom:10px;width:8px;cursor:ew-resize;" },
+        { dir: "nw", css: "top:-5px;left:-5px;width:11px;height:11px;cursor:nwse-resize;" },
+        { dir: "ne", css: "top:-5px;right:-5px;width:11px;height:11px;cursor:nesw-resize;" },
+        { dir: "sw", css: "bottom:-5px;left:-5px;width:11px;height:11px;cursor:nesw-resize;" },
+        { dir: "se", css: "bottom:-5px;right:-5px;width:11px;height:11px;cursor:nwse-resize;" }
+      ];
+
+      let resizing = false, activeDir = "", startX = 0, startY = 0, startScale = 1.0, centerX = 0, centerY = 0, baseR = 40;
+
+      for(const h of handles){
+        const el = document.createElement("div");
+        el.dataset.dir = h.dir;
+        el.style.cssText = "position:absolute;pointer-events:auto;" + h.css;
+        el.addEventListener("mouseenter", () => { frame.style.borderColor = "rgba(56,189,248,0.65)"; });
+        el.addEventListener("mouseleave", () => { if(!resizing) frame.style.borderColor = "transparent"; });
+
+        const beginResize = (cx, cy) => {
+          resizing = true;
+          activeDir = h.dir;
+          startX = cx; startY = cy;
+          startScale = Number(window.__CH_PIE_SCALE || 1.0);
+          frame.style.borderColor = "#38bdf8";
+          const r = frame.getBoundingClientRect();
+          centerX = r.left + r.width / 2;
+          centerY = r.top + r.height / 2;
+        };
+
+        el.addEventListener("mousedown", e => { e.preventDefault(); e.stopPropagation(); beginResize(e.clientX, e.clientY); });
+        el.addEventListener("touchstart", e => { if(e.touches.length === 1){ e.stopPropagation(); const t = e.touches.item(0); beginResize(t.clientX, t.clientY); } }, { passive: true });
+        frame.appendChild(el);
+      }
+
+      const updateScaleFromPointer = (cx, cy) => {
+        if(!resizing) return;
+        const dx0 = Math.abs(startX - centerX), dy0 = Math.abs(startY - centerY);
+        const dx1 = Math.abs(cx - centerX), dy1 = Math.abs(cy - centerY);
+        let ratio = 1.0;
+        if(activeDir === "e" || activeDir === "w") ratio = dx1 / Math.max(dx0, 14);
+        else if(activeDir === "n" || activeDir === "s") ratio = dy1 / Math.max(dy0, 14);
+        else ratio = Math.max(dx1 / Math.max(dx0, 14), dy1 / Math.max(dy0, 14));
+        window.__CH_PIE_SCALE = Math.max(0.55, Math.min(1.90, +(startScale * ratio).toFixed(3)));
       };
-      document.getElementById("ch-pie-dec-btn").onclick = (e) => { e.stopPropagation(); applyScale(-0.15); };
-      document.getElementById("ch-pie-inc-btn").onclick = (e) => { e.stopPropagation(); applyScale(+0.15); };
 
-      // Molette souris directement sur le Camembert pour agrandir/diminuer
-      container.addEventListener("wheel", (e) => {
-        if(typeof chart === "undefined" || !chart) return;
-        const opt = chart.getOption() || {};
-        const pieS = (Array.isArray(opt.series) ? opt.series : []).find(s => s && (s.id === "pieCamembert" || s.type === "pie"));
-        if(!pieS || !Array.isArray(pieS.center)) return;
-        const w = chart.getWidth(), h = chart.getHeight();
-        const cx = (parseFloat(pieS.center.at(0)) / 100) * w;
-        const cy = (parseFloat(pieS.center.at(1)) / 100) * h;
-        const R = Math.max(28, Math.round(Math.min(w, h) * 0.088 * (window.__CH_PIE_SCALE || 1.0)));
-        const r = container.getBoundingClientRect();
-        const dx = (e.clientX - r.left) - cx, dy = (e.clientY - r.top) - cy;
-        if((dx * dx + dy * dy) <= (R + 12) * (R + 12)){
-          e.preventDefault();
-          e.stopPropagation();
-          applyScale(e.deltaY < 0 ? 0.12 : -0.12);
-        }
-      }, { passive: false, capture: true });
+      window.addEventListener("mousemove", e => updateScaleFromPointer(e.clientX, e.clientY));
+      window.addEventListener("mouseup", () => { if(resizing){ resizing = false; frame.style.borderColor = "transparent"; } });
+      window.addEventListener("touchmove", e => { if(resizing && e.touches.length === 1){ e.preventDefault(); const t = e.touches.item(0); updateScaleFromPointer(t.clientX, t.clientY); } }, { passive: false });
+      window.addEventListener("touchend", () => { if(resizing){ resizing = false; frame.style.borderColor = "transparent"; } });
+
+      container.appendChild(frame);
     }
 
-    // Positionner discretement les boutons [- 100% +] juste sous le titre du bas du Camembert
-    if(typeof chart === "undefined" || !chart){ ctrl.style.display = "none"; return; }
+    if(typeof chart === "undefined" || !chart){ frame.style.display = "none"; return; }
     const opt = chart.getOption() || {};
     const pieS = (Array.isArray(opt.series) ? opt.series : []).find(s => s && (s.id === "pieCamembert" || s.type === "pie"));
     const isMasque = (document.getElementById("selPosCamembert")?.value === "MASQUE") || !pieS || (Array.isArray(pieS.radius) && parseFloat(pieS.radius.at(1)) === 0);
-    if(isMasque || !Array.isArray(pieS.center)){ ctrl.style.display = "none"; return; }
+    if(isMasque || !Array.isArray(pieS.center)){ frame.style.display = "none"; return; }
 
     const w = chart.getWidth(), h = chart.getHeight();
+    const scale = Number(window.__CH_PIE_SCALE || 1.0);
     const cx = (parseFloat(pieS.center.at(0)) / 100) * w;
     const cy = (parseFloat(pieS.center.at(1)) / 100) * h;
-    const R = Math.max(28, Math.round(Math.min(w, h) * 0.088 * (window.__CH_PIE_SCALE || 1.0)));
-    ctrl.style.display = "flex";
-    ctrl.style.left = Math.max(6, Math.min(w - 86, cx - 38)) + "px";
-    ctrl.style.top = Math.min(h - 28, cy + R + 28) + "px";
+    const R = Math.max(28, Math.round(Math.min(w, h) * 0.088 * scale));
+
+    // Englober exactement le disque + titre haut (R + 28) + titre bas (R + 24)
+    const halfW = Math.max(R + 18, Math.round(92 * scale));
+    const topH = R + 28;
+    const botH = R + 24;
+    frame.style.display = "block";
+    frame.style.left = Math.max(2, cx - halfW) + "px";
+    frame.style.top = Math.max(2, cy - topH) + "px";
+    frame.style.width = (halfW * 2) + "px";
+    frame.style.height = (topH + botH) + "px";
   }
 
-  setInterval(ensurePieResizeControls, 220);
+  setInterval(ensurePieWindowFrame, 120);
 })();
 </script>
 </body>
