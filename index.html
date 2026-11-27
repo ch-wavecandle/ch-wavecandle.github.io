@@ -5192,7 +5192,7 @@ window.__chInjecterIndicateurs = function() {
     allXIdx.push(gIdx);
     grids.push({ left: 45, right: 92, top: topPct + "%", height: subH + "%" });
     const isLastSub = (idx === nOsc - 1); xAxes.push({ ...xBase, gridIndex: gIdx, axisLabel: isLastSub ? (xBase.axisLabel || { show: true }) : { show: false } });
-    let yOsc = { gridIndex: gIdx, position: "right", name: oscName, nameLocation: "end", nameGap: 2, nameTextStyle: { color: axisCol, fontSize: 9, fontWeight: "bold" }, axisLabel: { color: axisCol, fontSize: 9, hideOverlap: true, showMinLabel: false }, splitLine: { lineStyle: { color: splitCol } } };
+    let yOsc = { gridIndex: gIdx, position: "right", name: oscName, nameLocation: "middle", nameGap: 46, nameRotate: 90, nameTextStyle: { color: axisCol, fontSize: 9, fontWeight: "bold" }, axisLabel: { color: axisCol, fontSize: 9, hideOverlap: true, showMinLabel: false }, splitLine: { lineStyle: { color: splitCol } } };
 
     if (oscName === "DELTA") {
       extra.push({ id: "ind_osc_delta", name: "Delta Net", type: "bar", barMaxWidth: 14, xAxisIndex: gIdx, yAxisIndex: yIdx, itemStyle: { color: (p) => ((Array.isArray(p.value) ? p.value.at(1) : p.value) >= 0) ? "#10B981" : "#EF4444" }, data: pair(deltaArr) });
@@ -11755,6 +11755,123 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     enforceUnifiedPieGeometry();
     // keep full session time axis in Live
   }, 150);
+})();
+</script>
+<script id="ch-indicator-curve-labels">
+(function(){
+  function enrichIndicatorCurveLabelsAndLegend(){
+    if(typeof chart === "undefined" || !chart) return;
+    const container = document.getElementById("chart-container");
+    if(!container) return;
+
+    try {
+      const opt = chart.getOption() || {};
+      const sList = Array.isArray(opt.series) ? opt.series : [];
+      const indSeries = sList.filter(s => s && String(s.id || "").startsWith("ind_"));
+
+      let legendBox = document.getElementById("ch-active-indicators-legend");
+      if(indSeries.length === 0){
+        if(legendBox) legendBox.style.display = "none";
+        return;
+      }
+
+      // 1. Activer endLabel sur chaque courbe lineaire d'indicateur qui ne l'a pas encore
+      let needUpdate = false;
+      const updatedSeries = [];
+      const legendItems = [];
+
+      for(const s of indSeries){
+        const col = (s.lineStyle && s.lineStyle.color) || (s.itemStyle && typeof s.itemStyle.color === "string" ? s.itemStyle.color : "#38BDF8");
+        const cleanName = String(s.name || s.id.replace("ind_", "")).trim();
+
+        // Extraire la derniere valeur non nulle de la serie
+        let lastVal = null;
+        if(Array.isArray(s.data)){
+          for(let i = s.data.length - 1; i >= 0; i--){
+            const pt = s.data.at(i);
+            const v = Array.isArray(pt) ? pt.at(1) : (pt && typeof pt === "object" ? pt.value : pt);
+            if(typeof v === "number" && Number.isFinite(v)){ lastVal = v; break; }
+          }
+        }
+        legendItems.push({ name: cleanName, color: col, val: lastVal, isOsc: String(s.id).startsWith("ind_osc_") });
+
+        if(s.type === "line" && (!s.endLabel || !s.endLabel.show)){
+          needUpdate = true;
+          updatedSeries.push({
+            id: s.id,
+            endLabel: {
+              show: true,
+              formatter: cleanName,
+              color: col,
+              fontSize: 10.5,
+              fontWeight: "bold",
+              fontFamily: "Consolas, monospace",
+              distance: 6,
+              backgroundColor: "rgba(15,23,42,0.75)",
+              borderRadius: 4,
+              padding: [2, 5]
+            },
+            labelLayout: { moveOverlap: "shiftY" }
+          });
+        }
+      }
+
+      if(needUpdate && updatedSeries.length > 0){
+        chart.setOption({ series: updatedSeries });
+      }
+
+      // 2. Afficher le ruban compact des courbes actives en haut a droite (sans toucher aux bougies)
+      const isClair = (typeof estThemeClair === "function") ? estThemeClair() : !document.body.classList.contains("dark-theme");
+      if(!legendBox){
+        legendBox = document.createElement("div");
+        legendBox.id = "ch-active-indicators-legend";
+        if(getComputedStyle(container).position === "static") container.style.position = "relative";
+        container.appendChild(legendBox);
+      }
+
+      const isMob = window.innerWidth <= 960;
+      legendBox.style.cssText = `
+        position:absolute;
+        top:${isMob ? "42px" : "38px"};
+        right:${isMob ? "52px" : "96px"};
+        z-index:22;
+        pointer-events:none;
+        display:flex;
+        flex-wrap:wrap;
+        justify-content:flex-end;
+        gap:5px;
+        max-width:${isMob ? "64vw" : "48vw"};
+      `;
+      legendBox.innerHTML = "";
+      for(const it of legendItems){
+        const pill = document.createElement("span");
+        pill.style.cssText = `
+          display:inline-flex;
+          align-items:center;
+          gap:5px;
+          padding:2px 7px;
+          border-radius:6px;
+          font-family:Consolas,monospace;
+          font-size:10.5px;
+          font-weight:700;
+          background:${isClair ? "rgba(255,255,255,0.84)" : "rgba(15,23,42,0.82)"};
+          border:1px solid ${it.color};
+          color:${isClair ? "#0f172a" : "#f1f5f9"};
+          box-shadow:0 2px 6px rgba(0,0,0,0.08);
+        `;
+        const dot = document.createElement("span");
+        dot.style.cssText = `width:7px;height:7px;border-radius:50%;background:${it.color};display:inline-block;flex-shrink:0;`;
+        const txt = document.createElement("span");
+        const valFmt = (it.val !== null) ? (" : " + (Math.abs(it.val) >= 100 ? Math.round(it.val).toLocaleString("fr-FR") : it.val.toFixed(2))) : "";
+        txt.textContent = it.name + valFmt;
+        pill.appendChild(dot);
+        pill.appendChild(txt);
+        legendBox.appendChild(pill);
+      }
+    } catch(e){}
+  }
+
+  setInterval(enrichIndicatorCurveLabelsAndLegend, 350);
 })();
 </script>
 </body>
