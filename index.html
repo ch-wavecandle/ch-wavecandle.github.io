@@ -2401,7 +2401,7 @@ function dessinerChandeliersMulti(data) { if (document.getElementById('selHorizo
     ],
     xAxis: {
       type: 'category', data: bougies.map(b => b.label),
-      axisLine: { lineStyle: { color: '#333' } }, splitLine: { show: (lastVal !== null), lineStyle: { color: '#1E1E1E' } },
+      axisLine: { lineStyle: { color: '#333' } }, splitLine: { show: true, lineStyle: { color: '#1E1E1E' } },
       axisLabel: {
         color: '#999', fontFamily: 'Consolas',
         interval: (data.granularite === 'SEMAINE' || data.granularite === 'MOIS') ? 0 : 'auto',
@@ -2641,7 +2641,7 @@ function dessinerChandeliersIntraday(data, pasMinutes) { const rp = String(pasMi
   }
 }
 
-function dessinerGraphique(data) { if (document.getElementById("selHorizon")?.value === "MULTI" && !window.__chForceSingleDraw) return;
+function dessinerGraphique(data) { if(document.getElementById("selHorizon")?.value === "MULTI") return; if (document.getElementById("selHorizon")?.value === "MULTI" && !window.__chForceSingleDraw) return;
   const vagues = data.vagues;
   if (!vagues || !vagues.length) { chart.clear(); return; }
   const modeActuel = document.getElementById('selModeRendu') ? document.getElementById('selModeRendu').value : 'VAGUES';
@@ -11830,8 +11830,8 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
           if(needTrim) upd.data = trimmedData;
           if(s.type === "line"){
             upd.endLabel = {
-              show: (lastVal !== null),
-              formatter: cleanName,
+              show: true,
+              formatter: cleanName, show: (lastVal !== null),
               color: col,
               fontSize: 10,
               fontWeight: "bold",
