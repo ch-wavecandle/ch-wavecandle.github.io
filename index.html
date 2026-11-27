@@ -12488,5 +12488,69 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
   setInterval(enhanceClosedCardAndDarkModal, 250);
 })();
 </script>
+<script id="ch-superposed-transparent-sliders">
+(function(){
+  function syncSuperposedSliders(){
+    const dom = document.getElementById("chart-container");
+    const ch = (typeof chart !== "undefined" && chart) ? chart : (window.echarts && dom ? echarts.getInstanceByDom(dom) : null);
+    if(!ch) return;
+    const opt = ch.getOption() || {};
+    const dzList = Array.isArray(opt.dataZoom) ? opt.dataZoom : [];
+    const hasSub = Array.isArray(opt.grid) && opt.grid.filter(g => g && g.show !== false).length > 1;
+    const vH = hasSub ? "42%" : "76%";
+
+    const sx = dzList.find(d => d && d.id === "zoomX_slider");
+    const sy = dzList.find(d => d && d.id === "zoomY_slider");
+    if(sx && sy && Number(sx.bottom) === 26 && Number(sy.right) === 54 && Number(sx.height) === 16) return;
+
+    const xAxes = Array.isArray(opt.xAxis) ? opt.xAxis : (opt.xAxis ? [opt.xAxis] : []);
+    const allX = xAxes.length > 0 ? xAxes.map((_, i) => i) : new Array(0);
+    const commonStyle = {
+      type: "slider",
+      show: true,
+      filterMode: "none",
+      backgroundColor: "rgba(148,163,184,0.06)",
+      borderColor: "rgba(100,116,139,0.50)",
+      fillerColor: "rgba(56,189,248,0.14)",
+      dataBackground: { lineStyle: { opacity: 0 }, areaStyle: { opacity: 0 } },
+      selectedDataBackground: { lineStyle: { opacity: 0 }, areaStyle: { opacity: 0 } },
+      handleSize: "100%",
+      handleStyle: { color: "#38bdf8", borderColor: "#e0f2fe", borderWidth: 1 },
+      moveHandleSize: 0,
+      brushSelect: false,
+      showDetail: false,
+      z: 35
+    };
+
+    ch.setOption({
+      dataZoom: [
+        Object.assign({}, commonStyle, {
+          id: "zoomX_slider",
+          xAxisIndex: allX,
+          start: (sx && typeof sx.start === "number") ? sx.start : 0,
+          end: (sx && typeof sx.end === "number") ? sx.end : 100,
+          left: 45,
+          right: 100,
+          bottom: 26,
+          height: 16
+        }),
+        Object.assign({}, commonStyle, {
+          id: "zoomY_slider",
+          orient: "vertical",
+          yAxisIndex: 0,
+          start: (sy && typeof sy.start === "number") ? sy.start : 0,
+          end: (sy && typeof sy.end === "number") ? sy.end : 100,
+          right: 54,
+          top: 32,
+          height: vH,
+          width: 16
+        })
+      ]
+    });
+  }
+
+  setInterval(syncSuperposedSliders, 300);
+})();
+</script>
 </body>
 </html>
