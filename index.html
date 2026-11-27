@@ -2520,7 +2520,7 @@ function dessinerChandeliersMulti(data) { if (document.getElementById('selHorizo
         data: seriesData
       },
       {
-        id: 'pieCamembert', type: 'pie', z: 50, radius: (document.getElementById('selPosCamembert')?.value === 'MASQUE' ? [0, 0] : [0, Math.max(36, Math.round(Math.min(chart.getWidth() || 360, chart.getHeight() || 360) * 0.13))]), center: Array.isArray(pieAuto.pos) ? pieAuto.pos : ['82%', '24%'], silent: true,
+        id: 'pieCamembert', type: 'pie', z: 50, radius: (document.getElementById('selPosCamembert')?.value === 'MASQUE' ? [0, 0] : [0, Math.max(36, Math.round(Math.min(chart.getWidth() || 360, chart.getHeight() || 360) * 0.088 * (window.__CH_PIE_SCALE || 1.0)))]), center: Array.isArray(pieAuto.pos) ? pieAuto.pos : ['82%', '24%'], silent: true,
         label: { show: document.getElementById('selPosCamembert')?.value !== 'MASQUE', position: 'inside', fontWeight: 'bold', fontFamily: 'Consolas', fontSize: 11, formatter: p => `${p.value.toLocaleString('fr-FR')}\nCMP:${p.data.cmp.toFixed(2)}` },
         data: genererDataCamembert(s)
       }
@@ -2838,7 +2838,7 @@ function dessinerGraphique(data) { if(document.getElementById("selHorizon")?.val
     xAxis: { type: 'value', min: 32400, max: 54000, interval: 3600, axisLine: { lineStyle: { color: '#333' } }, splitLine: { lineStyle: { color: '#1E1E1E' } }, axisLabel: { color: '#999', formatter: val => heureDepuisSec(val).slice(0,5) } },
     yAxis: { type: 'value', position: 'right', min: +(prixMin - margeY * 0.3).toFixed(2), max: +(prixMax + margeY).toFixed(2), axisLine: { lineStyle: { color: '#333' } }, splitLine: { lineStyle: { color: '#1E1E1E' } }, axisLabel: { color: '#999', formatter: val => val.toFixed(2) } },
     series: seriePrincipale.concat([{
-      id: 'pieCamembert', type: 'pie', z: 50, radius: (document.getElementById('selPosCamembert')?.value === 'MASQUE' ? [0, 0] : [0, Math.max(36, Math.round(Math.min(chart.getWidth() || 360, chart.getHeight() || 360) * 0.13))]), center: pieAutoV.pos, silent: true,
+      id: 'pieCamembert', type: 'pie', z: 50, radius: (document.getElementById('selPosCamembert')?.value === 'MASQUE' ? [0, 0] : [0, Math.max(36, Math.round(Math.min(chart.getWidth() || 360, chart.getHeight() || 360) * 0.088 * (window.__CH_PIE_SCALE || 1.0)))]), center: pieAutoV.pos, silent: true,
       label: { show: document.getElementById('selPosCamembert')?.value !== 'MASQUE', position: 'inside', fontWeight: 'bold', fontFamily: 'Consolas', fontSize: 11, formatter: p => `${p.value.toLocaleString('fr-FR')}\nCMP:${p.data.cmp.toFixed(2)}` },
       data: genererDataCamembert(s)
     }])
@@ -5176,9 +5176,9 @@ window.__chInjecterIndicateurs = function() {
   }
 
   const nOsc = cfg.oscs.length;
-  const mainH = nOsc === 1 ? 67 : (nOsc === 2 ? 53 : (nOsc === 3 ? 41 : 35));
+  const mainH = nOsc === 1 ? 71 : (nOsc === 2 ? 59 : (nOsc === 3 ? 50 : 43));
   const gapPct = 3.2;
-  const availH = 88.5 - mainH - (nOsc * gapPct);
+  const availH = 92.2 - mainH - (nOsc * gapPct);
   const subH = +(availH / nOsc).toFixed(1);
 
   const grids = new Array({ left: 45, right: 100, top: 32, height: mainH + "%" });
@@ -5267,7 +5267,7 @@ window.__chInjecterIndicateurs = function() {
     grid: grids,
     xAxis: xAxes,
     yAxis: yAxes,
-    dataZoom: new Array({ id: "zoomX_inside", type: "inside", xAxisIndex: allXIdx, filterMode: "none", zoomOnMouseWheel: true, moveOnMouseMove: false }, { id: "zoomX_slider", type: "slider", xAxisIndex: allXIdx, filterMode: "none", left: 45, right: 100, bottom: 22, height: 12, showDetail: false }),
+    dataZoom: new Array({ id: "zoomX_inside", type: "inside", xAxisIndex: allXIdx, filterMode: "none", zoomOnMouseWheel: true, moveOnMouseMove: false }, { id: "zoomX_slider", type: "slider", xAxisIndex: allXIdx, filterMode: "none", left: 45, right: 100, bottom: 4, height: 10, showDetail: false }),
     series: extra
   }, { replaceMerge: new Array("grid") });
 };
@@ -11674,7 +11674,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
       }
 
       const isMasque = (document.getElementById("selPosCamembert")?.value === "MASQUE") || (Array.isArray(pieS.radius) && parseFloat(pieS.radius.at(1)) === 0);
-      const R = Math.max(38, Math.round(Math.min(w, h) * 0.125));
+      const pieScale = Number(window.__CH_PIE_SCALE || 1.0); const R = Math.max(28, Math.round(Math.min(w, h) * 0.088 * pieScale));
       const cx = (parseFloat(targetCenter.at(0)) / 100) * w;
       const cy = (parseFloat(targetCenter.at(1)) / 100) * h;
 
@@ -11889,7 +11889,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
       if(legendBox.dataset.userMoved !== "1"){
         legendBox.style.cssText = `
           position:absolute;
-          bottom:${isMob ? "22px" : "24px"};
+          top:${isMob ? "42px" : "8px"};
           right:${isMob ? "12px" : "108px"};
           z-index:26;
           pointer-events:auto;
@@ -11989,6 +11989,72 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
   }
 
   setInterval(updateHudActiveIndicatorsList, 600);
+})();
+</script>
+<script id="ch-pie-interactive-resizer">
+(function(){
+  window.__CH_PIE_SCALE = window.__CH_PIE_SCALE || 1.0;
+
+  function ensurePieResizeControls(){
+    const container = document.getElementById("chart-container");
+    if(!container) return;
+    let ctrl = document.getElementById("ch-pie-size-controls");
+    if(!ctrl){
+      ctrl = document.createElement("div");
+      ctrl.id = "ch-pie-size-controls";
+      ctrl.style.cssText = "position:absolute;z-index:27;display:none;align-items:center;gap:3px;background:rgba(15,23,42,0.82);border:1px solid rgba(148,163,184,0.45);border-radius:6px;padding:1px 4px;box-shadow:0 2px 6px rgba(0,0,0,0.25);";
+      ctrl.innerHTML = `
+        <button id="ch-pie-dec-btn" title="Réduire le Camembert" style="background:transparent;border:none;color:#f8fafc;font-weight:bold;font-size:12px;cursor:pointer;padding:0 4px;">−</button>
+        <span id="ch-pie-scale-lbl" style="font-family:Consolas,monospace;font-size:9.5px;color:#38bdf8;">100%</span>
+        <button id="ch-pie-inc-btn" title="Agrandir le Camembert" style="background:transparent;border:none;color:#f8fafc;font-weight:bold;font-size:12px;cursor:pointer;padding:0 4px;">+</button>
+      `;
+      container.appendChild(ctrl);
+
+      const applyScale = (delta) => {
+        window.__CH_PIE_SCALE = Math.max(0.55, Math.min(1.85, +((window.__CH_PIE_SCALE || 1.0) + delta).toFixed(2)));
+        const lbl = document.getElementById("ch-pie-scale-lbl");
+        if(lbl) lbl.textContent = Math.round(window.__CH_PIE_SCALE * 100) + "%";
+      };
+      document.getElementById("ch-pie-dec-btn").onclick = (e) => { e.stopPropagation(); applyScale(-0.15); };
+      document.getElementById("ch-pie-inc-btn").onclick = (e) => { e.stopPropagation(); applyScale(+0.15); };
+
+      // Molette souris directement sur le Camembert pour agrandir/diminuer
+      container.addEventListener("wheel", (e) => {
+        if(typeof chart === "undefined" || !chart) return;
+        const opt = chart.getOption() || {};
+        const pieS = (Array.isArray(opt.series) ? opt.series : []).find(s => s && (s.id === "pieCamembert" || s.type === "pie"));
+        if(!pieS || !Array.isArray(pieS.center)) return;
+        const w = chart.getWidth(), h = chart.getHeight();
+        const cx = (parseFloat(pieS.center.at(0)) / 100) * w;
+        const cy = (parseFloat(pieS.center.at(1)) / 100) * h;
+        const R = Math.max(28, Math.round(Math.min(w, h) * 0.088 * (window.__CH_PIE_SCALE || 1.0)));
+        const r = container.getBoundingClientRect();
+        const dx = (e.clientX - r.left) - cx, dy = (e.clientY - r.top) - cy;
+        if((dx * dx + dy * dy) <= (R + 12) * (R + 12)){
+          e.preventDefault();
+          e.stopPropagation();
+          applyScale(e.deltaY < 0 ? 0.12 : -0.12);
+        }
+      }, { passive: false, capture: true });
+    }
+
+    // Positionner discretement les boutons [- 100% +] juste sous le titre du bas du Camembert
+    if(typeof chart === "undefined" || !chart){ ctrl.style.display = "none"; return; }
+    const opt = chart.getOption() || {};
+    const pieS = (Array.isArray(opt.series) ? opt.series : []).find(s => s && (s.id === "pieCamembert" || s.type === "pie"));
+    const isMasque = (document.getElementById("selPosCamembert")?.value === "MASQUE") || !pieS || (Array.isArray(pieS.radius) && parseFloat(pieS.radius.at(1)) === 0);
+    if(isMasque || !Array.isArray(pieS.center)){ ctrl.style.display = "none"; return; }
+
+    const w = chart.getWidth(), h = chart.getHeight();
+    const cx = (parseFloat(pieS.center.at(0)) / 100) * w;
+    const cy = (parseFloat(pieS.center.at(1)) / 100) * h;
+    const R = Math.max(28, Math.round(Math.min(w, h) * 0.088 * (window.__CH_PIE_SCALE || 1.0)));
+    ctrl.style.display = "flex";
+    ctrl.style.left = Math.max(6, Math.min(w - 86, cx - 38)) + "px";
+    ctrl.style.top = Math.min(h - 28, cy + R + 28) + "px";
+  }
+
+  setInterval(ensurePieResizeControls, 220);
 })();
 </script>
 </body>
