@@ -5183,7 +5183,34 @@ window.__chInjecterIndicateurs = function() {
     extra.push({ id: "ind_ichi_t", name: "Tenkan(9)", type: "line", xAxisIndex: 0, yAxisIndex: 0, showSymbol: false, lineStyle: { width: 1.3, color: "#EF4444" }, data: pair(tenkan), z: 37 });
     extra.push({ id: "ind_ichi_k", name: "Kijun(26)", type: "line", xAxisIndex: 0, yAxisIndex: 0, showSymbol: false, lineStyle: { width: 1.4, color: "#3B82F6" }, data: pair(kijun), z: 37 });
     extra.push({ id: "ind_ichi_sa", name: "Senkou A", type: "line", xAxisIndex: 0, yAxisIndex: 0, showSymbol: false, lineStyle: { width: 1, color: "rgba(16,185,129,0.6)" }, data: pair(senkouA), z: 35 });
-    extra.push({ id: "ind_ichi_sb", name: "Senkou B", type: "line", xAxisIndex: 0, yAxisIndex: 0, showSymbol: false, lineStyle: { width: 1, color: "rgba(239,68,68,0.6)" }, data: pair(senkouB), z: 35 });
+    extra.push({ id: "ind_ichi_sb", name: "Senkou B", type: "line", xAxisIndex: 0, yAxisIndex: 0, showSymbol: false, lineStyle: { width: 1.15, color: "rgba(239,68,68,0.75)" }, data: pair(senkouB), z: 35 });
+    const cloudSegs = senkouA.map((a, i) => (a !== null && senkouB.at(i) !== null) ? [i, a, senkouB.at(i)] : null).filter(Boolean);
+    const isLightKumo = (typeof estThemeClair === "function") ? estThemeClair() : document.body.classList.contains("light-mode");
+    const kumoAlpha = isLightKumo ? 0.30 : 0.22;
+    extra.push({
+      id: "ind_ichi_cloud",
+      name: "Nuage Kumo",
+      type: "custom",
+      xAxisIndex: 0,
+      yAxisIndex: 0,
+      silent: true,
+      z: 2,
+      renderItem: function(params, api){
+        const idx = params.dataIndex;
+        if(idx >= cloudSegs.length - 1) return null;
+        const p0 = cloudSegs.at(idx), p1 = cloudSegs.at(idx + 1);
+        if(!p0 || !p1 || (p1.at(0) - p0.at(0)) > 1) return null;
+        const c0a = api.coord([p0.at(0), p0.at(1)]), c0b = api.coord([p0.at(0), p0.at(2)]);
+        const c1a = api.coord([p1.at(0), p1.at(1)]), c1b = api.coord([p1.at(0), p1.at(2)]);
+        const isBull = ((p0.at(1) + p1.at(1)) >= (p0.at(2) + p1.at(2)));
+        return {
+          type: "polygon",
+          shape: { points: [c0a, c1a, c1b, c0b] },
+          style: { fill: isBull ? `rgba(16, 185, 129, ${kumoAlpha})` : `rgba(239, 68, 68, ${kumoAlpha})` }
+        };
+      },
+      data: cloudSegs
+    });
   }
   if (cfg.psar) {
     let psarArr = new Array(), up = true, af = 0.02, ep = highs.at(0) || 0, sar = lows.at(0) || 0;
