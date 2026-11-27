@@ -12304,5 +12304,120 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
   setInterval(renderSliderTraceInHud, 200);
 })();
 </script>
+<script id="ch-smart-xzoom-and-multi-replay">
+(function(){
+  window.__CH_MULTI_SELECTED_DATE_ISO = "";
+  window.__CH_MULTI_SELECTED_DATE_FR = "";
+
+  function bindUniversalWheelXZoomAndMultiReplay(){
+    const container = document.getElementById("chart-container");
+    const dom = container;
+    const ch = (typeof chart !== "undefined" && chart) ? chart : (window.echarts && dom ? echarts.getInstanceByDom(dom) : null);
+    if(!container || !ch) return;
+
+    // A. Zoom molette universel sur l'axe X (fonctionne 100% avec ou sans indicateurs)
+    if(!container.dataset.univWheelXBound){
+      container.dataset.univWheelXBound = "1";
+      container.addEventListener("wheel", (e) => {
+        if(e.shiftKey || e.ctrlKey || e.altKey) return;
+        if(e.target.closest("#ch-hud-tools, #ch-zoom-telemetry-hud-box, #ch-active-indicators-legend, #ch-pie-win-frame")) return;
+        const cInst = (typeof chart !== "undefined" && chart) ? chart : echarts.getInstanceByDom(container);
+        if(!cInst) return;
+        const opt = cInst.getOption() || {};
+        const dzList = Array.isArray(opt.dataZoom) ? opt.dataZoom : [];
+        const dzX = dzList.find(d => d && (d.id === "zoomX_inside" || d.id === "zoomX_slider"));
+        if(!dzX) return;
+
+        e.preventDefault();
+        const curS = (typeof dzX.start === "number") ? dzX.start : 0;
+        const curE = (typeof dzX.end === "number") ? dzX.end : 100;
+        const span = Math.max(4, curE - curS);
+        const factor = e.deltaY < 0 ? 0.82 : 1.22;
+        const nextSpan = Math.max(4, Math.min(100, span * factor));
+
+        const rect = container.getBoundingClientRect();
+        const plotW = Math.max(100, rect.width - 145);
+        const ratioX = Math.max(0, Math.min(1, (e.clientX - rect.left - 45) / plotW));
+        const anchor = curS + span * ratioX;
+
+        let nextS = anchor - nextSpan * ratioX;
+        let nextE = nextS + nextSpan;
+        if(nextS < 0){ nextE -= nextS; nextS = 0; }
+        if(nextE > 100){ nextS -= (nextE - 100); nextE = 100; }
+        nextS = Math.max(0, nextS);
+        nextE = Math.min(100, nextE);
+
+        cInst.dispatchAction({ type: "dataZoom", dataZoomId: "zoomX_inside", start: nextS, end: nextE });
+        cInst.dispatchAction({ type: "dataZoom", dataZoomId: "zoomX_slider", start: nextS, end: nextE });
+      }, { passive: false });
+    }
+
+    // B. Selection d'une bougie en Multiseances -> met a jour le raccourci "Replay Seance du <date>"
+    if(!ch.__chMultiReplayClickBound){
+      ch.__chMultiReplayClickBound = true;
+      ch.on("click", (params) => {
+        const isMulti = (document.getElementById("selHorizon")?.value === "MULTI");
+        if(!isMulti) return;
+        const b = params && params.data && params.data.bougie ? params.data.bougie : null;
+        const rawIso = b ? (b.date_fin_iso || b.date_deb_iso || b.cle || "") : String(params.name || "");
+        const mIso = rawIso.match(/(\d{4})-(\d{2})-(\d{2})/);
+        if(mIso){
+          window.__CH_MULTI_SELECTED_DATE_ISO = `${mIso.at(1)}-${mIso.at(2)}-${mIso.at(3)}`;
+          window.__CH_MULTI_SELECTED_DATE_FR = `${mIso.at(3)}/${mIso.at(2)}/${mIso.at(1)}`;
+        } else {
+          const mFr = String(params.name || "").match(/(\d{2})\/(\d{2})(?:\/(\d{4}))?/);
+          if(mFr){
+            const yr = mFr.at(3) || String(new Date().getFullYear());
+            window.__CH_MULTI_SELECTED_DATE_ISO = `${yr}-${mFr.at(2)}-${mFr.at(1)}`;
+            window.__CH_MULTI_SELECTED_DATE_FR = `${mFr.at(1)}/${mFr.at(2)}/${yr}`;
+          }
+        }
+      });
+    }
+
+    // C. Synchroniser le libelle et l'action directe du bouton vert flottant "Replay Seance du ..."
+    const isMulti = (document.getElementById("selHorizon")?.value === "MULTI");
+    document.querySelectorAll("button, div").forEach(el => {
+      const t = (el.textContent || "").trim();
+      if((t.startsWith("▶ Replay Séance") || t.startsWith("Replay Séance du")) && el.offsetHeight > 16 && el.offsetHeight < 48){
+        if(isMulti && window.__CH_MULTI_SELECTED_DATE_FR){
+          const targetLbl = `▶ Replay Séance du ${window.__CH_MULTI_SELECTED_DATE_FR}`;
+          if(el.textContent.trim() !== targetLbl) el.textContent = targetLbl;
+        }
+        if(isMulti && !el.dataset.multiReplayHooked){
+          el.dataset.multiReplayHooked = "1";
+          el.title = "Cliquez sur une bougie en Multiséances pour choisir sa date, puis cliquez ici pour lancer son Replay Tick-par-Tick";
+          el.addEventListener("click", (ev) => {
+            if(document.getElementById("selHorizon")?.value !== "MULTI") return;
+            ev.preventDefault();
+            ev.stopImmediatePropagation();
+            const selH = document.getElementById("selHorizon");
+            const inpD = document.getElementById("inpDate") || document.querySelector('input[type="date"]');
+            const chosenIso = window.__CH_MULTI_SELECTED_DATE_ISO || (inpD ? inpD.value : "");
+            if(selH){
+              selH.value = "JOUR";
+              selH.dispatchEvent(new Event("change", { bubbles: true }));
+            }
+            if(inpD && chosenIso){
+              inpD.value = chosenIso;
+              inpD.dispatchEvent(new Event("change", { bubbles: true }));
+            }
+            setTimeout(() => {
+              const btnLoad = Array.from(document.querySelectorAll("button")).find(b => b.textContent.trim() === "Charger");
+              if(btnLoad) btnLoad.click();
+              setTimeout(() => {
+                const btnTopReplay = Array.from(document.querySelectorAll("button")).find(b => b.id !== el.id && b.textContent.includes("Replay Séance"));
+                if(btnTopReplay) btnTopReplay.click();
+              }, 650);
+            }, 150);
+          }, true);
+        }
+      }
+    });
+  }
+
+  setInterval(bindUniversalWheelXZoomAndMultiReplay, 300);
+})();
+</script>
 </body>
 </html>
