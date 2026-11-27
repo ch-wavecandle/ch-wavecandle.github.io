@@ -1168,7 +1168,7 @@ body.theme-clair #chHudOrientBtn {
 <script id="ch-sync-zoom-and-logos">
 window.__CH_GET_INIT_X_ZOOM = function(bougies){
   const a = window.__CH_SAVED_PERIOD_ZOOM;
-  if(!a || !Array.isArray(bougies) || bougies.length < 3) return {};
+  if(!a || !a.hasX || !Array.isArray(bougies) || bougies.length < 3) return {};
   let s = a.pctStart, e = a.pctEnd;
   if(a.dateStart && a.dateEnd){
     const d1 = a.dateStart.slice(0, 16), d2 = a.dateEnd.slice(0, 16);
@@ -10217,7 +10217,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
 
     const gridH = getGridHeightPx();
     const spanPrice = priceMax - priceMin;
-    window.__CH_SAVED_PERIOD_ZOOM = {
+    window.__CH_SAVED_PERIOD_ZOOM = { hasX: hasX,
       dateStart: dStart,
       dateEnd: dEnd,
       pctStart: sx,
@@ -10271,12 +10271,12 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     const m = tnDate.getMonth() + 1;
     const isSummer = !isRamadan && (m === 7 || m === 8);
     if(isRamadan){
-      return { regime: "Séance Ramadan", openStr: "09:30", negStr: "10:00 – 13:00", openMin: 570, closeMin: 790 };
+      return { regime: "Séance Ramadan", openStr: "09:30", negStr: "10:00 – 13:00 • Clôture 13:05 (TAL 13:10)", openMin: 570, closeMin: 790 };
     }
     if(isSummer){
-      return { regime: "Séance d'Été (Juil. – Août)", openStr: "08:30", negStr: "09:00 – 12:30", openMin: 510, closeMin: 760 };
+      return { regime: "Séance d'Été (Juil. – Août)", openStr: "08:30", negStr: "09:00 – 12:30 • Clôture 12:35 (TAL 12:40)", openMin: 510, closeMin: 760 };
     }
-    return { regime: "Séance Normale", openStr: "08:30", negStr: "09:00 – 14:20", openMin: 510, closeMin: 870 };
+    return { regime: "Séance Normale", openStr: "08:30", negStr: "09:00 – 14:20 • Clôture 14:25 (TAL 14:30)", openMin: 510, closeMin: 870 };
   }
 
   function getTunisMarketState(){
