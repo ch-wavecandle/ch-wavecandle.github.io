@@ -10567,20 +10567,22 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
   };
 
   function injectHudMenuItemInAutres(){
-    const panels = document.querySelectorAll("div, ul");
-    for(const p of panels){
-      if(p.querySelector("#ch-menu-hud-item")) return;
-      const txt = p.textContent || "";
-      if((txt.includes("Position Camembert") || txt.includes("Journal") || txt.includes("Diagnostic")) && p.offsetHeight > 40 && p.offsetWidth > 120 && p.offsetWidth < 360){
-        const row = document.createElement("div");
+    if(document.getElementById("ch-menu-hud-item")) return;
+    const allEls = document.querySelectorAll("div, label");
+    for(const el of allEls){
+      const txt = (el.textContent || "").trim();
+      if(txt.includes("Masque automatique barre Info bourse") && el.offsetWidth > 140 && el.offsetWidth < 380 && el.offsetHeight < 90){
+        const parentBox = el.parentElement || el;
+        if(parentBox.querySelector("#ch-menu-hud-item")) return;
+        const row = document.createElement("label");
         row.id = "ch-menu-hud-item";
-        row.style.cssText = "display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border-top:1px solid rgba(148,163,184,0.2);cursor:pointer;font-size:12px;font-weight:600;color:#0f172a;background:rgba(56,189,248,0.08);border-radius:6px;margin-top:4px;";
-        row.innerHTML = `<span>🔬 Détecteur & Mesure Axes</span><input id="ch-menu-hud-chk" type="checkbox" ${window.__CH_HUD_VISIBLE ? "checked" : ""} style="cursor:pointer;accent-color:#0284c7;">`;
+        row.style.cssText = "display:flex;align-items:center;gap:8px;padding:7px 10px;margin-top:6px;background:rgba(30,41,59,0.85);border:1px solid rgba(56,189,248,0.35);border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;color:#e2e8f0;";
+        row.innerHTML = `<input id="ch-menu-hud-chk" type="checkbox" ${window.__CH_HUD_VISIBLE ? "checked" : ""} style="cursor:pointer;accent-color:#38bdf8;width:15px;height:15px;"><span>🔬 Détecteur & Mesure Axes</span>`;
         row.onclick = (e) => {
           e.stopPropagation();
           window.__CH_TOGGLE_TELEMETRY_HUD();
         };
-        p.appendChild(row);
+        parentBox.appendChild(row);
         break;
       }
     }
