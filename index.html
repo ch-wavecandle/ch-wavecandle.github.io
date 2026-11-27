@@ -10197,7 +10197,6 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
       priceMax = curAxisMin + (ey / 100) * span;
     }
 
-    const ya = opt && Array.isArray(opt.yAxis) ? opt.yAxis.at(0) : null;
     const hasExplicitY = (ya && typeof ya.min === "number" && typeof ya.max === "number");
     const hasX = (sx > 0.5 || ex < 99.5);
     const hasY = (sy > 0.5 || ey < 99.5 || hasExplicitY) && (priceMax > priceMin);
@@ -10263,29 +10262,45 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
 </script></script></script></script>
 <script id="ch-live-closed-guard">
 (function(){
+  function getBvmtSessionSchedule(tnDate){
+    let isRamadan = false;
+    try {
+      const hijriMonth = new Intl.DateTimeFormat("en-TN-u-ca-islamic", { month: "numeric", timeZone: "Africa/Tunis" }).format(tnDate);
+      if(String(hijriMonth).trim() === "9") isRamadan = true;
+    } catch(e){}
+    const m = tnDate.getMonth() + 1;
+    const isSummer = !isRamadan && (m === 7 || m === 8);
+    if(isRamadan){
+      return { regime: "Séance Ramadan", openStr: "09:30", negStr: "10:00 – 13:00", openMin: 570, closeMin: 790 };
+    }
+    if(isSummer){
+      return { regime: "Séance d'Été (Juil. – Août)", openStr: "08:30", negStr: "09:00 – 12:30", openMin: 510, closeMin: 760 };
+    }
+    return { regime: "Séance Normale", openStr: "08:30", negStr: "09:00 – 14:20", openMin: 510, closeMin: 870 };
+  }
+
   function getTunisMarketState(){
     const now = new Date();
     const tn = new Date(now.toLocaleString("en-US", { timeZone: "Africa/Tunis" }));
+    const sched = getBvmtSessionSchedule(tn);
     const day = tn.getDay();
     const mins = tn.getHours() * 60 + tn.getMinutes();
     const isWeekend = (day === 0 || day === 6);
-    const isNightBeforeOpen = (mins >= 0 && mins < 510); // 00:00 -> 08:30
-    const isAfterClose = (mins >= 900); // >= 15:00
+    const isNightBeforeOpen = (mins >= 0 && mins < sched.openMin);
+    const isAfterClose = (mins >= sched.closeMin);
     const isClosed = isWeekend || isNightBeforeOpen || isAfterClose;
     let reason = "";
-    if(isWeekend) reason = "Week-end — Réouverture Lundi à 08:30 (début des opérations à 09:00)";
-    else if(isNightBeforeOpen) reason = "Pré-ouverture BVMT à 08:30 • Début des opérations à 09:00 (heure de Tunis)";
-    else if(isAfterClose) reason = "Séance clôturée • Prochaine ouverture BVMT à 08:30 (opérations à 09:00)";
-    return { isClosed, isNightBeforeOpen, isWeekend, reason, tn };
+    if(isWeekend) reason = `Week-end — Réouverture Lundi à ${sched.openStr} (${sched.regime} : ${sched.negStr})`;
+    else if(isNightBeforeOpen) reason = `Pré-ouverture BVMT à ${sched.openStr} • Négociations : ${sched.negStr} (heure de Tunis)`;
+    else if(isAfterClose) reason = `Séance clôturée • Prochaine ouverture BVMT à ${sched.openStr} (${sched.negStr})`;
+    return { isClosed, reason, sched };
   }
 
-  function showLiveMarketClosedCard(reason){
+  function showLiveMarketClosedCard(state){
     const container = document.getElementById("chart-container");
     if(!container) return;
     if(typeof timerSimulLive !== "undefined" && timerSimulLive){ clearInterval(timerSimulLive); timerSimulLive = null; }
-    if(typeof chart !== "undefined" && chart){
-      try { chart.clear(); } catch(e){}
-    }
+    if(typeof chart !== "undefined" && chart){ try { chart.clear(); } catch(e){} }
     let overlay = document.getElementById("ch-live-closed-overlay");
     if(!overlay){
       overlay = document.createElement("div");
@@ -10294,24 +10309,25 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
       if(getComputedStyle(container).position === "static") container.style.position = "relative";
       container.appendChild(overlay);
     }
+    const sc = state.sched;
     overlay.style.display = "flex";
     overlay.innerHTML = `
-      <div style="max-width:460px;width:100%;background:#ffffff;border:1px solid #cbd5e1;border-radius:14px;padding:22px 24px;text-align:center;box-shadow:0 10px 28px rgba(15,23,42,0.08);font-family:Inter,system-ui,sans-serif;">
-        <div style="display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border-radius:999px;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;font-size:12px;font-weight:700;letter-spacing:.4px;margin-bottom:12px;">
+      <div style="max-width:480px;width:100%;background:#ffffff;border:1px solid #cbd5e1;border-radius:14px;padding:22px 24px;text-align:center;box-shadow:0 10px 28px rgba(15,23,42,0.08);font-family:Inter,system-ui,sans-serif;">
+        <div style="display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border-radius:999px;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;font-size:12px;font-weight:700;letter-spacing:.4px;margin-bottom:10px;">
           <span style="width:8px;height:8px;border-radius:50%;background:#dc2626;display:inline-block;"></span>
-          MARCHÉ FERMÉ
+          MARCHÉ FERMÉ • ${sc.regime.toUpperCase()}
         </div>
         <div style="font-size:18px;font-weight:800;color:#0f172a;margin-bottom:6px;">Bourse des Valeurs Mobilières de Tunis</div>
-        <div style="font-size:13px;color:#475569;line-height:1.5;margin-bottom:14px;">${reason}</div>
+        <div style="font-size:13px;color:#475569;line-height:1.5;margin-bottom:14px;">${state.reason}</div>
         <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;font-size:12px;color:#334155;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 12px;">
-          <span>Ouverture : <b>08:30</b></span>
+          <span>Ouverture : <b>${sc.openStr}</b></span>
           <span>•</span>
-          <span>Négociations : <b>09:00 – 14:20</b></span>
+          <span>Négociations : <b>${sc.negStr}</b></span>
         </div>
       </div>
     `;
     const st = document.getElementById("statusText");
-    if(st) st.innerText = "MARCHÉ FERMÉ — Ouverture BVMT à 08:30 (opérations à 09:00)";
+    if(st) st.innerText = `MARCHÉ FERMÉ (${sc.regime}) — Ouverture BVMT à ${sc.openStr} (${sc.negStr})`;
   }
 
   function hideLiveMarketClosedCard(){
@@ -10321,17 +10337,10 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
 
   function checkLiveGuard(){
     const selH = document.getElementById("selHorizon");
-    const hVal = selH ? selH.value : "";
-    if(hVal !== "LIVE"){
-      hideLiveMarketClosedCard();
-      return;
-    }
+    if(!selH || selH.value !== "LIVE"){ hideLiveMarketClosedCard(); return; }
     const st = getTunisMarketState();
-    if(st.isClosed){
-      showLiveMarketClosedCard(st.reason);
-    } else {
-      hideLiveMarketClosedCard();
-    }
+    if(st.isClosed) showLiveMarketClosedCard(st);
+    else hideLiveMarketClosedCard();
   }
 
   const selH = document.getElementById("selHorizon");
@@ -10347,10 +10356,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     const origLive = window.rafraichirFluxLive;
     window.rafraichirFluxLive = async function(){
       const st = getTunisMarketState();
-      if(st.isClosed){
-        showLiveMarketClosedCard(st.reason);
-        return;
-      }
+      if(st.isClosed){ showLiveMarketClosedCard(st); return; }
       hideLiveMarketClosedCard();
       return origLive.apply(this, arguments);
     };
@@ -10360,6 +10366,6 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
   window.addEventListener("load", () => setTimeout(checkLiveGuard, 150));
   setInterval(checkLiveGuard, 2000);
 })();
-</script>
+</script></script>
 </body>
 </html>
