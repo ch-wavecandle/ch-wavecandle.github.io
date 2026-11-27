@@ -7637,7 +7637,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
         const newYSliderId2 = "zoomY_slider_" + (currentExpandMode || "AUTO"); const dzYReset = Array.isArray(opt.dataZoom) ? opt.dataZoom.map(d => (d && ((d.id && d.id.startsWith("zoomY_slider")) || d.yAxisIndex === 0 && d.type === "slider")) ? { id: newYSliderId2, type: "slider", orient: "vertical", yAxisIndex: 0, top: 42, height: Math.max(260, (document.getElementById("chart-container")?.clientHeight || 520) - 92), right: 4, width: 16, borderColor: "#64748B", fillerColor: "rgba(56,189,248,0.22)", handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false, ...(window.__CH_GET_INIT_Y_ZOOM(globalData?.bougies)) } : (d && d.id === "zoomY_inside" ? window.__CH_GET_INIT_Y_ZOOM(globalData?.bougies) : {})) : undefined; chart.setOption({ yAxis: yPatch, ...(dzYReset ? { dataZoom: dzYReset } : {}) });
       }
 
-      setTimeout(() => { ["zoomY_inside", "zoomY_slider"].forEach(zId => { try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: 0, end: 100, startValue: null, endValue: null }); } catch(e){} }); }, 50); if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
+      if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
     } catch(e){} finally {
       setTimeout(() => { applyingAxis = false; }, 80);
     }
@@ -7794,7 +7794,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       selOutil.addEventListener("change", () => {
         if(selOutil.value !== "AUCUN"){
           selectedDrawIdx = -1;
-          setTimeout(() => { ["zoomY_inside", "zoomY_slider"].forEach(zId => { try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: 0, end: 100, startValue: null, endValue: null }); } catch(e){} }); }, 50); if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
+          if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
         }
       });
     }
@@ -7808,7 +7808,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       if(!hit){
         if(selectedDrawIdx !== -1){
           selectedDrawIdx = -1;
-          setTimeout(() => { ["zoomY_inside", "zoomY_slider"].forEach(zId => { try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: 0, end: 100, startValue: null, endValue: null }); } catch(e){} }); }, 50); if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
+          if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
         }
         return;
       }
@@ -7823,7 +7823,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
         if(hit.pointKey === "ctrl1" || hit.pointKey === "ctrl2") d.ctrlEdited = true;
         dragTarget = { idx: hit.idx, pointKey: hit.pointKey };
       }
-      setTimeout(() => { ["zoomY_inside", "zoomY_slider"].forEach(zId => { try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: 0, end: 100, startValue: null, endValue: null }); } catch(e){} }); }, 50); if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
+      if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
     });
 
     zr.on("mousemove", (params) => {
@@ -7861,13 +7861,13 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
         const dy = pt.at(1) - dragTarget.startDataY;
         d.points = dragTarget.origPoints.map(op => [op.at(0) + dx, op.at(1) + dy]);
       }
-      setTimeout(() => { ["zoomY_inside", "zoomY_slider"].forEach(zId => { try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: 0, end: 100, startValue: null, endValue: null }); } catch(e){} }); }, 50); if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
+      if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
     });
 
     zr.on("mouseup", () => {
       if(dragTarget){
         dragTarget = null;
-        setTimeout(() => { ["zoomY_inside", "zoomY_slider"].forEach(zId => { try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: 0, end: 100, startValue: null, endValue: null }); } catch(e){} }); }, 50); if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
+        if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
       }
     });
   }
@@ -9632,7 +9632,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       window.dessinerChandeliersMulti = function(){
         const res = origMulti.apply(this, arguments);
         syncDessinsTimestamps(true); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); 
-        setTimeout(() => { ["zoomY_inside", "zoomY_slider"].forEach(zId => { try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: 0, end: 100, startValue: null, endValue: null }); } catch(e){} }); }, 50); if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
+        if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
         return res;
       };
       window.dessinerChandeliersMulti.__chTimeAnchored = true;
@@ -9643,7 +9643,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       window.dessinerGraphique = function(){
         const res = origSingle.apply(this, arguments);
         syncDessinsTimestamps(true); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); 
-        setTimeout(() => { ["zoomY_inside", "zoomY_slider"].forEach(zId => { try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: 0, end: 100, startValue: null, endValue: null }); } catch(e){} }); }, 50); if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
+        if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
         return res;
       };
       window.dessinerGraphique.__chTimeAnchored = true;
@@ -10261,14 +10261,42 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
   window.__CH_RESTORE_Y_PX_SCALE = function(){
     const a = window.__CH_SAVED_PERIOD_ZOOM;
     if(!a || !a.hasY || !(a.pxPerTnd > 0) || !(a.centerPrice > 0) || typeof chart === "undefined" || !chart) return;
+    const opt = chart.getOption() || {};
+    const ya = Array.isArray(opt.yAxis) ? opt.yAxis.at(0) : null;
+    let axisMin = (ya && typeof ya.min === "number") ? ya.min : Infinity;
+    let axisMax = (ya && typeof ya.max === "number") ? ya.max : -Infinity;
+    const bList = (typeof globalData !== "undefined" && globalData && Array.isArray(globalData.bougies)) ? globalData.bougies : [];
+    if(!(axisMax > axisMin) && bList.length > 0){
+      for(const b of bList){
+        const lo = Number(b.low ?? b.min ?? b.close ?? b.prix_fin);
+        const hi = Number(b.high ?? b.max ?? b.close ?? b.prix_fin);
+        if(lo > 0 && lo < axisMin) axisMin = lo;
+        if(hi > 0 && hi > axisMax) axisMax = hi;
+      }
+      if(axisMax > axisMin){
+        const pad = Math.max(0.02, (axisMax - axisMin) * 0.08);
+        axisMin = Math.max(0.01, axisMin - pad);
+        axisMax = axisMax + pad;
+      }
+    }
+    if(!(axisMax > axisMin)) return;
     const gridH = getGridHeightPx();
     const targetSpan = gridH / a.pxPerTnd;
     const halfSpan = targetSpan / 2;
-    const newMin = Math.max(0.01, +(a.centerPrice - halfSpan).toFixed(3));
-    const newMax = +(newMin + targetSpan).toFixed(3);
+    const targetMin = a.centerPrice - halfSpan;
+    const targetMax = a.centerPrice + halfSpan;
+    const fullSpan = axisMax - axisMin;
+    let sy = ((targetMin - axisMin) / fullSpan) * 100;
+    let ey = ((targetMax - axisMin) / fullSpan) * 100;
+    sy = Math.max(0, Math.min(96, sy));
+    ey = Math.min(100, Math.max(sy + 4, ey));
     try {
-      window.__CH_RESTORING_Y = true; chart.setOption({ yAxis: [{ min: newMin, max: newMax, scale: false }] }); setTimeout(() => { window.__CH_RESTORING_Y = false; }, 180);
-    } catch(e){}
+      window.__CH_RESTORING_Y = true;
+      new Array("zoomY_inside", "zoomY_slider").forEach(zId => {
+        try { chart.dispatchAction({ type: "dataZoom", dataZoomId: zId, start: sy, end: ey, startValue: null, endValue: null }); } catch(e){}
+      });
+      setTimeout(() => { window.__CH_RESTORING_Y = false; }, 180);
+    } catch(e){ window.__CH_RESTORING_Y = false; }
   };
 
   function hookContinuousZoom(){
