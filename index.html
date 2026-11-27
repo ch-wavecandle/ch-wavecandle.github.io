@@ -7649,7 +7649,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
         const newYSliderId2 = "zoomY_slider_" + (currentExpandMode || "AUTO"); const dzYReset = Array.isArray(opt.dataZoom) ? opt.dataZoom.map(d => (d && ((d.id && d.id.startsWith("zoomY_slider")) || d.yAxisIndex === 0 && d.type === "slider")) ? { id: newYSliderId2, type: "slider", orient: "vertical", yAxisIndex: 0, top: 42, height: Math.max(260, (document.getElementById("chart-container")?.clientHeight || 520) - 92), right: 4, width: 16, borderColor: "#64748B", fillerColor: "rgba(56,189,248,0.22)", handleSize: 22, minSpan: 12, brushSelect: false, showDetail: false, ...(window.__CH_GET_INIT_Y_ZOOM(globalData?.bougies)) } : (d && d.id === "zoomY_inside" ? window.__CH_GET_INIT_Y_ZOOM(globalData?.bougies) : {})) : undefined; chart.setOption({ yAxis: yPatch, ...(dzYReset ? { dataZoom: dzYReset } : {}) });
       }
 
-      if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
+      if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_EXACT_X_TIME === "function") window.__CH_RESTORE_EXACT_X_TIME(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
     } catch(e){} finally {
       setTimeout(() => { applyingAxis = false; }, 80);
     }
@@ -7806,7 +7806,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       selOutil.addEventListener("change", () => {
         if(selOutil.value !== "AUCUN"){
           selectedDrawIdx = -1;
-          if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
+          if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_EXACT_X_TIME === "function") window.__CH_RESTORE_EXACT_X_TIME(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
         }
       });
     }
@@ -7820,7 +7820,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       if(!hit){
         if(selectedDrawIdx !== -1){
           selectedDrawIdx = -1;
-          if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
+          if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_EXACT_X_TIME === "function") window.__CH_RESTORE_EXACT_X_TIME(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
         }
         return;
       }
@@ -7835,7 +7835,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
         if(hit.pointKey === "ctrl1" || hit.pointKey === "ctrl2") d.ctrlEdited = true;
         dragTarget = { idx: hit.idx, pointKey: hit.pointKey };
       }
-      if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
+      if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_EXACT_X_TIME === "function") window.__CH_RESTORE_EXACT_X_TIME(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
     });
 
     zr.on("mousemove", (params) => {
@@ -7873,13 +7873,13 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
         const dy = pt.at(1) - dragTarget.startDataY;
         d.points = dragTarget.origPoints.map(op => [op.at(0) + dx, op.at(1) + dy]);
       }
-      if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
+      if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_EXACT_X_TIME === "function") window.__CH_RESTORE_EXACT_X_TIME(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
     });
 
     zr.on("mouseup", () => {
       if(dragTarget){
         dragTarget = null;
-        if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
+        if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_EXACT_X_TIME === "function") window.__CH_RESTORE_EXACT_X_TIME(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
       }
     });
   }
@@ -9643,8 +9643,8 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       const origMulti = window.dessinerChandeliersMulti;
       window.dessinerChandeliersMulti = function(){
         const res = origMulti.apply(this, arguments);
-        syncDessinsTimestamps(true); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); 
-        if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
+        syncDessinsTimestamps(true); if(typeof window.__CH_RESTORE_EXACT_X_TIME === "function") window.__CH_RESTORE_EXACT_X_TIME(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); 
+        if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_EXACT_X_TIME === "function") window.__CH_RESTORE_EXACT_X_TIME(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
         return res;
       };
       window.dessinerChandeliersMulti.__chTimeAnchored = true;
@@ -9654,8 +9654,8 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
       const origSingle = window.dessinerGraphique;
       window.dessinerGraphique = function(){
         const res = origSingle.apply(this, arguments);
-        syncDessinsTimestamps(true); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); 
-        if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
+        syncDessinsTimestamps(true); if(typeof window.__CH_RESTORE_EXACT_X_TIME === "function") window.__CH_RESTORE_EXACT_X_TIME(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); 
+        if(typeof rafraichirDessinsGraphique === "function") rafraichirDessinsGraphique(); if(typeof window.__CH_RESTORE_EXACT_X_TIME === "function") window.__CH_RESTORE_EXACT_X_TIME(); if(typeof window.__CH_RESTORE_Y_PX_SCALE === "function") window.__CH_RESTORE_Y_PX_SCALE(); if(typeof window.CH_TECH_RENDER === "function") setTimeout(window.CH_TECH_RENDER, 0);
         return res;
       };
       window.dessinerGraphique.__chTimeAnchored = true;
@@ -10441,5 +10441,85 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
 })();
 </script></script>
 
+<script id="ch-sync-pie-and-exact-time">
+(function(){
+  // 1. Souder en permanence les 2 titres du Camembert sur le centre reel de series[pieCamembert]
+  function syncPieTitlesToCenter(){
+    if(typeof chart === "undefined" || !chart) return;
+    try {
+      const opt = chart.getOption() || {};
+      const sList = Array.isArray(opt.series) ? opt.series : [];
+      const pieS = sList.find(s => s && (s.id === "pieCamembert" || s.type === "pie"));
+      if(!pieS || !Array.isArray(pieS.center) || pieS.center.length < 2) return;
+      const isMasque = (document.getElementById("selPosCamembert")?.value === "MASQUE") || (Array.isArray(pieS.radius) && parseFloat(pieS.radius.at(1)) === 0);
+      const w = chart.getWidth(), h = chart.getHeight();
+      if(!(w > 0 && h > 0)) return;
+      const cx = (parseFloat(pieS.center.at(0)) / 100) * w;
+      const cy = (parseFloat(pieS.center.at(1)) / 100) * h;
+      const rayonPx = Math.min(w, h) * 0.11;
+      const yTop = Math.max(6, cy - rayonPx - 20);
+      const yBot = Math.min(h - 22, cy + rayonPx + 8);
+      const gList = Array.isArray(opt.graphic) ? opt.graphic : [];
+      const grp = gList.find(g => g && g.id === "grpAgressivitePie");
+      if(grp && Array.isArray(grp.children)){
+        const tTop = grp.children.find(c => c && c.id === "pieTxtTop");
+        const tBot = grp.children.find(c => c && c.id === "pieTxtBot");
+        if(tTop && tTop.style && (Math.abs((tTop.style.x || 0) - cx) > 1 || Math.abs((tTop.style.y || 0) - yTop) > 1 || Boolean(tTop.invisible) !== isMasque)){
+          chart.setOption({
+            graphic: [{
+              id: "grpAgressivitePie",
+              invisible: isMasque,
+              children: [
+                { id: "pieTxtTop", invisible: isMasque, style: { x: cx, y: yTop } },
+                { id: "pieTxtBot", invisible: isMasque, style: { x: cx, y: yBot } }
+              ]
+            }]
+          });
+        }
+      }
+    } catch(e){}
+  }
+
+  // 2. Restaurer la position exacte sur l'axe du temps X (date + heure exacte) APRES elargissement +25% / +50%
+  window.__CH_RESTORE_EXACT_X_TIME = function(){
+    const a = window.__CH_SAVED_PERIOD_ZOOM;
+    if(!a || !a.hasX || !a.dateStart || !a.dateEnd || typeof chart === "undefined" || !chart) return;
+    const bList = (typeof globalData !== "undefined" && globalData && Array.isArray(globalData.bougies)) ? globalData.bougies : [];
+    if(bList.length < 3) return;
+    const opt = chart.getOption() || {};
+    const xa = Array.isArray(opt.xAxis) ? opt.xAxis.at(0) : null;
+    const totalAxisLen = (xa && Array.isArray(xa.data) && xa.data.length >= bList.length) ? xa.data.length : bList.length;
+
+    const d1 = a.dateStart.slice(0, 16), d2 = a.dateEnd.slice(0, 16);
+    let i1 = bList.findIndex(b => (b.date_deb_iso || b.cle || "").slice(0, 16) >= d1);
+    let i2 = -1;
+    for(let k = bList.length - 1; k >= 0; k--){
+      if((bList.at(k).date_fin_iso || bList.at(k).cle || "").slice(0, 16) <= d2){ i2 = k; break; }
+    }
+    if(i1 < 0) i1 = 0;
+    if(i2 < i1) i2 = Math.min(bList.length - 1, i1 + Math.min(bList.length - 1, 6));
+    const minCandles = Math.min(bList.length, 6);
+    if((i2 - i1 + 1) < minCandles){
+      const mid = Math.floor((i1 + i2) / 2);
+      i1 = Math.max(0, mid - Math.floor(minCandles / 2));
+      i2 = Math.min(bList.length - 1, i1 + minCandles - 1);
+      i1 = Math.max(0, i2 - minCandles + 1);
+    }
+
+    const denom = Math.max(1, totalAxisLen - 1);
+    const sx = Math.max(0, Math.min(98, (i1 / denom) * 100));
+    const ex = Math.min(100, Math.max(sx + 1, (i2 / denom) * 100));
+    try {
+      window.__CH_RESTORING_Y = true;
+      new Array("zoomX_inside", "zoomX_slider").forEach(xId => {
+        try { chart.dispatchAction({ type: "dataZoom", dataZoomId: xId, start: sx, end: ex, startValue: null, endValue: null }); } catch(e){}
+      });
+      setTimeout(() => { window.__CH_RESTORING_Y = false; }, 120);
+    } catch(e){ window.__CH_RESTORING_Y = false; }
+  };
+
+  setInterval(syncPieTitlesToCenter, 220);
+})();
+</script>
 </body>
 </html>
