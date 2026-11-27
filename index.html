@@ -7062,7 +7062,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
 
   function findHitNative(px, py){
     if(typeof chart === "undefined" || !chart || typeof dessinsUtilisateur === "undefined" || !Array.isArray(dessinsUtilisateur)) return -1;
-    const rect = chart.getModel().getComponent("grid", 0).coordinateSystem.getRect();
+    const gridComp = chart.getModel ? chart.getModel().getComponent("grid", 0) : null; if(!gridComp || !gridComp.coordinateSystem) return -1; const rect = gridComp.coordinateSystem.getRect();
     for(let i = dessinsUtilisateur.length - 1; i >= 0; i--){
       const d = dessinsUtilisateur.at(i);
       if(!d) continue;
@@ -10709,13 +10709,14 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     const toolsOpen = toolsBox && toolsBox.offsetParent !== null && toolsBox.offsetWidth > 60 && toolsBox.getBoundingClientRect().left < 220;
     const piePos = document.getElementById("selPosCamembert")?.value || "AUTO";
 
-    let leftPx = toolsOpen ? 196 : 18;
-    let topPx = 10;
+    const isMobileView = window.innerWidth <= 960;
+    let leftPx = isMobileView ? 12 : (toolsOpen ? 196 : 18);
+    let topPx = isMobileView ? 44 : 10;
     let bottomPx = "auto";
 
     if(piePos === "HG"){
       topPx = "auto";
-      bottomPx = 46;
+      bottomPx = isMobileView ? 58 : 46;
     }
 
         let clonedMediaHtml = "";
@@ -10769,6 +10770,239 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
   window.addEventListener("load", () => setTimeout(updateSmartTickerWatermark, 200));
   window.addEventListener("resize", updateSmartTickerWatermark);
   setInterval(updateSmartTickerWatermark, 400);
+})();
+</script>
+<style id="ch-mobile-pro-ui">
+@media screen and (max-width: 960px) {
+  body {
+    overflow-x: hidden !important;
+  }
+
+  /* Barre superieure mobile compacte et sans chevauchement */
+  #ch-mobile-top-bar {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1200 !important;
+    height: 48px !important;
+    padding: 4px 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 6px !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.12) !important;
+  }
+
+  /* Correction de la case a cocher geante dans le tiroir mobile Autres */
+  #ch-menu-hud-item {
+    padding: 10px 12px !important;
+    gap: 10px !important;
+    justify-content: flex-start !important;
+  }
+  #ch-menu-hud-chk {
+    width: 18px !important;
+    height: 18px !important;
+    min-width: 18px !important;
+    max-width: 18px !important;
+    flex: 0 0 18px !important;
+    margin: 0 !important;
+  }
+
+  /* Ruban KPI horizontal tactile sans ecrasement ni chevauchement */
+  .kpi-bar, #kpiBar, [class*="kpi-container"], [class*="stats-bar"] {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    gap: 6px !important;
+    padding: 5px 8px !important;
+    margin-top: 0 !important;
+    scrollbar-width: none !important;
+  }
+  .kpi-bar::-webkit-scrollbar, #kpiBar::-webkit-scrollbar {
+    display: none !important;
+  }
+  .kpi-bar > div, #kpiBar > div, .kpi-card {
+    flex: 0 0 auto !important;
+    min-width: 112px !important;
+    padding: 5px 9px !important;
+    border-radius: 8px !important;
+  }
+  .kpi-bar > div .kpi-val, #kpiBar > div .kpi-val, .kpi-card strong {
+    font-size: 13px !important;
+    white-space: nowrap !important;
+  }
+
+  /* Barre de periodes (5m..1A) fluide au pouce */
+  #ch-period-bar, .period-bar, [id*="periodBar"] {
+    max-width: calc(100vw - 16px) !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 3px 6px !important;
+    scrollbar-width: none !important;
+  }
+  #ch-period-bar::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  /* Cartouche Valeur + Logo compact sur mobile */
+  #ch-chart-ticker-watermark {
+    padding: 3px 8px !important;
+    gap: 6px !important;
+    max-width: 62vw !important;
+  }
+  #ch-chart-ticker-watermark div:first-child {
+    font-size: 12.5px !important;
+  }
+
+  /* Boite Outils mobile ergonomique au pouce */
+  #floatingTools, .floating-tools, #toolbox {
+    max-width: min(88vw, 310px) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.35) !important;
+  }
+  #floatingTools.ch-mob-collapsed, .floating-tools.ch-mob-collapsed, #toolbox.ch-mob-collapsed {
+    width: auto !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    top: auto !important;
+    bottom: 44px !important;
+    left: 10px !important;
+    right: auto !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+  #floatingTools.ch-mob-collapsed > *:not(#ch-mob-tools-fab) {
+    display: none !important;
+  }
+
+  /* Barre d'etat du bas epuree sur mobile */
+  .status-bar, #statusBar, footer {
+    font-size: 10.5px !important;
+    padding: 3px 8px !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+  }
+}
+</style>
+
+<script id="ch-mobile-pro-touch-engine">
+(function(){
+  function isMobileDevice(){
+    return window.innerWidth <= 960;
+  }
+
+  // 1. Pilule tactile flottante "Outils" au pouce sur smartphone
+  function setupMobileToolsFab(){
+    if(!isMobileDevice()) return;
+    const box = document.getElementById("floatingTools") || document.querySelector(".floating-tools, #toolbox");
+    if(!box) return;
+
+    if(!box.dataset.mobInitDone){
+      box.dataset.mobInitDone = "1";
+      box.classList.add("ch-mob-collapsed");
+    }
+
+    let fab = document.getElementById("ch-mob-tools-fab");
+    if(!fab){
+      fab = document.createElement("button");
+      fab.id = "ch-mob-tools-fab";
+      fab.type = "button";
+      fab.style.cssText = "display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:999px;background:linear-gradient(135deg,#0284c7,#0369a1);color:#ffffff;border:1px solid rgba(255,255,255,0.28);font-family:Inter,system-ui,sans-serif;font-size:12.5px;font-weight:700;box-shadow:0 6px 18px rgba(2,132,199,0.45);cursor:pointer;";
+      fab.innerHTML = "<span>🛠 Outils & Tracés</span>";
+      fab.onclick = (e) => {
+        e.stopPropagation();
+        const collapsed = box.classList.toggle("ch-mob-collapsed");
+        if(!collapsed){
+          box.style.top = "auto";
+          box.style.bottom = "46px";
+          box.style.left = "10px";
+          fab.innerHTML = "<span>✕ Fermer Outils</span>";
+          fab.style.background = "linear-gradient(135deg,#dc2626,#b91c1c)";
+          fab.style.marginBottom = "6px";
+        } else {
+          fab.innerHTML = "<span>🛠 Outils & Tracés</span>";
+          fab.style.background = "linear-gradient(135deg,#0284c7,#0369a1)";
+          fab.style.marginBottom = "0";
+        }
+      };
+      box.insertBefore(fab, box.firstChild);
+    }
+  }
+
+  // 2. Pont tactile universel (Dessiner au doigt avec n'importe quel outil sur smartphone/tablette)
+  function installTouchDrawingBridge(){
+    const container = document.getElementById("chart-container");
+    if(!container || container.dataset.touchBridgeInstalled) return;
+    container.dataset.touchBridgeInstalled = "1";
+
+    function isDrawingToolSelected(){
+      const selTool = document.getElementById("selOutilDessin") || document.querySelector("select[id*='Outil'], select[id*='Tool']");
+      if(!selTool) return false;
+      const v = String(selTool.value || "").toUpperCase();
+      return v !== "" && v !== "NONE" && v !== "CURSEUR" && v !== "MAIN" && v !== "MAIN_LIBRE" && v !== "PAN";
+    }
+
+    function dispatchSimulatedMouse(type, touch, target){
+      if(!touch || !target) return;
+      const ev = new MouseEvent(type, {
+        bubbles: true,
+        cancelable: true,
+        view: window,
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+        screenX: touch.screenX,
+        screenY: touch.screenY,
+        button: 0,
+        buttons: type === "mouseup" ? 0 : 1
+      });
+      target.dispatchEvent(ev);
+    }
+
+    let activeTouchDrawing = false;
+
+    container.addEventListener("touchstart", function(e){
+      if(e.touches.length !== 1) return;
+      if(isDrawingToolSelected()){
+        activeTouchDrawing = true;
+        e.preventDefault();
+        const t = e.touches[0];
+        const target = document.elementFromPoint(t.clientX, t.clientY) || container;
+        dispatchSimulatedMouse("mousemove", t, target);
+        dispatchSimulatedMouse("mousedown", t, target);
+      }
+    }, { passive: false });
+
+    container.addEventListener("touchmove", function(e){
+      if(!activeTouchDrawing || e.touches.length !== 1) return;
+      e.preventDefault();
+      const t = e.touches[0];
+      const target = document.elementFromPoint(t.clientX, t.clientY) || container;
+      dispatchSimulatedMouse("mousemove", t, target);
+    }, { passive: false });
+
+    container.addEventListener("touchend", function(e){
+      if(!activeTouchDrawing) return;
+      activeTouchDrawing = false;
+      const t = e.changedTouches[0];
+      const target = (t && document.elementFromPoint(t.clientX, t.clientY)) || container;
+      dispatchSimulatedMouse("mouseup", t, target);
+      dispatchSimulatedMouse("click", t, target);
+    }, { passive: false });
+  }
+
+  window.addEventListener("load", () => {
+    setupMobileToolsFab();
+    installTouchDrawingBridge();
+  });
+  window.addEventListener("resize", setupMobileToolsFab);
+  setInterval(() => {
+    setupMobileToolsFab();
+    installTouchDrawingBridge();
+  }, 800);
 })();
 </script>
 </body>
