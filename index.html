@@ -2381,7 +2381,7 @@ function dessinerChandeliersMulti(data) { if (document.getElementById('selHorizo
     backgroundColor: '#0A0A0A',
     animation: false,
     title: { show: false, id: 'titreCamembert', text: `${data.date_deb_fr} → ${data.date_fin_fr}`, left: pieAuto.pos[0], top: pieAuto.topTitle, textAlign: 'center', textStyle: { color: '#FFD700', fontSize: 11, fontFamily: 'Consolas', fontWeight: 'bold' } },
-    grid: { left: 45, right: 92, top: 32, bottom: 22 },
+    grid: { left: 45, right: 100, top: 32, bottom: 22 },
     tooltip: {
       trigger: 'item', z: 999, backgroundColor: 'rgba(18,18,18,0.96)', borderColor: '#444', textStyle: { color: '#FFF', fontFamily: 'Consolas', fontSize: 12 },
       formatter: p => {
@@ -2820,7 +2820,7 @@ function dessinerGraphique(data) { if(document.getElementById("selHorizon")?.val
   chart.setOption({
     backgroundColor: '#0A0A0A', animation: false,
     title: { show: false, id: 'titreCamembert', text: `Séance ${data.date_fr} (09:00 → 15:00)`, left: pieAutoV.pos[0], top: pieAutoV.topTitle, textAlign: 'center', textStyle: { color: '#FFD700', fontSize: 11, fontFamily: 'Consolas', fontWeight: 'bold' } },
-    grid: { left: 45, right: 92, top: 32, bottom: 22 },
+    grid: { left: 45, right: 100, top: 32, bottom: 22 },
     tooltip: {
       trigger: 'item', z: 999, backgroundColor: 'rgba(18,18,18,0.96)', borderColor: '#444', textStyle: { color: '#FFF', fontFamily: 'Consolas', fontSize: 12 },
       formatter: p => {
@@ -5160,17 +5160,17 @@ window.__chInjecterIndicateurs = function() {
   if (cfg.oscs.length === 0) {
     if (Array.isArray(opt.grid) && opt.grid.length > 1) {
       chart.setOption({
-        grid: new Array({ left: 45, right: 92, top: 32, bottom: 22 }),
+        grid: new Array({ left: 45, right: 100, top: 32, bottom: 22 }),
         xAxis: new Array({ ...xBase, gridIndex: 0 }),
         yAxis: baseYAxes,
         dataZoom: (Array.isArray(opt.dataZoom) && opt.dataZoom.length > 0) ? opt.dataZoom.map(dz => (dz && dz.yAxisIndex !== undefined && dz.xAxisIndex === undefined) ? dz : { ...dz, xAxisIndex: new Array(0) }) : new Array({ type: "inside", xAxisIndex: new Array(0) }),
         series: extra
-      });
+  }, { replaceMerge: new Array("grid", "xAxis", "yAxis") });
     } else {
       chart.setOption({
-        grid: new Array({ left: 45, right: 92, top: 32, bottom: 22 }),
+        grid: new Array({ left: 45, right: 100, top: 32, bottom: 22 }),
         series: extra
-      });
+  }, { replaceMerge: new Array("grid", "xAxis", "yAxis") });
     }
     return;
   }
@@ -5181,7 +5181,7 @@ window.__chInjecterIndicateurs = function() {
   const availH = 93.5 - mainH - (nOsc * gapPct);
   const subH = +(availH / nOsc).toFixed(1);
 
-  const grids = new Array({ left: 45, right: 92, top: 32, height: mainH + "%" });
+  const grids = new Array({ left: 45, right: 100, top: 32, height: mainH + "%" });
   const xAxes = new Array({ ...xBase, gridIndex: 0, axisLabel: { show: false } });
   const yAxes = baseYAxes.slice();
   const allXIdx = new Array(0);
@@ -5190,9 +5190,9 @@ window.__chInjecterIndicateurs = function() {
     const gIdx = idx + 1; const yIdx = yOscOffset + idx;
     const topPct = +(mainH + 4.2 + idx * (subH + gapPct)).toFixed(1);
     allXIdx.push(gIdx);
-    grids.push({ left: 45, right: 92, top: topPct + "%", height: subH + "%" });
+    grids.push({ left: 45, right: 100, top: topPct + "%", height: subH + "%" });
     const isLastSub = (idx === nOsc - 1); xAxes.push({ ...xBase, gridIndex: gIdx, axisLabel: isLastSub ? (xBase.axisLabel || { show: true }) : { show: false } });
-    let yOsc = { gridIndex: gIdx, position: "right", name: oscName, nameLocation: "middle", nameGap: 32, nameRotate: 90, nameTextStyle: { color: axisCol, fontSize: 9, fontWeight: "bold" }, axisLabel: { color: axisCol, fontSize: 9, hideOverlap: true, showMinLabel: false, showMaxLabel: false }, splitLine: { lineStyle: { color: splitCol } } };
+    let yOsc = { gridIndex: gIdx, position: "right", name: oscName, nameLocation: "middle", nameGap: 44, nameRotate: 90, nameTextStyle: { color: axisCol, fontSize: 9, fontWeight: "bold" }, axisLabel: { color: axisCol, fontSize: 9, hideOverlap: true, showMinLabel: false, showMaxLabel: false }, splitLine: { lineStyle: { color: splitCol } } };
 
     if (oscName === "DELTA") {
       extra.push({ id: "ind_osc_delta", name: "Delta Net", type: "bar", barMaxWidth: 14, xAxisIndex: gIdx, yAxisIndex: yIdx, itemStyle: { color: (p) => ((Array.isArray(p.value) ? p.value.at(1) : p.value) >= 0) ? "#10B981" : "#EF4444" }, data: pair(deltaArr) });
@@ -5269,7 +5269,7 @@ window.__chInjecterIndicateurs = function() {
     yAxis: yAxes,
     dataZoom: new Array({ id: "zoomX_inside", type: "inside", xAxisIndex: allXIdx, filterMode: "none", zoomOnMouseWheel: true, moveOnMouseMove: false }, { id: "zoomX_slider", type: "slider", xAxisIndex: allXIdx, filterMode: "none", bottom: 22, height: 12, showDetail: false }),
     series: extra
-  });
+  }, { replaceMerge: new Array("grid", "xAxis", "yAxis") });
 };
 
 document.addEventListener("click", (e) => {
@@ -11831,7 +11831,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
           if(s.type === "line"){
             upd.endLabel = {
               show: true,
-              formatter: cleanName, show: (lastVal !== null),
+              formatter: cleanName, show: (lastVal !== null && !/([+-]\d|Sup|Inf|Kijun|Senkou)/i.test(cleanName)),
               color: col,
               fontSize: 10,
               fontWeight: "bold",
@@ -11841,7 +11841,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
               borderRadius: 4,
               padding: new Array(2, 5)
             };
-            upd.labelLayout = { moveOverlap: "shiftY" };
+            
           }
           updatedSeries.push(upd);
         }
@@ -11903,6 +11903,57 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
   }
 
   setInterval(enrichIndicatorCurveLabelsAndLegend, 350);
+})();
+</script>
+<script id="ch-hud-active-indicators-list">
+(function(){
+  function updateHudActiveIndicatorsList(){
+    const hudBox = document.getElementById("ch-zoom-telemetry-hud-box");
+    const hudBody = document.getElementById("ch-hud-body") || hudBox;
+    if(!hudBox || !hudBody || hudBox.style.display === "none") return;
+
+    let indRow = document.getElementById("ch-hud-indicators-summary");
+    if(!indRow){
+      indRow = document.createElement("div");
+      indRow.id = "ch-hud-indicators-summary";
+      indRow.style.cssText = "margin-top:6px;padding-top:5px;border-top:1px solid rgba(56,189,248,0.28);font-size:10.5px;line-height:1.35;color:#e2e8f0;";
+      hudBody.appendChild(indRow);
+    }
+
+    if(typeof chart === "undefined" || !chart){
+      indRow.innerHTML = '<span style="color:#94a3b8;">Indicateurs :</span> Aucun';
+      return;
+    }
+
+    try {
+      const opt = chart.getOption() || {};
+      const sList = Array.isArray(opt.series) ? opt.series : [];
+      const indSeries = sList.filter(s => s && String(s.id || "").startsWith("ind_"));
+      if(indSeries.length === 0){
+        indRow.innerHTML = '<span style="color:#94a3b8;">Indicateurs (0) :</span> <span style="color:#64748b;">Aucun actif</span>';
+        return;
+      }
+
+      const badges = indSeries.map(s => {
+        const col = (s.lineStyle && s.lineStyle.color) || (s.itemStyle && typeof s.itemStyle.color === "string" ? s.itemStyle.color : "#38BDF8");
+        const nm = String(s.name || s.id.replace("ind_", "")).trim();
+        let lastVal = null;
+        if(Array.isArray(s.data)){
+          for(let i = s.data.length - 1; i >= 0; i--){
+            const pt = s.data.at(i);
+            const v = Array.isArray(pt) ? pt.at(1) : (pt && typeof pt === "object" ? pt.value : pt);
+            if(typeof v === "number" && Number.isFinite(v)){ lastVal = v; break; }
+          }
+        }
+        const vTxt = (lastVal !== null) ? (" " + (Math.abs(lastVal) >= 100 ? Math.round(lastVal).toLocaleString("fr-FR") : lastVal.toFixed(2))) : "";
+        return `<span style="display:inline-flex;align-items:center;gap:4px;margin:2px 4px 0 0;padding:1px 5px;border-radius:4px;background:rgba(15,23,42,0.85);border:1px solid ${col};color:#f8fafc;font-size:10px;"><span style="width:6px;height:6px;border-radius:50%;background:${col};display:inline-block;"></span>${nm}<b style="color:${col};">${vTxt}</b></span>`;
+      });
+
+      indRow.innerHTML = `<div style="color:#38bdf8;font-weight:700;margin-bottom:2px;">Indicateurs actifs (${indSeries.length}) :</div><div style="display:flex;flex-wrap:wrap;">${badges.join("")}</div>`;
+    } catch(e){}
+  }
+
+  setInterval(updateHudActiveIndicatorsList, 350);
 })();
 </script>
 </body>
