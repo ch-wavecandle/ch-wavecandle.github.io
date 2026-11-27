@@ -1239,28 +1239,28 @@ window.__CH_GET_INIT_Y_ZOOM = function(bougies){
 })();
 </script>
 <style id="ch-dark-indicators-modal-css">
-body:not(.theme-clair) .ch-preset-ind {
+body:not(.theme-clair):not(.light-mode) .ch-preset-ind {
   background: rgba(30, 41, 59, 0.96) !important;
   border: 1px solid rgba(100, 116, 139, 0.65) !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
 }
-body:not(.theme-clair) .ch-preset-ind:hover {
+body:not(.theme-clair):not(.light-mode) .ch-preset-ind:hover {
   background: rgba(51, 65, 85, 0.98) !important;
   border-color: #38bdf8 !important;
 }
-body:not(.theme-clair) .ch-preset-ind div,
-body:not(.theme-clair) .ch-preset-ind span,
-body:not(.theme-clair) .ch-preset-ind small {
+body:not(.theme-clair):not(.light-mode) .ch-preset-ind div,
+body:not(.theme-clair):not(.light-mode) .ch-preset-ind span,
+body:not(.theme-clair):not(.light-mode) .ch-preset-ind small {
   color: #e2e8f0 !important;
   opacity: 1 !important;
 }
-body:not(.theme-clair) .ch-preset-ind > div:first-child,
-body:not(.theme-clair) .ch-preset-ind > span:first-child {
+body:not(.theme-clair):not(.light-mode) .ch-preset-ind > div:first-child,
+body:not(.theme-clair):not(.light-mode) .ch-preset-ind > span:first-child {
   font-weight: 700 !important;
   color: #f8fafc !important;
 }
-body:not(.theme-clair) input[type="checkbox"].ch-ind-chk,
-body:not(.theme-clair) label input[type="checkbox"] {
+body:not(.theme-clair):not(.light-mode) input[type="checkbox"].ch-ind-chk,
+body:not(.theme-clair):not(.light-mode) label input[type="checkbox"] {
   appearance: none !important;
   -webkit-appearance: none !important;
   width: 15px !important;
@@ -1273,18 +1273,38 @@ body:not(.theme-clair) label input[type="checkbox"] {
   place-content: center !important;
   vertical-align: middle !important;
 }
-body:not(.theme-clair) input[type="checkbox"].ch-ind-chk:checked,
-body:not(.theme-clair) label input[type="checkbox"]:checked {
+body:not(.theme-clair):not(.light-mode) input[type="checkbox"].ch-ind-chk:checked,
+body:not(.theme-clair):not(.light-mode) label input[type="checkbox"]:checked {
   background-color: #0284c7 !important;
   border-color: #38bdf8 !important;
 }
-body:not(.theme-clair) input[type="checkbox"].ch-ind-chk:checked::before,
-body:not(.theme-clair) label input[type="checkbox"]:checked::before {
+body:not(.theme-clair):not(.light-mode) input[type="checkbox"].ch-ind-chk:checked::before,
+body:not(.theme-clair):not(.light-mode) label input[type="checkbox"]:checked::before {
   content: "✓" !important;
   color: #ffffff !important;
   font-size: 11px !important;
   font-weight: 900 !important;
   line-height: 1 !important;
+}
+body.theme-clair .ch-preset-ind, body.light-mode .ch-preset-ind {
+  background: #f1f5f9 !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05) !important;
+}
+body.theme-clair .ch-preset-ind:hover, body.light-mode .ch-preset-ind:hover {
+  background: #e0f2fe !important;
+  border-color: #0284c7 !important;
+}
+body.theme-clair .ch-preset-ind div, body.light-mode .ch-preset-ind div,
+body.theme-clair .ch-preset-ind span, body.light-mode .ch-preset-ind span,
+body.theme-clair .ch-preset-ind small, body.light-mode .ch-preset-ind small {
+  color: #475569 !important;
+  opacity: 1 !important;
+}
+body.theme-clair .ch-preset-ind > div:first-child, body.light-mode .ch-preset-ind > div:first-child,
+body.theme-clair .ch-preset-ind > span:first-child, body.light-mode .ch-preset-ind > span:first-child {
+  font-weight: 700 !important;
+  color: #0f172a !important;
 }
 </style>
 </head>
