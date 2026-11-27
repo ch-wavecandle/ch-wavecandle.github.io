@@ -12456,7 +12456,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
 
     const sx = dzList.find(d => d && d.id === "zoomX_slider");
     const sy = dzList.find(d => d && d.id === "zoomY_slider");
-    if(sx && sy && Number(sx.bottom) === 26 && Number(sy.right) === 54 && Number(sx.height) === 16) return;
+    if(sx && sy && Number(sx.bottom) === 6 && Number(sy.right) === 8 && Number(sx.height) === 12) return;
 
     const xAxes = Array.isArray(opt.xAxis) ? opt.xAxis : (opt.xAxis ? [opt.xAxis] : []);
     const allX = xAxes.length > 0 ? xAxes.map((_, i) => i) : new Array(0);
@@ -12612,7 +12612,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
         const batchX = [];
         dzList.forEach((d, idx) => {
           if(d && !(d.orient === "vertical" || (d.yAxisIndex !== undefined && d.xAxisIndex === undefined))){
-            batchX.push({ dataZoomIndex: idx, start: nS, end: nE });
+            batchX.push({ dataZoomIndex: idx, start: nS, end: nE, startValue: null, endValue: null });
           }
         });
         if(batchX.length) ch.dispatchAction({ type: "dataZoom", batch: batchX });
@@ -12667,7 +12667,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
         nxS = Math.max(0, nxS); nxE = Math.min(100, nxE);
         dzList.forEach((d, idx) => {
           if(d && !(d.orient === "vertical" || (d.yAxisIndex !== undefined && d.xAxisIndex === undefined))){
-            batchAll.push({ dataZoomIndex: idx, start: nxS, end: nxE });
+            batchAll.push({ dataZoomIndex: idx, start: nxS, end: nxE, startValue: null, endValue: null });
           }
         });
       }
@@ -12697,6 +12697,46 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
   }
 
   setInterval(bindUnifiedXYInteractions, 300);
+})();
+</script>
+<script id="ch-dblclick-and-apply-reset">
+(function(){
+  window.__CH_RESET_ALL_ZOOMS = function(){
+    window.__CH_SAVED_PERIOD_ZOOM = null;
+    const dom = document.getElementById("chart-container");
+    const ch = (typeof chart !== "undefined" && chart) ? chart : (window.echarts && dom ? echarts.getInstanceByDom(dom) : null);
+    if(!ch) return;
+    const opt = ch.getOption() || {};
+    const dzList = Array.isArray(opt.dataZoom) ? opt.dataZoom : [];
+    if(!dzList.length) return;
+    const batch = dzList.map((_, idx) => ({ dataZoomIndex: idx, start: 0, end: 100, startValue: null, endValue: null }));
+    ch.dispatchAction({ type: "dataZoom", batch: batch });
+  };
+
+  function bindDblClickAndApplyReset(){
+    const container = document.getElementById("chart-container");
+    if(container && !container.dataset.chDblResetBound){
+      container.dataset.chDblResetBound = "1";
+      container.addEventListener("dblclick", (e) => {
+        if(e.target.closest("#ch-hud-tools, #ch-zoom-telemetry-hud-box, #ch-active-indicators-legend, #ch-pie-win-frame")) return;
+        window.__CH_RESET_ALL_ZOOMS();
+      }, { capture: true });
+    }
+
+    // Reinitialiser les zooms juste avant d'appliquer des indicateurs
+    document.querySelectorAll("button").forEach(btn => {
+      if(btn.dataset.chApplyResetBound) return;
+      const t = (btn.textContent || "").trim();
+      if(t === "Appliquer" || t.startsWith("Appliquer (")){
+        btn.dataset.chApplyResetBound = "1";
+        btn.addEventListener("click", () => {
+          window.__CH_RESET_ALL_ZOOMS();
+        }, { capture: true });
+      }
+    });
+  }
+
+  setInterval(bindDblClickAndApplyReset, 300);
 })();
 </script>
 </body>
