@@ -10264,7 +10264,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
   window.__CH_RESTORE_Y_PX_SCALE = function(){
     const a = window.__CH_SAVED_PERIOD_ZOOM;
     if(!a || !a.hasY || !(a.pxPerTnd > 0) || !(a.centerPrice > 0) || typeof chart === "undefined" || !chart) return;
-    const opt = chInst.getOption() || {};
+    const opt = chart.getOption() || {};
     const ya = Array.isArray(opt.yAxis) ? opt.yAxis.at(0) : null;
     let axisMin = (ya && typeof ya.min === "number") ? ya.min : Infinity;
     let axisMax = (ya && typeof ya.max === "number") ? ya.max : -Infinity;
@@ -10445,7 +10445,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
   function syncPieTitlesToCenter(){
     if(typeof chart === "undefined" || !chart) return;
     try {
-      const opt = chInst.getOption() || {};
+      const opt = chart.getOption() || {};
       const sList = Array.isArray(opt.series) ? opt.series : [];
       const pieS = sList.find(s => s && (s.id === "pieCamembert" || s.type === "pie"));
       if(!pieS || !Array.isArray(pieS.center) || pieS.center.length < 2) return;
@@ -10484,7 +10484,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     if(!a || !a.hasX || !a.dateStart || !a.dateEnd || typeof chart === "undefined" || !chart) return;
     const bList = (typeof globalData !== "undefined" && globalData && Array.isArray(globalData.bougies)) ? globalData.bougies : [];
     if(bList.length < 3) return;
-    const opt = chInst.getOption() || {};
+    const opt = chart.getOption() || {};
     const xa = Array.isArray(opt.xAxis) ? opt.xAxis.at(0) : null;
     const totalAxisLen = (xa && Array.isArray(xa.data) && xa.data.length >= bList.length) ? xa.data.length : bList.length;
 
@@ -10619,7 +10619,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     let yMinStr = "--", yMaxStr = "--", dzYStr = "--", dzXStr = "--", clipErr = 0, dataRangeStr = "--";
 
     if(typeof chart !== "undefined" && chart){
-      const opt = chInst.getOption() || {};
+      const opt = chart.getOption() || {};
       const ya = Array.isArray(opt.yAxis) ? opt.yAxis.at(0) : null;
       if(ya){
         yMinStr = typeof ya.min === "number" ? ya.min.toFixed(3) : String(ya.min ?? "auto");
@@ -11487,7 +11487,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     // 2. Masquer le titre ECharts (title) et tout element graphic central en haut
     if(typeof chart === "undefined" || !chart) return;
     try {
-      const opt = chInst.getOption() || {};
+      const opt = chart.getOption() || {};
       const titles = Array.isArray(opt.title) ? opt.title : (opt.title ? [opt.title] : []);
       if(titles.some(t => t && t.show !== false)){
         chart.setOption({ title: titles.map(() => ({ show: false, text: "" })) });
@@ -11588,7 +11588,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     if(!hasData){ emptySeriesStreak = 0; return; }
 
     try {
-      const opt = chInst.getOption() || {};
+      const opt = chart.getOption() || {};
       const seriesArr = Array.isArray(opt.series) ? opt.series : [];
       const xAxisArr = Array.isArray(opt.xAxis) ? opt.xAxis : [];
       const hasMainSeries = seriesArr.some(s => s && s.type !== "pie" && Array.isArray(s.data) && s.data.length > 0);
@@ -11644,7 +11644,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
       container.addEventListener("dblclick", () => {
         setTimeout(() => {
           if(typeof chart === "undefined" || !chart) return;
-          const opt = chInst.getOption() || {};
+          const opt = chart.getOption() || {};
           const pieS = (Array.isArray(opt.series) ? opt.series : []).find(s => s && (s.id === "pieCamembert" || s.type === "pie"));
           if(pieS && Array.isArray(pieS.center) && pieS.center.length >= 2){
             window.__CH_USER_PIE_CENTER = [pieS.center.at(0), pieS.center.at(1)];
@@ -11658,7 +11658,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
   function enforceUnifiedPieGeometry(){
     if(typeof chart === "undefined" || !chart) return;
     try {
-      const opt = chInst.getOption() || {};
+      const opt = chart.getOption() || {};
       const sList = Array.isArray(opt.series) ? opt.series : [];
       const pieS = sList.find(s => s && (s.id === "pieCamembert" || s.type === "pie"));
       if(!pieS || !Array.isArray(pieS.center) || pieS.center.length < 2) return;
@@ -11723,7 +11723,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     if(typeof chart === "undefined" || !chart) return;
 
     try {
-      const opt = chInst.getOption() || {};
+      const opt = chart.getOption() || {};
       const xa = Array.isArray(opt.xAxis) ? opt.xAxis.at(0) : null;
       const sList = Array.isArray(opt.series) ? opt.series : [];
       if(!xa || !Array.isArray(xa.data) || xa.data.length < 3) return;
@@ -11782,7 +11782,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     if(!container) return;
 
     try {
-      const opt = chInst.getOption() || {};
+      const opt = chart.getOption() || {};
       const sList = Array.isArray(opt.series) ? opt.series : [];
       const indSeries = sList.filter(s => s && String(s.id || "").startsWith("ind_"));
 
@@ -11920,13 +11920,13 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
       hudBox.appendChild(indRow);
     }
 
-    const chInst = (typeof chart !== "undefined" && chart) ? chart : (window.echarts && document.getElementById("chart-container") ? echarts.getInstanceByDom(document.getElementById("chart-container")) : null); if(!chInst){
+    const chInst = (typeof chart !== "undefined" && chart) ? chart : (window.echarts && document.getElementById("chart-container") ? echarts.getInstanceByDom(document.getElementById("chart-container")) : null); if(!chInst){ return; } const opt = chInst.getOption() || {}; if(false){
       indRow.innerHTML = '<span style="color:#94a3b8;">Indicateurs :</span> Aucun';
       return;
     }
 
     try {
-      const opt = chInst.getOption() || {};
+      const opt = chart.getOption() || {};
       const sList = Array.isArray(opt.series) ? opt.series : [];
       const indSeries = sList.filter(s => s && String(s.id || "").startsWith("ind_"));
       if(indSeries.length === 0){
