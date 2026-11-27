@@ -5176,7 +5176,7 @@ window.__chInjecterIndicateurs = function() {
   }
 
   const nOsc = cfg.oscs.length;
-  const mainH = nOsc === 1 ? 67 : (nOsc === 2 ? 53 : (nOsc === 3 ? 44 : 37));
+  const mainH = nOsc === 1 ? 67 : (nOsc === 2 ? 53 : (nOsc === 3 ? 41 : 35));
   const gapPct = 3.2;
   const availH = 93.5 - mainH - (nOsc * gapPct);
   const subH = +(availH / nOsc).toFixed(1);
@@ -10531,10 +10531,10 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     if(box) return box;
     box = document.createElement("div");
     box.id = "ch-zoom-telemetry-hud-box";
-    box.style.cssText = "display:none;position:fixed;top:38px;left:230px;z-index:9999;background:rgba(15,23,42,0.93);color:#e2e8f0;border:1px solid #38bdf8;border-radius:10px;padding:9px 12px;font-family:Consolas,monospace;font-size:11px;line-height:1.45;box-shadow:0 8px 24px rgba(0,0,0,0.3);min-width:300px;backdrop-filter:blur(6px);";
+    box.style.cssText = "display:none;position:fixed;top:98px;left:230px;z-index:9999;background:rgba(15,23,42,0.93);color:#e2e8f0;border:1px solid #38bdf8;border-radius:10px;padding:9px 12px;font-family:Consolas,monospace;font-size:11px;line-height:1.45;box-shadow:0 8px 24px rgba(0,0,0,0.3);min-width:300px;backdrop-filter:blur(6px);";
     box.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(148,163,184,0.25);padding-bottom:4px;margin-bottom:5px;gap:8px;">
-        <span style="font-weight:700;color:#38bdf8;">🔬 DÉTECTEUR & MESURE AXES (X/Y)</span>
+        <span id="ch-hud-drag-handle" style="font-weight:700;color:#38bdf8;cursor:move;user-select:none;flex:1;">✥ 🔬 DÉTECTEUR & MESURE AXES (X/Y)</span>
         <div style="display:flex;gap:4px;">
           <button id="ch-hud-min-btn" title="Réduire / Développer" style="background:transparent;border:1px solid #475569;color:#cbd5e1;border-radius:4px;padding:0 5px;cursor:pointer;font-size:10px;">—</button>
           <button id="ch-hud-close-btn" title="Fermer" style="background:transparent;border:1px solid #ef4444;color:#fca5a5;border-radius:4px;padding:0 5px;cursor:pointer;font-size:10px;">✕</button>
@@ -10555,6 +10555,26 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
       const chk = document.getElementById("ch-menu-hud-chk");
       if(chk) chk.checked = false;
     };
+    const handle = document.getElementById("ch-hud-drag-handle");
+    if(handle){
+      let dragOn = false, sx = 0, sy = 0, ol = 0, ot = 0;
+      const startDrag = (cx, cy) => {
+        const r = box.getBoundingClientRect();
+        dragOn = true; sx = cx; sy = cy; ol = r.left; ot = r.top;
+      };
+      const moveDrag = (cx, cy) => {
+        if(!dragOn) return;
+        box.style.left = Math.max(4, Math.min(window.innerWidth - 120, ol + (cx - sx))) + "px";
+        box.style.top = Math.max(4, Math.min(window.innerHeight - 60, ot + (cy - sy))) + "px";
+        box.style.right = "auto";
+      };
+      handle.addEventListener("mousedown", e => { e.preventDefault(); startDrag(e.clientX, e.clientY); });
+      window.addEventListener("mousemove", e => moveDrag(e.clientX, e.clientY));
+      window.addEventListener("mouseup", () => { dragOn = false; });
+      handle.addEventListener("touchstart", e => { if(e.touches.length === 1){ const t = e.touches.item(0); startDrag(t.clientX, t.clientY); } }, { passive: true });
+      window.addEventListener("touchmove", e => { if(dragOn && e.touches.length === 1){ e.preventDefault(); const t = e.touches.item(0); moveDrag(t.clientX, t.clientY); } }, { passive: false });
+      window.addEventListener("touchend", () => { dragOn = false; });
+    }
     return box;
   }
 
