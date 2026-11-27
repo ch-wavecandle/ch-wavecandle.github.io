@@ -1809,7 +1809,7 @@ function detecterCentreCamembert(pointsPrix, prixMin, prixMax) {
   const boites = pointsPrix.map((p, idx) => {
     const x0 = typeof p.xNorm0 === 'number' ? p.xNorm0 : (idx / Math.max(n, 1));
     const x1 = typeof p.xNorm1 === 'number' ? p.xNorm1 : ((idx + 1) / Math.max(n, 1));
-    const yBas = (p.low - prixMin) / etendueY;
+    if(!p || p.vide || !(Number(p.high) > 0) || !(Number(p.low) > 0)) return { x0: 0, x1: 0, yBas: -1, yHaut: -1 }; const yBas = (p.low - prixMin) / etendueY;
     // Ajout d'une marge haute (+0.22) pour tenir compte de l'elevation volumetrique des vagues
     const yHaut = Math.min(1.0, ((p.high - prixMin) / etendueY) + 0.22);
     return { x0, x1, yBas, yHaut };
@@ -2433,7 +2433,7 @@ function dessinerChandeliersMulti(data) { if (document.getElementById('selHorizo
           if (!b) return { type: 'group', children: [] };
           if (b.vide || b.open === null) {
             if (!b.prixRef) return { type: 'group', children: [] };
-            const ptRef = api.coord([params.dataIndex, b.prixRef]);
+            let lastActIdx = -1; for(let k = bougies.length - 1; k >= 0; k--){ if(bougies[k] && !bougies[k].vide && Number(bougies[k].vol_tot) > 0){ lastActIdx = k; break; } } if(lastActIdx >= 0 && params.dataIndex > lastActIdx) return null; const ptRef = api.coord([params.dataIndex, b.prixRef]);
             const cxV = ptRef[0], cyV = ptRef[1];
             const wSlotV = Math.min(Math.max(api.size([1, 0])[0] * 0.36, 5), 14);
             return {
