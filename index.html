@@ -11909,7 +11909,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
 (function(){
   function updateHudActiveIndicatorsList(){
     const hudBox = document.getElementById("ch-zoom-telemetry-hud-box");
-    hudBox.style.width = "285px"; hudBox.style.minWidth = "285px"; hudBox.style.maxWidth = "285px"; const hudBody = document.getElementById("ch-hud-body");
+    if(!hudBox || hudBox.style.display === "none") return; hudBox.style.width = "285px"; hudBox.style.minWidth = "285px"; hudBox.style.maxWidth = "285px"; const hudBody = document.getElementById("ch-hud-body");
     if(!hudBox || hudBox.style.display === "none") return; if(hudBody && hudBody.style.display === "none"){ const r0 = document.getElementById("ch-hud-indicators-summary"); if(r0) r0.style.display = "none"; return; } else { const r0 = document.getElementById("ch-hud-indicators-summary"); if(r0) r0.style.display = "block"; }
 
     let indRow = document.getElementById("ch-hud-indicators-summary");
