@@ -11666,8 +11666,8 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
         chart.setOption({ series: [{ id: "pieCamembert", radius: isMasque ? [0, 0] : [0, R], center: targetCenter }] });
       }
 
-      const relTopY = -(R + 18);
-      const relBotY = R + 6;
+      const relTopY = -(R + 24);
+      const relBotY = R + 12;
       const gList = Array.isArray(opt.graphic) ? opt.graphic : [];
       const grp = gList.find(g => g && g.id === "grpAgressivitePie");
       if(grp && Array.isArray(grp.children)){
@@ -11753,7 +11753,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
   setInterval(() => {
     bindManualPiePositionLock();
     enforceUnifiedPieGeometry();
-    trimLiveCandlesticksToLastPeriod();
+    // keep full session time axis in Live
   }, 150);
 })();
 </script>
