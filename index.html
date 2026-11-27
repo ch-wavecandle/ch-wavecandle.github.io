@@ -568,7 +568,7 @@ body.theme-clair .statusbar {
   background-size: 10px 10px, 100% 100% !important;
   border-top: 1px solid #B0BDCE !important;
 }
-#ch-hud-tools:not(.vertical) { width: max-content !important; max-width: none !important; overflow: visible !important; } #ch-hud-tools:not(.vertical) .ch-hud-ctrl-bar { width: auto !important; flex: 0 0 auto !important; }</style>
+</style>
 <!-- CH_WEB_LIVE_FIX_START -->
 <style>
   /* Masquer les sélecteurs de dossiers/fichiers locaux en mode Web hébergé */
@@ -576,7 +576,7 @@ body.theme-clair .statusbar {
   button[id*="DossierLive"], button[id*="FichiersLive"] {
     display: none !important;
   }
-#ch-hud-tools:not(.vertical) { width: max-content !important; max-width: none !important; overflow: visible !important; } #ch-hud-tools:not(.vertical) .ch-hud-ctrl-bar { width: auto !important; flex: 0 0 auto !important; }</style>
+</style>
 <script>
 (function() {
   function nettoyerInterfaceWeb() {
@@ -749,12 +749,7 @@ body.theme-clair .statusbar {
         font-size: 10px !important;
         line-height: 1.15 !important;
       }
-      canvas {
-        display: block !important;
-        width: 100vw !important;
-        height: calc(100dvh - 44px) !important;
-        touch-action: none !important;
-      }
+      #chart-container { width: 100vw !important; height: calc(100dvh - 76px) !important; }
     }
 
     /* === MODE PAYSAGE (HORIZONTAL) : 100% GRAPHIQUE PLEIN ECRAN === */
@@ -762,16 +757,10 @@ body.theme-clair .statusbar {
       .ch-kpi-strip, .ch-bottom-bar {
         display: none !important;
       }
-      canvas {
-        position: fixed !important;
-        inset: 0 !important;
-        width: 100vw !important;
-        height: 100dvh !important;
-        touch-action: none !important;
-      }
+      #chart-container { width: 100vw !important; height: calc(100dvh - 76px) !important; }
     }
   }
-#ch-hud-tools:not(.vertical) { width: max-content !important; max-width: none !important; overflow: visible !important; } #ch-hud-tools:not(.vertical) .ch-hud-ctrl-bar { width: auto !important; flex: 0 0 auto !important; }</style>
+</style>
 <!-- CH_MOBILE_MODE_END -->
 <!-- CH_LIGHT_THEME_PRO_START -->
 <style id="ch-light-theme-pro">
@@ -908,7 +897,7 @@ body.theme-clair .statusbar {
     background: #F8FAFC !important;
     border-right: 1px solid #CBD5E1 !important;
   }
-#ch-hud-tools:not(.vertical) { width: max-content !important; max-width: none !important; overflow: visible !important; } #ch-hud-tools:not(.vertical) .ch-hud-ctrl-bar { width: auto !important; flex: 0 0 auto !important; }</style>
+</style>
 <!-- CH_LIGHT_THEME_PRO_END -->
 <!-- CH_LOGO_HEAD_START -->
 <link id="chFavicon" rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://w3.org' viewBox='0 0 64 64'%3E%3Crect x='2' y='2' width='60' height='60' rx='13' fill='%230A0A0A' stroke='%23FFD700' stroke-width='2.5'/%3E%3Cpolygon points='8,53 18,39 28,45 40,25 55,14 55,53' fill='%23059669' fill-opacity='0.35'/%3E%3Cpolyline points='8,53 18,39 28,45 40,25 55,14' fill='none' stroke='%2310B981' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpolyline points='47,13 56,13 55,22' fill='none' stroke='%2338BDF8' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cline x1='21' y1='15' x2='21' y2='44' stroke='%23FFD700' stroke-width='2'/%3E%3Crect x='17' y='21' width='8' height='15' rx='1.5' fill='%23FFD700'/%3E%3Cline x1='42' y1='10' x2='42' y2='36' stroke='%23FFD700' stroke-width='2'/%3E%3Crect x='38' y='15' width='8' height='13' rx='1.5' fill='%230A0A0A' stroke='%23FFD700' stroke-width='2'/%3E%3C/svg%3E">
@@ -959,7 +948,7 @@ body.theme-clair .statusbar {
   }
   body.theme-clair .ch-brand-main, body.light-mode .ch-brand-main { color: #92400E !important; }
   body.theme-clair .ch-brand-sub, body.light-mode .ch-brand-sub { color: #047857 !important; }
-#ch-hud-tools:not(.vertical) { width: max-content !important; max-width: none !important; overflow: visible !important; } #ch-hud-tools:not(.vertical) .ch-hud-ctrl-bar { width: auto !important; flex: 0 0 auto !important; }</style>
+</style>
 <!-- CH_LOGO_HEAD_END -->
 <!-- CH_ZBAR_FS_CSS_START -->
 <style id="ch-zbar-fullscreen-only">
@@ -978,7 +967,7 @@ body.theme-clair .statusbar {
     z-index: 100002 !important;
     gap: 4px !important;
   }
-#ch-hud-tools:not(.vertical) { width: max-content !important; max-width: none !important; overflow: visible !important; } #ch-hud-tools:not(.vertical) .ch-hud-ctrl-bar { width: auto !important; flex: 0 0 auto !important; }</style>
+</style>
 <!-- CH_ZBAR_FS_CSS_END -->
 <!-- CH_UNIVERSAL_FS_CSS_START -->
 <style id="ch-universal-fullscreen-css">
@@ -1034,7 +1023,7 @@ body.theme-clair .statusbar {
       min-height: 25px !important;
     }
   }
-#ch-hud-tools:not(.vertical) { width: max-content !important; max-width: none !important; overflow: visible !important; } #ch-hud-tools:not(.vertical) .ch-hud-ctrl-bar { width: auto !important; flex: 0 0 auto !important; }</style>
+</style>
 <!-- CH_UNIVERSAL_FS_CSS_END -->
 <style id="ch-pdf-scroll-fix-css">
   .ch-doc-thumb-card img, .ch-doc-thumb-card canvas {
@@ -1054,28 +1043,28 @@ body.theme-clair .statusbar {
     max-height: 360px !important;
     object-fit: contain !important;
   }
-#ch-hud-tools:not(.vertical) { width: max-content !important; max-width: none !important; overflow: visible !important; } #ch-hud-tools:not(.vertical) .ch-hud-ctrl-bar { width: auto !important; flex: 0 0 auto !important; }</style>
+</style>
 <style id="ch-opt-img-size">.ch-msg-img, .ch-doc-thumb-card img, .ch-doc-thumb-card canvas { width: auto !important; max-width: min(100%, 420px) !important; height: auto !important; max-height: 240px !important; object-fit: contain !important; border-radius: 6px !important; cursor: zoom-in !important; display: block !important; }
-#ch-hud-tools:not(.vertical) { width: max-content !important; max-width: none !important; overflow: visible !important; } #ch-hud-tools:not(.vertical) .ch-hud-ctrl-bar { width: auto !important; flex: 0 0 auto !important; }</style>
+</style>
 
 
 
 
 <style id="ch-mobile-hd-css">@media (pointer: coarse), (max-width: 960px) { html, body { margin:0 !important; padding:0 !important; width:100vw !important; height:100dvh !important; overflow:hidden !important; font-family:"Segoe UI",system-ui,sans-serif !important; font-variant-numeric:tabular-nums !important; } [_echarts_instance_] { width:100vw !important; height:calc(100dvh - 20px) !important; max-height:calc(100dvh - 20px) !important; margin:0 !important; padding:0 !important; } button, select { font-size:9.5px !important; padding:2px 6px !important; min-height:22px !important; height:22px !important; border-radius:5px !important; } }
-#ch-hud-tools:not(.vertical) { width: max-content !important; max-width: none !important; overflow: visible !important; } #ch-hud-tools:not(.vertical) .ch-hud-ctrl-bar { width: auto !important; flex: 0 0 auto !important; }</style>
+</style>
 <style id="ch-mobile-hd-css">@media (pointer: coarse), (max-width: 960px) { html, body { margin:0 !important; padding:0 !important; width:100vw !important; height:100dvh !important; overflow:hidden !important; font-family:"Segoe UI",system-ui,sans-serif !important; font-variant-numeric:tabular-nums !important; } [_echarts_instance_] { width:100vw !important; height:calc(100dvh - 20px) !important; max-height:calc(100dvh - 20px) !important; margin:0 !important; padding:0 !important; } button, select { font-size:9.5px !important; padding:2px 6px !important; min-height:22px !important; height:22px !important; border-radius:5px !important; } }
-#ch-hud-tools:not(.vertical) { width: max-content !important; max-width: none !important; overflow: visible !important; } #ch-hud-tools:not(.vertical) .ch-hud-ctrl-bar { width: auto !important; flex: 0 0 auto !important; }</style>
+</style>
 
 
 <style id="ch-mob-toolbar-fix">@media (pointer: coarse), (max-width: 960px) { #chMobCurRowFix { display: flex !important; flex-wrap: wrap !important; gap: 6px !important; width: 100% !important; align-items: stretch !important; } #chMobCurBtnFix, #chMobThemeBtnFix { flex: 1 1 46% !important; width: auto !important; min-width: 110px !important; max-width: none !important; height: 34px !important; min-height: 34px !important; padding: 4px 10px !important; font-size: 12px !important; font-weight: 700 !important; white-space: nowrap !important; overflow: visible !important; text-overflow: clip !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important; } #chMobZoomBoxFix { top: 4px !important; right: 44px !important; padding: 2px 4px !important; gap: 3px !important; border-radius: 6px !important; align-items: center !important; display: inline-flex !important; z-index: 45 !important; transform: scale(0.88) !important; transform-origin: top right !important; } #chMobZoomBoxFix button { height: 22px !important; min-height: 22px !important; max-height: 22px !important; padding: 0 7px !important; font-size: 11px !important; line-height: 20px !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; margin: 0 !important; } }
-#ch-hud-tools:not(.vertical) { width: max-content !important; max-width: none !important; overflow: visible !important; } #ch-hud-tools:not(.vertical) .ch-hud-ctrl-bar { width: auto !important; flex: 0 0 auto !important; }</style>
+</style>
 <style id="ch-tuto-css">
 #chTutoOverlay{display:none;position:fixed;inset:0;z-index:100200;pointer-events:auto;font-family:"Segoe UI",system-ui,sans-serif;}#chTutoOverlay.open{display:block;}#chTutoSpot{position:fixed;border:2px solid #38BDF8;border-radius:8px;box-shadow:0 0 0 9999px rgba(2,6,23,0.68),0 0 18px rgba(56,189,248,0.65);transition:all .25s ease;pointer-events:none;z-index:100201;}#chTutoCard{position:fixed;z-index:100202;width:min(350px,90vw);background:#0F172A;color:#F8FAFC;border:1px solid #38BDF8;border-radius:12px;padding:12px 14px;box-shadow:0 14px 38px rgba(0,0,0,0.8);font-size:12px;line-height:1.45;}#chTutoCard h4{margin:0 0 6px;font-size:13.5px;color:#38BDF8;display:flex;align-items:center;justify-content:space-between;}#chTutoCard p{margin:0 0 10px;color:#CBD5E1;font-size:11.5px;}.ch-tuto-actions{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;}.ch-tuto-btn{border:none;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;height:auto!important;min-height:26px!important;}.ch-tuto-btn-pri{background:#0284C7;color:#FFF;}.ch-tuto-btn-sec{background:#1E293B;color:#CBD5E1;border:1px solid #334155;}.ch-tuto-btn-lex{background:rgba(245,158,11,0.18);color:#FBBF24;border:1px solid rgba(245,158,11,0.5);}#chLexModal{display:none;position:fixed;inset:0;z-index:100210;background:rgba(2,6,23,0.88);align-items:center;justify-content:center;padding:14px;font-family:"Segoe UI",system-ui,sans-serif;}#chLexModal.open{display:flex;}.ch-lex-box{width:min(760px,96vw);max-height:88vh;background:#0F172A;color:#F8FAFC;border:1px solid #334155;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,0.85);}.ch-lex-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#1E293B;border-bottom:1px solid #334155;}.ch-lex-tabs{display:flex;gap:6px;padding:8px 12px;background:#0B1120;border-bottom:1px solid #1E293B;overflow-x:auto;}.ch-lex-tab{background:#1E293B;color:#94A3B8;border:1px solid #334155;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;height:auto!important;}.ch-lex-tab.active{background:#0284C7;color:#FFF;border-color:#38BDF8;}.ch-lex-body{padding:12px 14px;overflow-y:auto;font-size:12px;line-height:1.5;color:#CBD5E1;display:grid;gap:10px;}.ch-lex-item{background:#1E293B;border:1px solid #334155;border-radius:8px;padding:10px 12px;}.ch-lex-item strong{color:#38BDF8;display:block;margin-bottom:4px;font-size:12.5px;}.ch-lex-badge{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700;margin-right:6px;}
-#ch-hud-tools:not(.vertical) { width: max-content !important; max-width: none !important; overflow: visible !important; } #ch-hud-tools:not(.vertical) .ch-hud-ctrl-bar { width: auto !important; flex: 0 0 auto !important; }</style>
+</style>
 
 <style id="ch-hand-cursor-css">
 body.ch-mode-hand [_echarts_instance_], body.ch-mode-hand [_echarts_instance_] canvas { cursor: grab !important; } body.ch-mode-hand [_echarts_instance_]:active, body.ch-mode-hand [_echarts_instance_] canvas:active { cursor: grabbing !important; } html body.ch-mode-draw [_echarts_instance_], html body.ch-mode-draw [_echarts_instance_] * { cursor: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3czLm9yZyIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9IiNGQkJGMjQiIHN0cm9rZT0iIzBGMTcyQSIgc3Ryb2tlLXdpZHRoPSIxLjYiIGQ9Ik0zIDE3LjI1VjIxaDMuNzVMMTcuODEgOS45NGwtMy43NS0zLjc1TDMgMTcuMjV6TTIwLjcxIDcuMDRhMSAxIDAgMCAwIDAtMS40MmwtMi4zNC0yLjM0YTEgMSAwIDAgMC0xLjQyIDBsLTEuODMgMS44MyAzLjc1IDMuNzUgMS44NC0xLjgyeiIvPjwvc3ZnPg==') 2 22, auto !important; }
-#ch-hud-tools:not(.vertical) { width: max-content !important; max-width: none !important; overflow: visible !important; } #ch-hud-tools:not(.vertical) .ch-hud-ctrl-bar { width: auto !important; flex: 0 0 auto !important; }</style>
+</style>
 <style id="ch-hud-pro-ui">
 #ch-hud-tools {
   background: rgba(15, 23, 42, 0.86) !important;
@@ -1164,7 +1153,7 @@ body.theme-clair #chHudOrientBtn {
   padding-bottom: 2px !important;
   margin-bottom: 0 !important;
 }
-#ch-hud-tools:not(.vertical) { width: max-content !important; max-width: none !important; overflow: visible !important; } #ch-hud-tools:not(.vertical) .ch-hud-ctrl-bar { width: auto !important; flex: 0 0 auto !important; }</style>
+</style>
 <script id="ch-sync-zoom-and-logos">
 window.__CH_GET_INIT_X_ZOOM = function(bougies){
   const a = window.__CH_SAVED_PERIOD_ZOOM;
@@ -1294,7 +1283,7 @@ window.__CH_GET_INIT_Y_ZOOM = function(bougies){
   }
   .accueil-btn.green-btn { background: linear-gradient(180deg, #00FF66 0%, #059669 100%); }
   #accueilMsg { font-size: 12px; margin-top: 10px; min-height: 18px; text-align: center; }
-#ch-hud-tools:not(.vertical) { width: max-content !important; max-width: none !important; overflow: visible !important; } #ch-hud-tools:not(.vertical) .ch-hud-ctrl-bar { width: auto !important; flex: 0 0 auto !important; }</style>
+</style>
 
 <div id="portailAccueilOverlay">
   <div class="accueil-card">
@@ -2531,7 +2520,7 @@ function dessinerChandeliersMulti(data) { if (document.getElementById('selHorizo
         data: seriesData
       },
       {
-        id: 'pieCamembert', type: 'pie', z: 50, radius: (document.getElementById('selPosCamembert')?.value === 'MASQUE' ? [0, 0] : ['0%', '22%']), center: Array.isArray(pieAuto.pos) ? pieAuto.pos : ['82%', '24%'], silent: true,
+        id: 'pieCamembert', type: 'pie', z: 50, radius: (document.getElementById('selPosCamembert')?.value === 'MASQUE' ? [0, 0] : [0, Math.max(36, Math.round(Math.min(chart.getWidth() || 360, chart.getHeight() || 360) * 0.13))]), center: Array.isArray(pieAuto.pos) ? pieAuto.pos : ['82%', '24%'], silent: true,
         label: { show: document.getElementById('selPosCamembert')?.value !== 'MASQUE', position: 'inside', fontWeight: 'bold', fontFamily: 'Consolas', fontSize: 11, formatter: p => `${p.value.toLocaleString('fr-FR')}\nCMP:${p.data.cmp.toFixed(2)}` },
         data: genererDataCamembert(s)
       }
@@ -2849,7 +2838,7 @@ function dessinerGraphique(data) { if (document.getElementById("selHorizon")?.va
     xAxis: { type: 'value', min: 32400, max: 54000, interval: 3600, axisLine: { lineStyle: { color: '#333' } }, splitLine: { lineStyle: { color: '#1E1E1E' } }, axisLabel: { color: '#999', formatter: val => heureDepuisSec(val).slice(0,5) } },
     yAxis: { type: 'value', position: 'right', min: +(prixMin - margeY * 0.3).toFixed(2), max: +(prixMax + margeY).toFixed(2), axisLine: { lineStyle: { color: '#333' } }, splitLine: { lineStyle: { color: '#1E1E1E' } }, axisLabel: { color: '#999', formatter: val => val.toFixed(2) } },
     series: seriePrincipale.concat([{
-      id: 'pieCamembert', type: 'pie', z: 50, radius: (document.getElementById('selPosCamembert')?.value === 'MASQUE' ? [0, 0] : ['0%', '22%']), center: pieAutoV.pos, silent: true,
+      id: 'pieCamembert', type: 'pie', z: 50, radius: (document.getElementById('selPosCamembert')?.value === 'MASQUE' ? [0, 0] : [0, Math.max(36, Math.round(Math.min(chart.getWidth() || 360, chart.getHeight() || 360) * 0.13))]), center: pieAutoV.pos, silent: true,
       label: { show: document.getElementById('selPosCamembert')?.value !== 'MASQUE', position: 'inside', fontWeight: 'bold', fontFamily: 'Consolas', fontSize: 11, formatter: p => `${p.value.toLocaleString('fr-FR')}\nCMP:${p.data.cmp.toFixed(2)}` },
       data: genererDataCamembert(s)
     }])
@@ -4552,7 +4541,7 @@ window.addEventListener('load', () => {
   body.theme-clair .ch-tool-btn, body.light-mode .ch-tool-btn { background:#FFF !important; color:#0F172A !important; border-color:#CBD5E1 !important; }
   body.theme-clair .ch-chat-compose, body.light-mode .ch-chat-compose { background:#F1F5F9 !important; }
   body.theme-clair #chChatInput, body.light-mode #chChatInput { background:#FFF; color:#0F172A; border-color:#CBD5E1; }
-#ch-hud-tools:not(.vertical) { width: max-content !important; max-width: none !important; overflow: visible !important; } #ch-hud-tools:not(.vertical) .ch-hud-ctrl-bar { width: auto !important; flex: 0 0 auto !important; }</style>
+</style>
 <div id="chChatDrawer" aria-hidden="true">
   <div class="ch-chat-hdr">
     <strong style="font-size:13px; color:#FFD700;">💬 Salon Communautaire — CH-WaveCandle</strong>
@@ -4848,7 +4837,7 @@ window.__CH_CHAT_CORE = {
   body.theme-clair #chIndPopover, body.light-mode #chIndPopover { background:#FFF; color:#0F172A; border-color:#0284C7; box-shadow:0 10px 28px rgba(15,23,42,0.18); }
   body.theme-clair .ch-ind-sec, body.light-mode .ch-ind-sec { color:#92400E; border-bottom-color:#E2E8F0; }
   body.theme-clair .ch-ind-num, body.light-mode .ch-ind-num, body.theme-clair .ch-ind-type, body.light-mode .ch-ind-type { background:#F1F5F9; color:#0F172A; border-color:#CBD5E1; }
-#ch-hud-tools:not(.vertical) { width: max-content !important; max-width: none !important; overflow: visible !important; } #ch-hud-tools:not(.vertical) .ch-hud-ctrl-bar { width: auto !important; flex: 0 0 auto !important; }</style>
+</style>
 
 <div id="chIndPopover">
   <div class="ch-ind-hdr">
@@ -6006,7 +5995,7 @@ document.addEventListener("change", (e) => {
   body.theme-clair #chDocBody, body.light-mode #chDocBody { background: #FFFFFF; color: #0F172A; }
   body.theme-clair .ch-doc-tbl th, body.light-mode .ch-doc-tbl th { background: #F1F5F9; color: #92400E; border-bottom-color: #CBD5E1; }
   body.theme-clair .ch-doc-tbl td, body.light-mode .ch-doc-tbl td { border-bottom-color: #E2E8F0; }
-#ch-hud-tools:not(.vertical) { width: max-content !important; max-width: none !important; overflow: visible !important; } #ch-hud-tools:not(.vertical) .ch-hud-ctrl-bar { width: auto !important; flex: 0 0 auto !important; }</style>
+</style>
 
 <div id="chDocModal">
   <div class="ch-doc-hdr">
@@ -8851,7 +8840,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
   body.theme-clair .ch-ind-ftr, body.light-mode .ch-ind-ftr {
     background: #F1F5F9; border-top-color: #CBD5E1;
   }
-#ch-hud-tools:not(.vertical) { width: max-content !important; max-width: none !important; overflow: visible !important; } #ch-hud-tools:not(.vertical) .ch-hud-ctrl-bar { width: auto !important; flex: 0 0 auto !important; }</style>
+</style>
 <script id="ch-master-ui-orchestrator">
 (function(){
   let heureMarcheVerrouillee = "";
@@ -9337,7 +9326,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
     background: #F59E0B !important;
     animation: none !important;
   }
-#ch-hud-tools:not(.vertical) { width: max-content !important; max-width: none !important; overflow: visible !important; } #ch-hud-tools:not(.vertical) .ch-hud-ctrl-bar { width: auto !important; flex: 0 0 auto !important; }</style>
+</style>
 <script id="ch-live-sticker-sync">
 (function() {
   function syncLiveSticker() {
@@ -9739,7 +9728,7 @@ body.theme-clair .ch-per-btn:hover {
   border-color: #38BDF8;
   box-shadow: 0 2px 8px rgba(2, 132, 199, 0.35);
 }
-#ch-hud-tools:not(.vertical) { width: max-content !important; max-width: none !important; overflow: visible !important; } #ch-hud-tools:not(.vertical) .ch-hud-ctrl-bar { width: auto !important; flex: 0 0 auto !important; }</style>
+</style>
 <script id="ch-period-bar-script">
 (function(){
   const PERIODES = [
@@ -9866,7 +9855,7 @@ body.theme-clair .ch-per-btn:hover {
   padding: 0 8px !important;
   min-width: 28px !important;
 }
-#ch-hud-tools:not(.vertical) { width: max-content !important; max-width: none !important; overflow: visible !important; } #ch-hud-tools:not(.vertical) .ch-hud-ctrl-bar { width: auto !important; flex: 0 0 auto !important; }</style>
+</style>
 <style id="ch-hud-horizontal-polish">
 #ch-hud-tools:not(.vertical) { justify-content: flex-start !important; box-sizing: border-box !important;
   gap: 5px !important;
@@ -9900,7 +9889,7 @@ body.theme-clair .ch-per-btn:hover {
   padding: 0 8px !important;
   min-width: 30px !important;
 }
-#ch-hud-tools:not(.vertical) { width: max-content !important; max-width: none !important; overflow: visible !important; } #ch-hud-tools:not(.vertical) .ch-hud-ctrl-bar { width: auto !important; flex: 0 0 auto !important; }</style>
+</style>
 <script id="ch-hud-width-lock">
 (function(){
   let _syncing = false;
@@ -10691,7 +10680,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
       if(getComputedStyle(container).position === "static") container.style.position = "relative";
       container.appendChild(wm);
     }
-    if(isClosedVisible){
+    if(isClosedVisible || window.innerWidth <= 960){
       wm.style.display = "none";
       return;
     }
@@ -11233,6 +11222,187 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
   window.addEventListener("load", () => { setupMobileToolsFabAndDrag(); installTouchDrawingBridge(); });
   window.addEventListener("resize", setupMobileToolsFabAndDrag);
   setInterval(() => { setupMobileToolsFabAndDrag(); installTouchDrawingBridge(); }, 600);
+})();
+</script>
+<style id="ch-mobile-modal-tools-css">
+@media screen and (max-width: 960px) and (pointer: coarse), screen and (max-width: 768px) {
+  #ch-chart-ticker-watermark { display: none !important; }
+
+  #ch-hud-tools {
+    display: none !important;
+  }
+  #ch-hud-tools.ch-mob-modal-open {
+    display: flex !important;
+    flex-direction: column !important;
+    position: fixed !important;
+    top: 46px !important;
+    left: 10px !important;
+    right: 10px !important;
+    bottom: 38px !important;
+    width: auto !important;
+    max-width: none !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 12px !important;
+    gap: 8px !important;
+    border-radius: 16px !important;
+    background: rgba(15, 23, 42, 0.96) !important;
+    border: 1px solid rgba(56, 189, 248, 0.45) !important;
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.65) !important;
+    z-index: 160000 !important;
+    touch-action: pan-y !important;
+  }
+  #ch-hud-tools.ch-mob-modal-open * {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  #ch-hud-tools.ch-mob-modal-open .ch-hud-ctrl-bar {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    gap: 8px !important;
+  }
+  #ch-hud-tools.ch-mob-modal-open select,
+  #ch-hud-tools.ch-mob-modal-open button {
+    width: 100% !important;
+    min-height: 40px !important;
+    font-size: 13.5px !important;
+    border-radius: 10px !important;
+  }
+}
+</style>
+
+<script id="ch-mobile-autonomous-pill">
+(function(){
+  function isMobScreen(){ return window.innerWidth <= 960; }
+
+  // 1. Afficher le logo officiel de la valeur directement dans la barre superieure #chMobControls
+  function syncTopMobileTickerLogo(){
+    const bar = document.getElementById("chMobControls");
+    const selTk = document.getElementById("selTicker");
+    if(!bar || !selTk || !isMobScreen()) return;
+    let badge = document.getElementById("ch-mob-top-logo");
+    if(!badge){
+      badge = document.createElement("div");
+      badge.id = "ch-mob-top-logo";
+      badge.style.cssText = "width:28px;height:28px;border-radius:7px;background:#ffffff;border:1px solid rgba(148,163,184,0.45);display:flex;align-items:center;justify-content:center;padding:2px;flex-shrink:0;overflow:hidden;";
+      const mobSel = bar.querySelector("select");
+      if(mobSel) bar.insertBefore(badge, mobSel);
+      else bar.appendChild(badge);
+    }
+    const prev = selTk.previousElementSibling || (selTk.parentElement && selTk.parentElement.querySelector("[id*='logo'], [class*='logo']"));
+    const imgEl = prev ? (prev.tagName === "IMG" ? prev : prev.querySelector("img")) : null;
+    if(imgEl && imgEl.src){
+      if(badge.dataset.src !== imgEl.src){
+        badge.dataset.src = imgEl.src;
+        badge.innerHTML = "";
+        const im = document.createElement("img");
+        im.src = imgEl.src;
+        im.style.cssText = "width:24px;height:24px;object-fit:contain;display:block;";
+        badge.appendChild(im);
+      }
+    }
+  }
+
+  // 2. Pilule flottante autonome librement deplacable au doigt sur tout l'ecran
+  function ensureAutonomousMobileToolsPill(){
+    const host = document.fullscreenElement || document.body;
+    if(!host) return;
+    let pill = document.getElementById("ch-mob-tools-pill");
+
+    if(!isMobScreen()){
+      if(pill) pill.style.display = "none";
+      const hud = document.getElementById("ch-hud-tools");
+      if(hud) hud.classList.remove("ch-mob-modal-open");
+      return;
+    }
+
+    if(!pill){
+      pill = document.createElement("button");
+      pill.id = "ch-mob-tools-pill";
+      pill.type = "button";
+      pill.textContent = "✥ 🛠 Outils";
+      pill.style.cssText = "position:fixed;left:48px;bottom:34px;z-index:165000;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 14px;border-radius:999px;background:linear-gradient(135deg,#0284c7,#0369a1);color:#ffffff;border:1px solid rgba(255,255,255,0.35);font-family:Inter,system-ui,sans-serif;font-size:12.5px;font-weight:800;box-shadow:0 6px 20px rgba(2,132,199,0.5);cursor:grab;touch-action:none;user-select:none;";
+
+      let dragging = false, moved = false, sx = 0, sy = 0, ol = 0, ot = 0;
+      pill.addEventListener("touchstart", function(e){
+        if(e.touches.length !== 1) return;
+        const t = e.touches.item(0);
+        const r = pill.getBoundingClientRect();
+        dragging = true; moved = false; sx = t.clientX; sy = t.clientY; ol = r.left; ot = r.top;
+      }, { passive: true });
+
+      pill.addEventListener("touchmove", function(e){
+        if(!dragging || e.touches.length !== 1) return;
+        const t = e.touches.item(0);
+        const dx = t.clientX - sx, dy = t.clientY - sy;
+        if(Math.abs(dx) > 5 || Math.abs(dy) > 5) moved = true;
+        if(moved){
+          e.preventDefault();
+          pill.style.left = Math.max(8, Math.min(window.innerWidth - 115, ol + dx)) + "px";
+          pill.style.top = Math.max(44, Math.min(window.innerHeight - 66, ot + dy)) + "px";
+          pill.style.bottom = "auto";
+          pill.style.right = "auto";
+        }
+      }, { passive: false });
+
+      pill.addEventListener("touchend", function(e){
+        if(!dragging) return;
+        dragging = false;
+        if(!moved){
+          e.preventDefault();
+          e.stopPropagation();
+          const hud = document.getElementById("ch-hud-tools");
+          if(hud){
+            const open = hud.classList.toggle("ch-mob-modal-open");
+            if(open){
+              pill.textContent = "✕ Fermer Outils";
+              pill.style.background = "linear-gradient(135deg,#dc2626,#b91c1c)";
+              if(typeof window.__CH_UNLOCK_HUD_CONTROLS === "function") window.__CH_UNLOCK_HUD_CONTROLS();
+            } else {
+              pill.textContent = "✥ 🛠 Outils";
+              pill.style.background = "linear-gradient(135deg,#0284c7,#0369a1)";
+            }
+          }
+        }
+      }, { passive: false });
+    }
+
+    if(pill.parentElement !== host) host.appendChild(pill);
+    pill.style.display = "inline-flex";
+  }
+
+  // Refermer automatiquement la modale Outils des qu'un outil de dessin est selectionne
+  document.addEventListener("change", function(e){
+    if(e.target && e.target.id === "selOutilDessin" && isMobScreen()){
+      const hud = document.getElementById("ch-hud-tools");
+      const pill = document.getElementById("ch-mob-tools-pill");
+      if(hud && hud.classList.contains("ch-mob-modal-open")){
+        hud.classList.remove("ch-mob-modal-open");
+        if(pill){
+          pill.textContent = "✥ 🛠 Outils";
+          pill.style.background = "linear-gradient(135deg,#0284c7,#0369a1)";
+        }
+      }
+    }
+  });
+
+  window.addEventListener("load", () => {
+    syncTopMobileTickerLogo();
+    ensureAutonomousMobileToolsPill();
+    if(typeof chart !== "undefined" && chart) setTimeout(() => chart.resize(), 150);
+  });
+  window.addEventListener("resize", () => {
+    ensureAutonomousMobileToolsPill();
+    if(typeof chart !== "undefined" && chart) setTimeout(() => chart.resize(), 100);
+  });
+  setInterval(() => {
+    syncTopMobileTickerLogo();
+    ensureAutonomousMobileToolsPill();
+  }, 500);
 })();
 </script>
 </body>
