@@ -1196,7 +1196,7 @@ window.__CH_GET_INIT_X_ZOOM = function(bougies){
     e = Math.min(100, s + minSpan);
     s = Math.max(0, e - minSpan);
   }
-  return { start: Math.max(0, Math.min(98, s)), end: Math.min(100, Math.max(s + 2, e)) };
+  if(s > 94){ s = Math.max(0, 100 - minSpan); e = 100; } return { start: Math.max(0, Math.min(98, s)), end: Math.min(100, Math.max(s + 2, e)) };
 };
 
 window.__CH_GET_INIT_Y_ZOOM = function(bougies){
@@ -10249,8 +10249,13 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     const bougies = Array.isArray(globalData.bougies) ? globalData.bougies : [];
     let dStart = "", dEnd = "";
     if(bougies.length > 1){
-      const i1 = Math.max(0, Math.min(bougies.length - 1, Math.floor((sx / 100) * (bougies.length - 1))));
-      const i2 = Math.max(i1, Math.min(bougies.length - 1, Math.ceil((ex / 100) * (bougies.length - 1))));
+      const xa = opt && Array.isArray(opt.xAxis) ? opt.xAxis.at(0) : null;
+      const totalAxisLen = (xa && Array.isArray(xa.data) && xa.data.length >= bougies.length) ? xa.data.length : bougies.length;
+      const rawI1 = Math.floor((sx / 100) * (totalAxisLen - 1));
+      const rawI2 = Math.ceil((ex / 100) * (totalAxisLen - 1));
+      const maxReal = bougies.length - 1;
+      const i2 = Math.max(Math.min(maxReal, 5), Math.min(maxReal, rawI2));
+      const i1 = Math.max(0, Math.min(i2 - Math.min(maxReal, 5), rawI1));
       dStart = bougies.at(i1)?.date_deb_iso || bougies.at(i1)?.cle || "";
       dEnd = bougies.at(i2)?.date_fin_iso || bougies.at(i2)?.cle || "";
     }
@@ -10435,83 +10440,6 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
   setInterval(checkLiveGuard, 2000);
 })();
 </script></script>
-<script id="ch-zoom-telemetry-hud">
-(function(){
-  function createTelemetryHud(){
-    if(document.getElementById("ch-zoom-telemetry-hud-box")) return;
-    const box = document.createElement("div");
-    box.id = "ch-zoom-telemetry-hud-box";
-    box.style.cssText = "position:fixed;top:92px;right:34px;z-index:9999;background:rgba(15,23,42,0.92);color:#e2e8f0;border:1px solid #38bdf8;border-radius:10px;padding:8px 11px;font-family:Consolas,monospace;font-size:11px;line-height:1.45;box-shadow:0 8px 24px rgba(0,0,0,0.28);min-width:295px;backdrop-filter:blur(6px);";
-    box.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(148,163,184,0.25);padding-bottom:4px;margin-bottom:5px;">
-        <span style="font-weight:700;color:#38bdf8;">🔬 DÉTECTEUR & MESURE AXES (X/Y)</span>
-        <button id="ch-hud-toggle-btn" style="background:transparent;border:1px solid #475569;color:#cbd5e1;border-radius:4px;padding:0 5px;cursor:pointer;font-size:10px;">—</button>
-      </div>
-      <div id="ch-hud-body"></div>
-    `;
-    document.body.appendChild(box);
-    document.getElementById("ch-hud-toggle-btn").onclick = () => {
-      const b = document.getElementById("ch-hud-body");
-      const btn = document.getElementById("ch-hud-toggle-btn");
-      if(b.style.display === "none"){ b.style.display = "block"; btn.innerText = "—"; }
-      else { b.style.display = "none"; btn.innerText = "+"; }
-    };
-  }
 
-  function updateTelemetryHud(){
-    createTelemetryHud();
-    const body = document.getElementById("ch-hud-body");
-    if(!body || body.style.display === "none") return;
-
-    const gran = document.getElementById("selGranularite")?.value || document.getElementById("selGranulariteIntra")?.value || "--";
-    const axMode = document.getElementById("selExpandAxes")?.value || "AUTO";
-    let yMinStr = "--", yMaxStr = "--", dzYStr = "--", dzXStr = "--", clipErr = 0, dataRangeStr = "--";
-
-    if(typeof chart !== "undefined" && chart){
-      const opt = chart.getOption() || {};
-      const ya = Array.isArray(opt.yAxis) ? opt.yAxis.at(0) : null;
-      if(ya){
-        yMinStr = typeof ya.min === "number" ? ya.min.toFixed(3) : String(ya.min ?? "auto");
-        yMaxStr = typeof ya.max === "number" ? ya.max.toFixed(3) : String(ya.max ?? "auto");
-      }
-      const dzList = Array.isArray(opt.dataZoom) ? opt.dataZoom : [];
-      const dzY = dzList.find(d => d && ((d.id && d.id.startsWith("zoomY_slider")) || d.yAxisIndex === 0));
-      const dzX = dzList.find(d => d && (d.id === "zoomX_slider" || d.xAxisIndex === 0));
-      if(dzY) dzYStr = `${(dzY.start ?? 0).toFixed(1)}% → ${(dzY.end ?? 100).toFixed(1)}% (${dzY.id || "Y"})`;
-      if(dzX) dzXStr = `${(dzX.start ?? 0).toFixed(1)}% → ${(dzX.end ?? 100).toFixed(1)}%`;
-
-      const bougies = (typeof globalData !== "undefined" && globalData && Array.isArray(globalData.bougies)) ? globalData.bougies : [];
-      if(bougies.length > 0){
-        let dMin = Infinity, dMax = -Infinity;
-        const yMinNum = typeof ya?.min === "number" ? ya.min : -Infinity;
-        for(const b of bougies){
-          const lo = Number(b.low ?? b.min ?? b.close);
-          const hi = Number(b.high ?? b.max ?? b.close);
-          if(lo > 0 && lo < dMin) dMin = lo;
-          if(hi > 0 && hi > dMax) dMax = hi;
-          if(hi > 0 && hi < yMinNum) clipErr++;
-        }
-        if(dMax > dMin) dataRangeStr = `${dMin.toFixed(3)} → ${dMax.toFixed(3)} (${bougies.length} b.)`;
-      }
-    }
-
-    const mem = window.__CH_SAVED_PERIOD_ZOOM;
-    const memStr = mem ? `hasY:${mem.hasY ? "OUI" : "NON"} | px/TND:${(mem.pxPerTnd || 0).toFixed(0)} | C:${(mem.centerPrice || 0).toFixed(3)}` : "Aucune mémoire";
-
-    body.innerHTML = `
-      <div>Période: <b style="color:#38bdf8;">${gran}</b> | Axe: <b>${axMode}</b></div>
-      <div>Données: <span style="color:#94a3b8;">${dataRangeStr}</span></div>
-      <div>yAxis actif: <b style="color:#fbbf24;">${yMinStr} → ${yMaxStr}</b></div>
-      <div>Slider Y: <b style="color:${dzYStr.startsWith("0.0% → 100.0%") ? "#f87171" : "#4ade80"};">${dzYStr}</b></div>
-      <div>Slider X: <span style="color:#cbd5e1;">${dzXStr}</span></div>
-      <div>Mémoire: <span style="color:#a5f3fc;">${memStr}</span></div>
-      <div>Bougies hors-cadre bas: <b style="color:${clipErr > 0 ? "#fb923c" : "#4ade80"};">${clipErr} (clip: ON)</b></div>
-    `;
-  }
-
-  window.addEventListener("load", () => setTimeout(updateTelemetryHud, 300));
-  setInterval(updateTelemetryHud, 350);
-})();
-</script>
 </body>
 </html>
