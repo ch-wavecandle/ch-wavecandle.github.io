@@ -10383,19 +10383,31 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
       container.appendChild(overlay);
     }
     const sc = state.sched;
+    const isClair = (typeof estThemeClair === "function") ? estThemeClair() : !document.body.classList.contains("dark-theme");
+    overlay.style.background = isClair ? "rgba(248,250,252,0.96)" : "rgba(10,14,23,0.94)";
     overlay.style.display = "flex";
+    const cardBg = isClair ? "#ffffff" : "#111827";
+    const cardBorder = isClair ? "#cbd5e1" : "rgba(56,189,248,0.32)";
+    const titleCol = isClair ? "#0f172a" : "#f8fafc";
+    const subCol = isClair ? "#475569" : "#94a3b8";
+    const boxBg = isClair ? "#f8fafc" : "#1e293b";
+    const boxBorder = isClair ? "#e2e8f0" : "rgba(148,163,184,0.22)";
+    const boxText = isClair ? "#334155" : "#e2e8f0";
+    const badgeBg = isClair ? "#fef2f2" : "rgba(239,68,68,0.16)";
+    const badgeBorder = isClair ? "#fecaca" : "rgba(248,113,113,0.4)";
+    const badgeText = isClair ? "#b91c1c" : "#fca5a5";
     overlay.innerHTML = `
-      <div style="max-width:480px;width:100%;background:#ffffff;border:1px solid #cbd5e1;border-radius:14px;padding:22px 24px;text-align:center;box-shadow:0 10px 28px rgba(15,23,42,0.08);font-family:Inter,system-ui,sans-serif;">
-        <div style="display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border-radius:999px;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;font-size:12px;font-weight:700;letter-spacing:.4px;margin-bottom:10px;">
-          <span style="width:8px;height:8px;border-radius:50%;background:#dc2626;display:inline-block;"></span>
+      <div style="max-width:490px;width:100%;background:${cardBg};border:1px solid ${cardBorder};border-radius:14px;padding:24px 26px;text-align:center;box-shadow:0 14px 34px rgba(0,0,0,${isClair ? "0.08" : "0.45"});font-family:Inter,system-ui,sans-serif;">
+        <div style="display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border-radius:999px;background:${badgeBg};border:1px solid ${badgeBorder};color:${badgeText};font-size:12px;font-weight:700;letter-spacing:.4px;margin-bottom:12px;">
+          <span style="width:8px;height:8px;border-radius:50%;background:#ef4444;display:inline-block;"></span>
           MARCHÉ FERMÉ • ${sc.regime.toUpperCase()}
         </div>
-        <div style="font-size:18px;font-weight:800;color:#0f172a;margin-bottom:6px;">Bourse des Valeurs Mobilières de Tunis</div>
-        <div style="font-size:13px;color:#475569;line-height:1.5;margin-bottom:14px;">${state.reason}</div>
-        <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;font-size:12px;color:#334155;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 12px;">
-          <span>Ouverture : <b>${sc.openStr}</b></span>
+        <div style="font-size:18px;font-weight:800;color:${titleCol};margin-bottom:6px;">Bourse des Valeurs Mobilières de Tunis</div>
+        <div style="font-size:13px;color:${subCol};line-height:1.5;margin-bottom:15px;">${state.reason}</div>
+        <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;font-size:12px;color:${boxText};background:${boxBg};border:1px solid ${boxBorder};border-radius:8px;padding:9px 14px;">
+          <span>Ouverture : <b style="color:${titleCol};">${sc.openStr}</b></span>
           <span>•</span>
-          <span>Négociations : <b>${sc.negStr}</b></span>
+          <span>Négociations : <b style="color:${titleCol};">${sc.negStr}</b></span>
         </div>
       </div>
     `;
@@ -10662,6 +10674,76 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
   document.addEventListener("click", () => setTimeout(injectHudMenuItemInAutres, 40));
   window.addEventListener("load", () => setTimeout(injectHudMenuItemInAutres, 300));
   setInterval(updateTelemetryHud, 350);
+})();
+</script>
+<script id="ch-smart-ticker-watermark">
+(function(){
+  function updateSmartTickerWatermark(){
+    const container = document.getElementById("chart-container");
+    if(!container) return;
+    const closedOv = document.getElementById("ch-live-closed-overlay");
+    const isClosedVisible = closedOv && closedOv.style.display !== "none";
+
+    let wm = document.getElementById("ch-chart-ticker-watermark");
+    if(!wm){
+      wm = document.createElement("div");
+      wm.id = "ch-chart-ticker-watermark";
+      if(getComputedStyle(container).position === "static") container.style.position = "relative";
+      container.appendChild(wm);
+    }
+    if(isClosedVisible){
+      wm.style.display = "none";
+      return;
+    }
+
+    const selTk = document.getElementById("selTicker");
+    const tickerName = (selTk && selTk.value ? selTk.value : "DELICE HOLDING").trim().toUpperCase();
+    const selH = document.getElementById("selHorizon");
+    const hVal = selH ? selH.value : "MULTI";
+    const gran = document.getElementById("selGranularite")?.value || "JOUR";
+    const granMap = { "5M": "5 min", "10M": "10 min", "15M": "15 min", "30M": "30 min", "HEURE": "1 Heure", "JOUR": "Journalier (1J)", "SEMAINE": "Hebdomadaire (1S)", "MOIS": "Mensuel (1M)" };
+    const subLabel = hVal === "MULTI" ? `Multi-Séances • ${granMap[gran] || gran}` : (hVal === "LIVE" ? "Séance Direct Live" : "Séance Unique");
+
+    const isClair = (typeof estThemeClair === "function") ? estThemeClair() : !document.body.classList.contains("dark-theme");
+    const toolsBox = document.getElementById("floatingTools") || document.querySelector(".floating-tools, #toolbox");
+    const toolsOpen = toolsBox && toolsBox.offsetParent !== null && toolsBox.offsetWidth > 60 && toolsBox.getBoundingClientRect().left < 220;
+    const piePos = document.getElementById("selPosCamembert")?.value || "AUTO";
+
+    let leftPx = toolsOpen ? 196 : 18;
+    let topPx = 10;
+    let bottomPx = "auto";
+
+    if(piePos === "HG"){
+      topPx = "auto";
+      bottomPx = 46;
+    }
+
+    wm.style.cssText = `
+      position:absolute;
+      left:${leftPx}px;
+      top:${topPx === "auto" ? "auto" : topPx + "px"};
+      bottom:${bottomPx === "auto" ? "auto" : bottomPx + "px"};
+      z-index:18;
+      pointer-events:none;
+      user-select:none;
+      display:flex;
+      flex-direction:column;
+      gap:1px;
+      padding:4px 10px;
+      border-radius:8px;
+      background:${isClair ? "rgba(255,255,255,0.72)" : "rgba(15,23,42,0.68)"};
+      border:1px solid ${isClair ? "rgba(148,163,184,0.28)" : "rgba(56,189,248,0.22)"};
+      backdrop-filter:blur(4px);
+    `;
+    wm.innerHTML = `
+      <div style="font-family:Inter,system-ui,sans-serif;font-size:15px;font-weight:800;letter-spacing:0.6px;color:${isClair ? "#0f172a" : "#f1f5f9"};line-height:1.15;">${tickerName}</div>
+      <div style="font-family:Consolas,monospace;font-size:10.5px;font-weight:600;color:${isClair ? "#0284c7" : "#38bdf8"};">${subLabel} • BVMT</div>
+    `;
+  }
+
+  window.addEventListener("load", () => setTimeout(updateSmartTickerWatermark, 200));
+  window.addEventListener("resize", updateSmartTickerWatermark);
+  setInterval(updateSmartTickerWatermark, 400);
 })();
 </script>
 </body>
