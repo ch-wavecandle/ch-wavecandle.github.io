@@ -5374,7 +5374,7 @@ document.addEventListener("change", (e) => {
       setTimeout(patchLiveFallback, 150);
       return;
     }
-    const origLive = window.rafraichirFluxLive;
+    const origLive = window.rafraichirFluxLive; const guardedOrigLive = async function(){ if(document.getElementById("selHorizon")?.value !== "LIVE") return; return origLive.apply(this, arguments); };
     window.rafraichirFluxLive = async function(forcer = false) {
       const tk = document.getElementById("selTicker")?.value || "DELICE HOLDING";
       const lbl = document.getElementById("lblTicker");
@@ -10358,7 +10358,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     return { isClosed, reason, sched };
   }
 
-  function showLiveMarketClosedCard(state){
+  function showLiveMarketClosedCard(state){ if(document.getElementById("selHorizon")?.value !== "LIVE") return;
     const container = document.getElementById("chart-container");
     if(!container) return;
     if(typeof timerSimulLive !== "undefined" && timerSimulLive){ clearInterval(timerSimulLive); timerSimulLive = null; }
@@ -10427,12 +10427,12 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
   }
 
   if(typeof window.rafraichirFluxLive === "function" && !window.rafraichirFluxLive.__chClosedGuarded){
-    const origLive = window.rafraichirFluxLive;
+    const origLive = window.rafraichirFluxLive; const guardedOrigLive = async function(){ if(document.getElementById("selHorizon")?.value !== "LIVE") return; return origLive.apply(this, arguments); };
     window.rafraichirFluxLive = async function(){
       const st = getTunisMarketState();
       if(st.isClosed){ showLiveMarketClosedCard(st); return; }
       hideLiveMarketClosedCard();
-      return origLive.apply(this, arguments);
+      return guardedOrigLive.apply(this, arguments);
     };
     window.rafraichirFluxLive.__chClosedGuarded = true;
   }
@@ -11578,11 +11578,15 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
 
       if(!hasMainSeries || xAxisArr.length === 0){
         emptySeriesStreak++;
-        if(emptySeriesStreak >= 2){
+        if(emptySeriesStreak >= 1){
           emptySeriesStreak = 0;
           const h = document.getElementById("selHorizon")?.value || "LIVE";
-          if(h === "MULTI" && typeof dessinerChandeliersMulti === "function"){
-            dessinerChandeliersMulti(globalData);
+          if(h === "MULTI"){
+            if(typeof dessinerChandeliersMulti === "function" && Array.isArray(globalData?.bougies) && globalData.bougies.length > 0){
+              dessinerChandeliersMulti(globalData);
+            } else if(typeof chargerMultiSeances === "function"){
+              chargerMultiSeances();
+            }
           } else if(typeof dessinerGraphique === "function"){
             dessinerGraphique(globalData);
           }
