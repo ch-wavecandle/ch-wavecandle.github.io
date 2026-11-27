@@ -2528,7 +2528,7 @@ function dessinerChandeliersMulti(data) { if (document.getElementById('selHorizo
   };
   chart.setOption(option, true);
   appliquerThemeGraphique();
-  setTimeout(() => { dessinerMarqueursMoisAxe(); placerLabelAgressivite(pieAuto.pos, s); }, 60);
+  dessinerMarqueursMoisAxe(); placerLabelAgressivite(pieAuto.pos, s);
 }
 
 
@@ -11612,7 +11612,32 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
 </script>
 <script id="ch-unified-pie-and-live-trim">
 (function(){
-  // A. Rendu unifie et indissociable du Camembert (Disque + Titre haut + Titre bas sur le meme centre et rayon exact)
+  // Memoriser la position manuelle du Camembert (double-clic ou glisser) pour qu'un nouveau tick Live ne l'ecrase pas
+  function bindManualPiePositionLock(){
+    const selPos = document.getElementById("selPosCamembert");
+    if(selPos && !selPos.dataset.manualLockBound){
+      selPos.dataset.manualLockBound = "1";
+      selPos.addEventListener("change", () => {
+        if(selPos.value !== "MANUEL") window.__CH_USER_PIE_CENTER = null;
+      });
+    }
+    const container = document.getElementById("chart-container");
+    if(container && !container.dataset.pieDblLockBound){
+      container.dataset.pieDblLockBound = "1";
+      container.addEventListener("dblclick", () => {
+        setTimeout(() => {
+          if(typeof chart === "undefined" || !chart) return;
+          const opt = chart.getOption() || {};
+          const pieS = (Array.isArray(opt.series) ? opt.series : []).find(s => s && (s.id === "pieCamembert" || s.type === "pie"));
+          if(pieS && Array.isArray(pieS.center) && pieS.center.length >= 2){
+            window.__CH_USER_PIE_CENTER = [pieS.center.at(0), pieS.center.at(1)];
+            enforceUnifiedPieGeometry();
+          }
+        }, 40);
+      });
+    }
+  }
+
   function enforceUnifiedPieGeometry(){
     if(typeof chart === "undefined" || !chart) return;
     try {
@@ -11624,17 +11649,21 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
       const w = chart.getWidth(), h = chart.getHeight();
       if(!(w > 0 && h > 0)) return;
 
+      // Appliquer la position manuelle verrouillee si l'utilisateur a deplace le camembert
+      let targetCenter = pieS.center;
+      if(Array.isArray(window.__CH_USER_PIE_CENTER) && window.__CH_USER_PIE_CENTER.length >= 2){
+        targetCenter = window.__CH_USER_PIE_CENTER;
+      }
+
       const isMasque = (document.getElementById("selPosCamembert")?.value === "MASQUE") || (Array.isArray(pieS.radius) && parseFloat(pieS.radius.at(1)) === 0);
       const R = Math.max(38, Math.round(Math.min(w, h) * 0.125));
-      const cx = (parseFloat(pieS.center.at(0)) / 100) * w;
-      const cy = (parseFloat(pieS.center.at(1)) / 100) * h;
-      const yTop = Math.max(6, cy - R - 20);
-      const yBot = Math.min(h - 20, cy + R + 8);
+      const cx = (parseFloat(targetCenter.at(0)) / 100) * w;
+      const cy = (parseFloat(targetCenter.at(1)) / 100) * h;
 
-      // Verifier si le rayon du disque doit etre normalise en pixels exacts
       const curR1 = Array.isArray(pieS.radius) ? pieS.radius.at(1) : null;
-      if(!isMasque && curR1 !== R){
-        chart.setOption({ series: [{ id: "pieCamembert", radius: [0, R], center: pieS.center }] });
+      const centerDiff = (String(pieS.center.at(0)) !== String(targetCenter.at(0))) || (String(pieS.center.at(1)) !== String(targetCenter.at(1)));
+      if((!isMasque && curR1 !== R) || centerDiff){
+        chart.setOption({ series: [{ id: "pieCamembert", radius: isMasque ? [0, 0] : [0, R], center: targetCenter }] });
       }
 
       const relTopY = -(R + 18);
@@ -11666,14 +11695,13 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     } catch(e){}
   }
 
-  // B. En mode Live + Chandeliers (3D / Japonais), arreter l'axe X a la derniere periode recue (sans creneaux vides jusqu'a 14:00)
+  // En mode Live + Chandeliers (3D / Japonais), s'arreter net a la derniere periode ayant un volume > 0
   function trimLiveCandlesticksToLastPeriod(){
     const selH = document.getElementById("selHorizon");
     const selR = document.getElementById("selModeRendu");
     if(!selH || selH.value !== "LIVE" || !selR) return;
     const modeVal = String(selR.value || "").toUpperCase();
     const modeTxt = (selR.options && selR.selectedIndex >= 0) ? String(selR.options.item(selR.selectedIndex)?.text || "").toUpperCase() : "";
-    // Ne s'applique qu'aux modes Chandeliers / Bougies (pas aux Vagues Polygonales qui couvrent la seance)
     if(modeVal.includes("POLY") || modeVal.includes("VAGUE") || modeTxt.includes("VAGUE") || modeTxt.includes("POLYGONE")) return;
     if(typeof chart === "undefined" || !chart) return;
 
@@ -11683,15 +11711,26 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
       const sList = Array.isArray(opt.series) ? opt.series : [];
       if(!xa || !Array.isArray(xa.data) || xa.data.length < 3) return;
 
+      const bList = (typeof globalData !== "undefined" && globalData && Array.isArray(globalData.bougies)) ? globalData.bougies : [];
       let lastIdx = -1;
-      for(const s of sList){
-        if(!s || s.type === "pie" || !Array.isArray(s.data)) continue;
-        for(let i = s.data.length - 1; i >= 0; i--){
-          const item = s.data.at(i);
-          if(item !== null && item !== undefined){
-            const valArr = Array.isArray(item) ? item : (Array.isArray(item.value) ? item.value : null);
-            const hasPrice = valArr ? valArr.some((v, idx) => idx > 0 && typeof v === "number" && v > 0) : (typeof item === "number" && item > 0);
-            if(hasPrice && i > lastIdx){ lastIdx = i; break; }
+
+      if(bList.length > 0){
+        for(let i = Math.min(bList.length, xa.data.length) - 1; i >= 0; i--){
+          const b = bList.at(i);
+          const vol = Number(b?.vol_tot ?? b?.volume ?? b?.qte ?? 0);
+          if(vol > 0){ lastIdx = i; break; }
+        }
+      }
+
+      if(lastIdx < 0){
+        for(const s of sList){
+          if(!s || s.type === "pie" || !Array.isArray(s.data)) continue;
+          for(let i = s.data.length - 1; i >= 0; i--){
+            const item = s.data.at(i);
+            if(item && typeof item === "object" && Number(item.vol_tot ?? item.volume ?? 0) > 0){
+              if(i > lastIdx) lastIdx = i;
+              break;
+            }
           }
         }
       }
@@ -11712,9 +11751,10 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
   }
 
   setInterval(() => {
+    bindManualPiePositionLock();
     enforceUnifiedPieGeometry();
     trimLiveCandlesticksToLastPeriod();
-  }, 220);
+  }, 150);
 })();
 </script>
 </body>
