@@ -12218,5 +12218,38 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
   setInterval(bindSmoothVerticalPan, 300);
 })();
 </script>
+<script id="ch-keep-zoom-sliders-visible">
+(function(){
+  function enforceZoomSlidersAlwaysVisible(){
+    const dom = document.getElementById("chart-container");
+    const ch = (typeof chart !== "undefined" && chart) ? chart : (window.echarts && dom ? echarts.getInstanceByDom(dom) : null);
+    if(!ch) return;
+    try {
+      const opt = ch.getOption() || {};
+      const dzList = Array.isArray(opt.dataZoom) ? opt.dataZoom : [];
+      const xAxes = Array.isArray(opt.xAxis) ? opt.xAxis : (opt.xAxis ? [opt.xAxis] : []);
+      const allX = xAxes.length > 0 ? xAxes.map((_, i) => i) : new Array(0);
+      const hasSubGrids = Array.isArray(opt.grid) && opt.grid.filter(g => g && g.show !== false).length > 1;
+      const vHeight = hasSubGrids ? "42%" : "74%";
+
+      const sx = dzList.find(d => d && d.id === "zoomX_slider");
+      const sy = dzList.find(d => d && d.id === "zoomY_slider");
+
+      if(!sx || sx.show === false || Number(sx.bottom) < 20 || !sy || sy.show === false){
+        ch.setOption({
+          dataZoom: [
+            { id: "zoomX_inside", type: "inside", xAxisIndex: allX, filterMode: "none", zoomOnMouseWheel: true, moveOnMouseMove: true, moveOnMouseWheel: false },
+            { id: "zoomX_slider", type: "slider", show: true, xAxisIndex: allX, filterMode: "none", left: 45, right: 100, bottom: 26, height: 14, brushSelect: false, showDetail: false, borderColor: "#475569", fillerColor: "rgba(56,189,248,0.22)" },
+            { id: "zoomY_inside", type: "inside", yAxisIndex: 0, filterMode: "none", zoomOnMouseWheel: "shift", moveOnMouseMove: true, moveOnMouseWheel: false },
+            { id: "zoomY_slider", type: "slider", show: true, orient: "vertical", yAxisIndex: 0, filterMode: "none", right: 4, top: 32, height: vHeight, width: 12, brushSelect: false, showDetail: false, borderColor: "#475569", fillerColor: "rgba(56,189,248,0.22)" }
+          ]
+        });
+      }
+    } catch(e){}
+  }
+
+  setInterval(enforceZoomSlidersAlwaysVisible, 250);
+})();
+</script>
 </body>
 </html>
