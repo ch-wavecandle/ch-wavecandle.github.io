@@ -1155,7 +1155,7 @@ body.theme-clair #chHudOrientBtn {
 }
 </style>
 <script id="ch-sync-zoom-and-logos">
-window.__CH_GET_INIT_X_ZOOM = function(bougies){
+window.__CH_GET_INIT_X_ZOOM = function(bougies){ if(!window.__CH_SAVED_PERIOD_ZOOM || !window.__CH_SAVED_PERIOD_ZOOM.hasX) return { start: 0, end: 100 };
   const a = window.__CH_SAVED_PERIOD_ZOOM;
   if(!a || !a.hasX || !Array.isArray(bougies) || bougies.length < 3) return {};
   let s = a.pctStart, e = a.pctEnd;
@@ -5163,7 +5163,7 @@ window.__chInjecterIndicateurs = function() {
         grid: new Array({ left: 45, right: 100, top: 32, bottom: 52 }),
         xAxis: new Array({ ...xBase, gridIndex: 0 }),
         yAxis: baseYAxes,
-        dataZoom: new Array({ id: "zoomX_inside", type: "inside", xAxisIndex: new Array(0), filterMode: "none", zoomOnMouseWheel: true, moveOnMouseMove: true, moveOnMouseWheel: false }, { id: "zoomX_slider", type: "slider", show: true, xAxisIndex: new Array(0), filterMode: "none", left: 45, right: 100, bottom: 32, height: 13, brushSelect: false, showDetail: false }, { id: "zoomY_inside", type: "inside", yAxisIndex: 0, filterMode: "none", zoomOnMouseWheel: "shift", moveOnMouseMove: true, moveOnMouseWheel: false }, { id: "zoomY_slider", type: "slider", show: true, orient: "vertical", yAxisIndex: 0, filterMode: "none", right: 4, top: 32, height: "72%", width: 12, brushSelect: false, showDetail: false }),
+        dataZoom: new Array({ id: "zoomX_inside", type: "inside", xAxisIndex: new Array(0), filterMode: "none", start: 0, end: 100, zoomOnMouseWheel: true, moveOnMouseMove: true, moveOnMouseWheel: false }, { id: "zoomX_slider", type: "slider", show: true, xAxisIndex: new Array(0), filterMode: "none", start: 0, end: 100, left: 45, right: 100, bottom: 32, height: 13, brushSelect: false, showDetail: false }, { id: "zoomY_inside", type: "inside", yAxisIndex: 0, filterMode: "none", zoomOnMouseWheel: "shift", moveOnMouseMove: true, moveOnMouseWheel: false }, { id: "zoomY_slider", type: "slider", show: true, orient: "vertical", yAxisIndex: 0, filterMode: "none", right: 4, top: 32, height: "72%", width: 12, brushSelect: false, showDetail: false }),
         series: extra
   }, { replaceMerge: new Array("grid") });
     } else {
