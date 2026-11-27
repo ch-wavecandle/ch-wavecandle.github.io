@@ -9470,7 +9470,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
         if (nextE > 100) { nextS = Math.max(0, nextS - (nextE - 100)); nextE = 100; }
 
         const batch = [];
-        opt.dataZoom.forEach((dz, idx) => {
+        opt.dataZoom.forEach((dz, idx) => { if(dz && (dz.orient === "vertical" || (dz.yAxisIndex !== undefined && dz.xAxisIndex === undefined))) return;
           if (dz && dz.yAxisIndex !== undefined && dz.xAxisIndex === undefined) return;
           batch.push({ dataZoomIndex: idx, start: nextS, end: nextE });
         });
@@ -9528,7 +9528,7 @@ window.__chOuvrirDocumentForum = async function(dataUrl, fileName, preloadedRows
         if (nextS < 0) { nextE -= nextS; nextS = 0; }
         if (nextE > 100) { nextS -= (nextE - 100); nextE = 100; }
         const batch = [];
-        opt.dataZoom.forEach((dz, idx) => {
+        opt.dataZoom.forEach((dz, idx) => { if(dz && (dz.orient === "vertical" || (dz.yAxisIndex !== undefined && dz.xAxisIndex === undefined))) return;
           if (dz && dz.yAxisIndex !== undefined && dz.xAxisIndex === undefined) return;
           batch.push({ dataZoomIndex: idx, start: nextS, end: nextE });
         });
