@@ -5163,7 +5163,7 @@ window.__chInjecterIndicateurs = function() {
         grid: new Array({ left: 45, right: 100, top: 32, bottom: 22 }),
         xAxis: new Array({ ...xBase, gridIndex: 0 }),
         yAxis: baseYAxes,
-        dataZoom: new Array({ id: "zoomX_inside", type: "inside", xAxisIndex: new Array(0), filterMode: "none", zoomOnMouseWheel: true, moveOnMouseMove: true, moveOnMouseWheel: false }, { id: "zoomX_slider", type: "slider", xAxisIndex: new Array(0), filterMode: "none", left: 45, right: 100, bottom: 4, height: 12, showDetail: false }, { id: "zoomY_inside", type: "inside", yAxisIndex: 0, filterMode: "none", zoomOnMouseWheel: "shift", moveOnMouseMove: true, moveOnMouseWheel: false }, { id: "zoomY_slider", type: "slider", orient: "vertical", yAxisIndex: 0, filterMode: "none", right: 4, top: 32, height: (typeof mainH !== "undefined" ? (mainH - 2) : 70) + "%", width: 12, showDetail: false }),
+        dataZoom: new Array({ id: "zoomX_inside", type: "inside", xAxisIndex: new Array(0), filterMode: "none", zoomOnMouseWheel: true, moveOnMouseMove: true, moveOnMouseWheel: false }, { id: "zoomX_slider", type: "slider", xAxisIndex: new Array(0), filterMode: "none", left: 45, right: 100, bottom: 4, height: 12, showDetail: false }, { id: "zoomY_inside", type: "inside", yAxisIndex: 0, filterMode: "none", zoomOnMouseWheel: "shift", moveOnMouseMove: true, moveOnMouseWheel: false }, { id: "zoomY_slider", type: "slider", orient: "vertical", yAxisIndex: 0, filterMode: "none", right: 4, top: 32, height: "70%", width: 12, showDetail: false }),
         series: extra
   }, { replaceMerge: new Array("grid") });
     } else {
@@ -5267,7 +5267,7 @@ window.__chInjecterIndicateurs = function() {
     grid: grids,
     xAxis: xAxes,
     yAxis: yAxes,
-    dataZoom: new Array({ id: "zoomX_inside", type: "inside", xAxisIndex: allXIdx, filterMode: "none", zoomOnMouseWheel: true, moveOnMouseMove: true, moveOnMouseWheel: false }, { id: "zoomX_slider", type: "slider", xAxisIndex: allXIdx, filterMode: "none", left: 45, right: 100, bottom: 4, height: 12, showDetail: false }, { id: "zoomY_inside", type: "inside", yAxisIndex: 0, filterMode: "none", zoomOnMouseWheel: "shift", moveOnMouseMove: true, moveOnMouseWheel: false }, { id: "zoomY_slider", type: "slider", orient: "vertical", yAxisIndex: 0, filterMode: "none", right: 4, top: 32, height: (typeof mainH !== "undefined" ? (mainH - 2) : 70) + "%", width: 12, showDetail: false }),
+    dataZoom: new Array({ id: "zoomX_inside", type: "inside", xAxisIndex: allXIdx, filterMode: "none", zoomOnMouseWheel: true, moveOnMouseMove: true, moveOnMouseWheel: false }, { id: "zoomX_slider", type: "slider", xAxisIndex: allXIdx, filterMode: "none", left: 45, right: 100, bottom: 4, height: 12, showDetail: false }, { id: "zoomY_inside", type: "inside", yAxisIndex: 0, filterMode: "none", zoomOnMouseWheel: "shift", moveOnMouseMove: true, moveOnMouseWheel: false }, { id: "zoomY_slider", type: "slider", orient: "vertical", yAxisIndex: 0, filterMode: "none", right: 4, top: 32, height: (mainH - 2) + "%", width: 12, showDetail: false }),
     series: extra
   }, { replaceMerge: new Array("grid") });
 };
