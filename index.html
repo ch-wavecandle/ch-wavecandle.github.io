@@ -11861,18 +11861,49 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
       }
 
       const isMob = window.innerWidth <= 960;
-      legendBox.style.cssText = `
-        position:absolute;
-        top:${isMob ? "42px" : "38px"};
-        right:${isMob ? "52px" : "96px"};
-        z-index:22;
-        pointer-events:none;
-        display:flex;
-        flex-wrap:wrap;
-        justify-content:flex-end;
-        gap:5px;
-        max-width:${isMob ? "64vw" : "48vw"};
-      `;
+      if(!legendBox.dataset.dragBound){
+        legendBox.dataset.dragBound = "1";
+        let dragL = false, sx = 0, sy = 0, ol = 0, ot = 0;
+        const startL = (cx, cy) => {
+          const r = legendBox.getBoundingClientRect();
+          const pr = container.getBoundingClientRect();
+          dragL = true; sx = cx; sy = cy; ol = r.left - pr.left; ot = r.top - pr.top;
+          legendBox.style.transform = "none";
+          legendBox.style.left = ol + "px";
+          legendBox.style.top = ot + "px";
+        };
+        const moveL = (cx, cy) => {
+          if(!dragL) return;
+          legendBox.dataset.userMoved = "1";
+          legendBox.style.left = Math.max(4, Math.min(container.clientWidth - 120, ol + (cx - sx))) + "px";
+          legendBox.style.top = Math.max(4, Math.min(container.clientHeight - 36, ot + (cy - sy))) + "px";
+        };
+        legendBox.addEventListener("mousedown", e => { e.preventDefault(); startL(e.clientX, e.clientY); });
+        window.addEventListener("mousemove", e => moveL(e.clientX, e.clientY));
+        window.addEventListener("mouseup", () => { dragL = false; });
+        legendBox.addEventListener("touchstart", e => { if(e.touches.length === 1){ const t = e.touches.item(0); startL(t.clientX, t.clientY); } }, { passive: true });
+        window.addEventListener("touchmove", e => { if(dragL && e.touches.length === 1){ e.preventDefault(); const t = e.touches.item(0); moveL(t.clientX, t.clientY); } }, { passive: false });
+        window.addEventListener("touchend", () => { dragL = false; });
+      }
+      if(legendBox.dataset.userMoved !== "1"){
+        legendBox.style.cssText = `
+          position:absolute;
+          top:${isMob ? "42px" : "8px"};
+          left:50%;
+          transform:translateX(-50%);
+          z-index:26;
+          pointer-events:auto;
+          cursor:move;
+          user-select:none;
+          display:flex;
+          flex-wrap:wrap;
+          justify-content:center;
+          gap:5px;
+          max-width:${isMob ? "86vw" : "46vw"};
+        `;
+      } else {
+        legendBox.style.display = "flex";
+      }
       legendBox.innerHTML = "";
       for(const it of legendItems){
         const pill = document.createElement("span");
