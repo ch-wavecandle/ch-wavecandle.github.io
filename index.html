@@ -10745,7 +10745,7 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
       left:${leftPx}px;
       top:${topPx === "auto" ? "auto" : topPx + "px"};
       bottom:${bottomPx === "auto" ? "auto" : bottomPx + "px"};
-      z-index:18;
+      z-index:1;opacity:0.65;
       pointer-events:none;
       user-select:none;
       display:flex;
@@ -10754,9 +10754,9 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
       gap:9px;
       padding:5px 11px;
       border-radius:9px;
-      background:${isClair ? "rgba(255,255,255,0.78)" : "rgba(15,23,42,0.74)"};
-      border:1px solid ${isClair ? "rgba(148,163,184,0.3)" : "rgba(56,189,248,0.24)"};
-      backdrop-filter:blur(5px);
+      background:transparent;
+      border:none;
+      
     `;
     wm.innerHTML = `
       ${logoHtml}
@@ -10833,33 +10833,60 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     white-space: nowrap !important;
   }
 
+  /* Barre de periodes en COLONNE verticale compacte sur le bord gauche */
   #ch-period-bar, .period-bar {
-    max-width: calc(100vw - 148px) !important;
-    overflow-x: auto !important;
-    white-space: nowrap !important;
+    position: fixed !important;
+    left: calc(4px + env(safe-area-inset-left)) !important;
+    top: 46px !important;
+    bottom: 76px !important;
+    width: 38px !important;
+    max-width: 38px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 3px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch !important;
     scrollbar-width: none !important;
-    padding: 2px 4px !important;
+    padding: 4px 2px !important;
+    border-radius: 10px !important;
+    z-index: 95000 !important;
   }
-  #ch-period-bar::-webkit-scrollbar { display: none !important; }
+  #ch-period-bar::-webkit-scrollbar, .period-bar::-webkit-scrollbar { display: none !important; }
   #ch-period-bar button, .period-bar button {
-    font-size: 11.5px !important;
-    padding: 4px 8px !important;
-    min-height: 28px !important;
+    width: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+    height: 25px !important;
+    min-height: 25px !important;
+    padding: 0 !important;
+    font-size: 10.5px !important;
+    font-weight: 700 !important;
+    border-radius: 6px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
   }
 
+  /* Cartouche Valeur + Logo en arriere-plan (z-index: 1) */
   #ch-chart-ticker-watermark {
-    padding: 4px 8px !important;
+    left: 48px !important;
+    top: 46px !important;
+    z-index: 1 !important;
+    opacity: 0.65 !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 2px 4px !important;
     gap: 7px !important;
-    border-radius: 8px !important;
     max-width: 58vw !important;
   }
-  #ch-chart-ticker-watermark > div:last-child > div:first-child { font-size: 12px !important; }
+  #ch-chart-ticker-watermark > div:last-child > div:first-child { font-size: 13px !important; }
   #ch-chart-ticker-watermark > div:last-child > div:last-child { font-size: 9.5px !important; }
 
-  #btnPickDir, #btnAutoDir, #btnLoadCsv, button[id*="Dossier"], button[id*="Auto"] {
-    display: none !important;
-  }
+  #btnPickDir, #btnAutoDir, #btnLoadCsv, button[id*="Dossier"], button[id*="Auto"] { display: none !important; }
   header button, div:has(> #selTicker) button {
     display: flex !important;
     align-items: center !important;
@@ -10888,14 +10915,14 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
   }
 
   #ch-hud-tools {
-    max-width: min(92vw, 310px) !important;
-    max-height: calc(100dvh - 80px) !important;
+    max-width: min(86vw, 295px) !important;
+    max-height: calc(100dvh - 82px) !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
     border-radius: 14px !important;
     box-shadow: 0 14px 36px rgba(0, 0, 0, 0.42) !important;
     z-index: 100005 !important;
-    touch-action: manipulation !important;
+    touch-action: none !important;
   }
   #ch-hud-tools select, #ch-hud-tools button {
     min-height: 36px !important;
@@ -10911,10 +10938,6 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     max-height: none !important;
     overflow: visible !important;
     padding: 0 !important;
-    top: auto !important;
-    bottom: calc(34px + env(safe-area-inset-bottom)) !important;
-    left: 10px !important;
-    right: auto !important;
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
@@ -10927,6 +10950,15 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
   function isMobileViewport(){
     return window.innerWidth <= 960;
   }
+
+  window.__CH_IS_ACTUAL_DRAW = function(sel){
+    if(!sel) return false;
+    const v = String(sel.value || "").trim().toUpperCase();
+    const lbl = (sel.options && sel.selectedIndex >= 0) ? String(sel.options.item(sel.selectedIndex)?.text || "").toUpperCase() : "";
+    if(!v || v === "NONE" || v === "CURSEUR" || v === "CURSOR" || v === "MAIN" || v === "MAIN_LIBRE" || v === "PAN" || v === "SELECT" || v === "DEFAULT") return false;
+    if(lbl.includes("MAIN LIBRE") || lbl.includes("CURSEUR")) return false;
+    return true;
+  };
 
   function openMobileActionSheetForSelect(sel){
     if(!sel || !sel.options || sel.options.length === 0) return;
@@ -10942,9 +10974,15 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
 
     const header = document.createElement("div");
     header.style.cssText = "display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(148,163,184,0.2);font-size:13.5px;font-weight:800;color:#38bdf8;";
-    const titleTxt = sel.title || sel.getAttribute("aria-label") || "Sélectionner une option";
-    header.innerHTML = `<span>${titleTxt}</span><button type="button" style="background:#ef4444;color:#fff;border:none;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;">✕</button>`;
-    header.querySelector("button").onclick = () => sheetOverlay.remove();
+    const titleSpan = document.createElement("span");
+    titleSpan.textContent = sel.title || sel.getAttribute("aria-label") || "Sélectionner une option";
+    const closeBtn = document.createElement("button");
+    closeBtn.type = "button";
+    closeBtn.textContent = "✕";
+    closeBtn.style.cssText = "background:#ef4444;color:#fff;border:none;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;";
+    closeBtn.onclick = () => sheetOverlay.remove();
+    header.appendChild(titleSpan);
+    header.appendChild(closeBtn);
     card.appendChild(header);
 
     const list = document.createElement("div");
@@ -10957,7 +10995,14 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
       const btn = document.createElement("button");
       btn.type = "button";
       btn.style.cssText = `width:100%;text-align:left;padding:11px 14px;border-radius:10px;border:1px solid ${isSelected ? "#38bdf8" : "rgba(148,163,184,0.2)"};background:${isSelected ? "rgba(56,189,248,0.2)" : "#1e293b"};color:${isSelected ? "#38bdf8" : "#f1f5f9"};font-size:13.5px;font-weight:${isSelected ? "800" : "600"};display:flex;align-items:center;justify-content:space-between;cursor:pointer;`;
-      btn.innerHTML = `<span>${opt.text}</span>${isSelected ? "<span>✓</span>" : ""}`;
+      const lblSpan = document.createElement("span");
+      lblSpan.textContent = opt.text;
+      btn.appendChild(lblSpan);
+      if(isSelected){
+        const chkSpan = document.createElement("span");
+        chkSpan.textContent = "✓";
+        btn.appendChild(chkSpan);
+      }
       btn.onclick = () => {
         sel.selectedIndex = i;
         sel.value = opt.value;
@@ -10971,84 +11016,42 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     sheetOverlay.appendChild(card);
     sheetOverlay.onclick = (e) => { if(e.target === sheetOverlay) sheetOverlay.remove(); };
     const fsHost = document.fullscreenElement || document.body;
-    fsHost.appendChild(sheetOverlay);
+    if(fsHost) fsHost.appendChild(sheetOverlay);
   }
 
-  function unlockHudInteractiveControls(){
-    const hud = document.getElementById("ch-hud-tools");
-    if(!hud || hud.dataset.controlsUnlocked) return;
-    hud.dataset.controlsUnlocked = "1";
-
-    hud.addEventListener("touchstart", function(e){
-      const t = e.target;
-      const sel = t && (t.tagName === "SELECT" ? t : t.closest("select"));
-      if(sel && isMobileViewport()){
-        e.preventDefault();
-        e.stopPropagation();
-        openMobileActionSheetForSelect(sel);
-        return;
-      }
-      if(t && (t.tagName === "BUTTON" || t.tagName === "INPUT" || t.closest("button"))){
-        e.stopPropagation();
-      }
-    }, { capture: true, passive: false });
-
-    hud.addEventListener("click", function(e){
-      const t = e.target;
-      const sel = t && (t.tagName === "SELECT" ? t : t.closest("select"));
-      if(sel && isMobileViewport()){
-        e.preventDefault();
-        e.stopPropagation();
-        openMobileActionSheetForSelect(sel);
-      }
-    }, { capture: true });
-
-    const selOutil = document.getElementById("selOutilDessin");
-    if(selOutil && !selOutil.dataset.mobAutoCollapse){
-      selOutil.dataset.mobAutoCollapse = "1";
-      selOutil.addEventListener("change", function(){
-        if(!isMobileViewport()) return;
-        const v = String(selOutil.value || "").toUpperCase();
-        const isDraw = v !== "" && v !== "NONE" && v !== "CURSEUR" && v !== "MAIN" && v !== "MAIN_LIBRE" && v !== "PAN";
-        if(isDraw){
-          if(typeof window.__CH_SET_MOB_TOOLS === "function") window.__CH_SET_MOB_TOOLS(false);
-          if(typeof window.__CH_UPDATE_MOB_BANNER === "function") window.__CH_UPDATE_MOB_BANNER(selOutil.options[selOutil.selectedIndex]?.text || v);
-        } else {
-          if(typeof window.__CH_UPDATE_MOB_BANNER === "function") window.__CH_UPDATE_MOB_BANNER("");
-        }
-      });
-    }
-  }
-
-  window.__CH_UNLOCK_HUD_CONTROLS = unlockHudInteractiveControls;
+  window.__CH_OPEN_MOB_SHEET = openMobileActionSheetForSelect;
 })();
 </script>
 <script id="ch-mobile-pro-fab-and-draw">
 (function(){
-  function isMobileViewport(){
-    return window.innerWidth <= 960;
-  }
+  function isMobileViewport(){ return window.innerWidth <= 960; }
 
-  window.__CH_UPDATE_MOB_BANNER = function(toolLabel){
+  window.__CH_MOB_DRAW_BANNER = function(toolLabel){
     let banner = document.getElementById("ch-mob-draw-banner");
-    if(!toolLabel){
-      if(banner) banner.style.display = "none";
-      return;
-    }
+    if(!toolLabel){ if(banner) banner.style.display = "none"; return; }
     const host = document.fullscreenElement || document.body;
+    if(!host) return;
     if(!banner){
       banner = document.createElement("div");
       banner.id = "ch-mob-draw-banner";
       banner.style.cssText = "position:fixed;bottom:calc(34px + env(safe-area-inset-bottom));right:10px;z-index:100006;background:rgba(15,23,42,0.92);color:#38bdf8;border:1px solid #38bdf8;border-radius:999px;padding:7px 12px;font-size:11.5px;font-weight:700;display:flex;align-items:center;gap:8px;box-shadow:0 6px 18px rgba(0,0,0,0.35);";
     }
     if(banner.parentElement !== host) host.appendChild(banner);
-    banner.style.display = "flex";
-    banner.innerHTML = `<span>✏️ ${toolLabel} : touchez & glissez</span><button type="button" id="ch-mob-exit-draw" style="background:#ef4444;color:#fff;border:none;border-radius:999px;padding:2px 8px;font-size:11px;font-weight:700;cursor:pointer;">Fin</button>`;
-    document.getElementById("ch-mob-exit-draw").onclick = () => {
+    banner.innerHTML = "";
+    const txtSpan = document.createElement("span");
+    txtSpan.textContent = "✏️ " + toolLabel + " : touchez & glissez";
+    const exitBtn = document.createElement("button");
+    exitBtn.type = "button";
+    exitBtn.textContent = "Fin";
+    exitBtn.style.cssText = "background:#ef4444;color:#fff;border:none;border-radius:999px;padding:2px 8px;font-size:11px;font-weight:700;cursor:pointer;";
+    exitBtn.onclick = () => {
       const selOutil = document.getElementById("selOutilDessin");
-      if(selOutil){ selOutil.value = "NONE"; selOutil.dispatchEvent(new Event("change")); }
+      if(selOutil){ selOutil.selectedIndex = 0; selOutil.dispatchEvent(new Event("change", { bubbles: true })); }
       banner.style.display = "none";
     };
+    banner.appendChild(txtSpan);
+    banner.appendChild(exitBtn);
+    banner.style.display = "flex";
   };
 
   window.__CH_SET_MOB_TOOLS = function(open){
@@ -11059,47 +11062,126 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
       hud.classList.remove("ch-mob-tools-closed");
       hud.style.display = "flex";
       hud.style.flexDirection = "column";
-      hud.style.top = "46px";
-      hud.style.bottom = "calc(34px + env(safe-area-inset-bottom))";
-      hud.style.left = "10px";
-      fab.innerHTML = "<span>✕ Fermer Outils</span>";
+      if(!hud.dataset.userMoved){
+        hud.style.top = "46px";
+        hud.style.bottom = "calc(34px + env(safe-area-inset-bottom))";
+        hud.style.left = "48px";
+      }
+      fab.textContent = "✕ Fermer Outils (Glisser)";
       fab.style.background = "linear-gradient(135deg,#dc2626,#b91c1c)";
       fab.style.marginBottom = "8px";
     } else {
       hud.classList.add("ch-mob-tools-closed");
-      hud.style.top = "auto";
-      hud.style.bottom = "calc(34px + env(safe-area-inset-bottom))";
-      fab.innerHTML = "<span>🛠 Outils & Tracés</span>";
+      if(!hud.dataset.userMoved){
+        hud.style.top = "auto";
+        hud.style.bottom = "calc(34px + env(safe-area-inset-bottom))";
+        hud.style.left = "48px";
+      }
+      fab.textContent = "✥ 🛠 Outils";
       fab.style.background = "linear-gradient(135deg,#0284c7,#0369a1)";
       fab.style.marginBottom = "0";
     }
   };
 
-  function setupMobileToolsFab(){
+  window.__CH_IS_MOB_VIEW = isMobileViewport;
+})();
+</script>
+<script id="ch-mobile-pro-drag-and-bridge">
+(function(){
+  function setupMobileToolsFabAndDrag(){
     const hud = document.getElementById("ch-hud-tools");
     if(!hud) return;
-    if(!isMobileViewport()){
+    const isMob = (typeof window.__CH_IS_MOB_VIEW === "function") ? window.__CH_IS_MOB_VIEW() : (window.innerWidth <= 960);
+
+    if(!hud.dataset.controlsUnlocked){
+      hud.dataset.controlsUnlocked = "1";
+      hud.addEventListener("touchstart", function(e){
+        const t = e.target;
+        const sel = t && (t.tagName === "SELECT" ? t : t.closest("select"));
+        if(sel && isMob && typeof window.__CH_OPEN_MOB_SHEET === "function"){
+          e.preventDefault(); e.stopPropagation(); window.__CH_OPEN_MOB_SHEET(sel); return;
+        }
+        if(t && (t.tagName === "BUTTON" || t.tagName === "INPUT" || t.closest("button"))) e.stopPropagation();
+      }, { capture: true, passive: false });
+
+      hud.addEventListener("click", function(e){
+        const t = e.target;
+        const sel = t && (t.tagName === "SELECT" ? t : t.closest("select"));
+        if(sel && isMob && typeof window.__CH_OPEN_MOB_SHEET === "function"){
+          e.preventDefault(); e.stopPropagation(); window.__CH_OPEN_MOB_SHEET(sel);
+        }
+      }, { capture: true });
+
+      const selOutil = document.getElementById("selOutilDessin");
+      if(selOutil && !selOutil.dataset.mobAutoCollapse){
+        selOutil.dataset.mobAutoCollapse = "1";
+        selOutil.addEventListener("change", function(){
+          if(window.innerWidth > 960) return;
+          if(typeof window.__CH_IS_ACTUAL_DRAW === "function" && window.__CH_IS_ACTUAL_DRAW(selOutil)){
+            if(typeof window.__CH_SET_MOB_TOOLS === "function") window.__CH_SET_MOB_TOOLS(false);
+            const lbl = selOutil.options.item(selOutil.selectedIndex)?.text || selOutil.value;
+            if(typeof window.__CH_MOB_DRAW_BANNER === "function") window.__CH_MOB_DRAW_BANNER(lbl);
+          } else {
+            if(typeof window.__CH_MOB_DRAW_BANNER === "function") window.__CH_MOB_DRAW_BANNER("");
+          }
+        });
+      }
+    }
+
+    if(!isMob){
       hud.classList.remove("ch-mob-tools-closed");
       const fabOld = document.getElementById("ch-mob-tools-fab");
       if(fabOld) fabOld.style.display = "none";
       return;
     }
+
     if(!hud.dataset.mobFabInit){
       hud.dataset.mobFabInit = "1";
       hud.classList.add("ch-mob-tools-closed");
+      hud.style.top = "auto";
+      hud.style.bottom = "calc(34px + env(safe-area-inset-bottom))";
+      hud.style.left = "48px";
     }
+
     let fab = document.getElementById("ch-mob-tools-fab");
     if(!fab){
       fab = document.createElement("button");
       fab.id = "ch-mob-tools-fab";
       fab.type = "button";
-      fab.style.cssText = "display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 14px;border-radius:999px;background:linear-gradient(135deg,#0284c7,#0369a1);color:#ffffff;border:1px solid rgba(255,255,255,0.3);font-family:Inter,system-ui,sans-serif;font-size:12px;font-weight:700;box-shadow:0 6px 18px rgba(2,132,199,0.45);cursor:pointer;pointer-events:auto;";
-      fab.innerHTML = "<span>🛠 Outils & Tracés</span>";
-      fab.onclick = (e) => {
-        e.stopPropagation();
-        const isClosed = hud.classList.contains("ch-mob-tools-closed");
-        window.__CH_SET_MOB_TOOLS(isClosed);
-      };
+      fab.style.cssText = "display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 13px;border-radius:999px;background:linear-gradient(135deg,#0284c7,#0369a1);color:#ffffff;border:1px solid rgba(255,255,255,0.3);font-family:Inter,system-ui,sans-serif;font-size:12px;font-weight:700;box-shadow:0 6px 18px rgba(2,132,199,0.45);cursor:grab;pointer-events:auto;touch-action:none;";
+      fab.textContent = "✥ 🛠 Outils";
+
+      let dragging = false, moved = false, startX = 0, startY = 0, origLeft = 0, origTop = 0;
+      fab.addEventListener("touchstart", function(e){
+        if(e.touches.length !== 1) return;
+        const t = e.touches.item(0);
+        const r = hud.getBoundingClientRect();
+        dragging = true; moved = false; startX = t.clientX; startY = t.clientY; origLeft = r.left; origTop = r.top;
+      }, { passive: true });
+
+      fab.addEventListener("touchmove", function(e){
+        if(!dragging || e.touches.length !== 1) return;
+        const t = e.touches.item(0);
+        const dx = t.clientX - startX, dy = t.clientY - startY;
+        if(Math.abs(dx) > 6 || Math.abs(dy) > 6) moved = true;
+        if(moved){
+          e.preventDefault();
+          hud.dataset.userMoved = "1";
+          hud.style.left = Math.max(44, Math.min(window.innerWidth - 110, origLeft + dx)) + "px";
+          hud.style.top = Math.max(44, Math.min(window.innerHeight - 68, origTop + dy)) + "px";
+          hud.style.bottom = "auto"; hud.style.right = "auto";
+        }
+      }, { passive: false });
+
+      fab.addEventListener("touchend", function(e){
+        if(!dragging) return;
+        dragging = false;
+        if(!moved){
+          e.stopPropagation();
+          if(typeof window.__CH_SET_MOB_TOOLS === "function") window.__CH_SET_MOB_TOOLS(hud.classList.contains("ch-mob-tools-closed"));
+        }
+      }, { passive: false });
+
       hud.insertBefore(fab, hud.firstChild);
     }
     fab.style.display = "inline-flex";
@@ -11110,72 +11192,47 @@ body.theme-clair #chLogoPickerDrop { background: #FFFFFF; color: #0F172A; border
     if(!container || container.dataset.touchBridgeInstalled) return;
     container.dataset.touchBridgeInstalled = "1";
 
-    function isDrawingToolSelected(){
-      const selTool = document.getElementById("selOutilDessin");
-      if(!selTool) return false;
-      const v = String(selTool.value || "").toUpperCase();
-      return v !== "" && v !== "NONE" && v !== "CURSEUR" && v !== "MAIN" && v !== "MAIN_LIBRE" && v !== "PAN";
-    }
-
-    function dispatchSimulatedMouse(type, touch, target){
+    function simMouse(type, touch, target){
       if(!touch || !target) return;
-      const ev = new MouseEvent(type, {
-        bubbles: true,
-        cancelable: true,
-        view: window,
-        clientX: touch.clientX,
-        clientY: touch.clientY,
-        screenX: touch.screenX,
-        screenY: touch.screenY,
-        button: 0,
-        buttons: type === "mouseup" ? 0 : 1
-      });
-      target.dispatchEvent(ev);
+      target.dispatchEvent(new MouseEvent(type, {
+        bubbles: true, cancelable: true, view: window,
+        clientX: touch.clientX, clientY: touch.clientY, screenX: touch.screenX, screenY: touch.screenY,
+        button: 0, buttons: type === "mouseup" ? 0 : 1
+      }));
     }
 
-    let activeTouchDrawing = false;
-
+    let activeDraw = false;
     container.addEventListener("touchstart", function(e){
       if(e.touches.length !== 1) return;
-      if(isDrawingToolSelected()){
-        activeTouchDrawing = true;
-        e.preventDefault();
+      const selTool = document.getElementById("selOutilDessin");
+      if(typeof window.__CH_IS_ACTUAL_DRAW === "function" && window.__CH_IS_ACTUAL_DRAW(selTool)){
+        activeDraw = true; e.preventDefault();
         const t = e.touches.item(0);
         const target = document.elementFromPoint(t.clientX, t.clientY) || container;
-        dispatchSimulatedMouse("mousemove", t, target);
-        dispatchSimulatedMouse("mousedown", t, target);
+        simMouse("mousemove", t, target); simMouse("mousedown", t, target);
       }
     }, { passive: false });
 
     container.addEventListener("touchmove", function(e){
-      if(!activeTouchDrawing || e.touches.length !== 1) return;
+      if(!activeDraw || e.touches.length !== 1) return;
       e.preventDefault();
       const t = e.touches.item(0);
       const target = document.elementFromPoint(t.clientX, t.clientY) || container;
-      dispatchSimulatedMouse("mousemove", t, target);
+      simMouse("mousemove", t, target);
     }, { passive: false });
 
     container.addEventListener("touchend", function(e){
-      if(!activeTouchDrawing) return;
-      activeTouchDrawing = false;
+      if(!activeDraw) return;
+      activeDraw = false;
       const t = e.changedTouches ? e.changedTouches.item(0) : null;
       const target = (t && document.elementFromPoint(t.clientX, t.clientY)) || container;
-      dispatchSimulatedMouse("mouseup", t, target);
-      dispatchSimulatedMouse("click", t, target);
+      simMouse("mouseup", t, target); simMouse("click", t, target);
     }, { passive: false });
   }
 
-  window.addEventListener("load", () => {
-    if(typeof window.__CH_UNLOCK_HUD_CONTROLS === "function") window.__CH_UNLOCK_HUD_CONTROLS();
-    setupMobileToolsFab();
-    installTouchDrawingBridge();
-  });
-  window.addEventListener("resize", setupMobileToolsFab);
-  setInterval(() => {
-    if(typeof window.__CH_UNLOCK_HUD_CONTROLS === "function") window.__CH_UNLOCK_HUD_CONTROLS();
-    setupMobileToolsFab();
-    installTouchDrawingBridge();
-  }, 600);
+  window.addEventListener("load", () => { setupMobileToolsFabAndDrag(); installTouchDrawingBridge(); });
+  window.addEventListener("resize", setupMobileToolsFabAndDrag);
+  setInterval(() => { setupMobileToolsFabAndDrag(); installTouchDrawingBridge(); }, 600);
 })();
 </script>
 </body>
